@@ -19,6 +19,7 @@ package net.eiroca.library.diagnostics.monitors;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.diagnostics.CommandException;
@@ -26,6 +27,7 @@ import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MeasureGroup;
 import net.eiroca.library.metrics.derived.HitMissRatioMeasure;
 import net.eiroca.library.metrics.derived.IDerivedMeasure;
+import net.eiroca.library.metrics.derived.RateMeasure;
 import redis.clients.jedis.Jedis;
 
 public class RedisMonitor extends TCPServerMonitor {
@@ -33,29 +35,31 @@ public class RedisMonitor extends TCPServerMonitor {
   public static final String CONFIG_PORT = "port";
   public static final String CONFIG_AUTH = "redisAuth";
 
-  protected MeasureGroup mgRedisInfo = new MeasureGroup("Redis Statistics");
+  protected MeasureGroup mgRedisInfo = new MeasureGroup("Redis Statistics", "Redis - {0}");
 
   protected Measure mServerResult = new Measure(mgServerInfo, "Result");
   protected Measure mServerStatus = new Measure(mgServerInfo, "Status");
 
-  protected Measure mRedisServerUptime = new Measure(mgRedisInfo, "Redis - Server - uptime");
-  protected Measure mRedisStatsOps = new Measure(mgRedisInfo, "Redis - Stats - instantaneous_ops_per_sec");
-  protected Measure mRedisStatsCmds = new Measure(mgRedisInfo, "Redis - Stats - total_commands_processed");
-  protected Measure mRedisStatsHits = new Measure(mgRedisInfo, "Redis - Stats - keyspace_hits");
-  protected Measure mRedisStatsMiss = new Measure(mgRedisInfo, "Redis - Stats - keyspace_misses");
-  protected Measure mRedisClientsConn = new Measure(mgRedisInfo, "Redis - Clients - connected_clients");
-  protected Measure mRedisMemoryUsed = new Measure(mgRedisInfo, "Redis - Memory - used_memory");
-  protected Measure mRedisMemoryPeak = new Measure(mgRedisInfo, "Redis - Memory - used_memory_peak");
-  protected Measure mRedisMemoryOverhead = new Measure(mgRedisInfo, "Redis - Memory - used_memory_overhead");
-  protected Measure mRedisReplicationLastIO = new Measure(mgRedisInfo, "Redis - Replication - master_last_io_seconds_ago");
-  protected Measure mRedisReplicationSyncIn = new Measure(mgRedisInfo, "Redis - Replication - master_sync_in_progress");
-  protected Measure mRedisReplicationSlaves = new Measure(mgRedisInfo, "Redis - Replication - connected_slaves");
-  protected Measure mRedisKeyspaceKeys = new Measure(mgRedisInfo, "Redis - Keyspace - keys");
-  protected Measure mRedisRDBLstSave = new Measure(mgRedisInfo, "Redis - Persistence - rdb_last_bgsave_time_sec");
-  protected Measure mRedisRDBBkgSave = new Measure(mgRedisInfo, "Redis - Persistence - rdb_bgsave_in_progress");
-  protected Measure mRedisRDBChanges = new Measure(mgRedisInfo, "Redis - Persistence - rdb_changes_since_last_save");
+  protected Measure mRedisServerUptime = new Measure(mgRedisInfo, "Server - uptime");
+  protected Measure mRedisStatsOps = new Measure(mgRedisInfo, "Stats - instantaneous_ops_per_sec");
+  protected Measure mRedisStatsCmds = new Measure(mgRedisInfo, "Stats - total_commands_processed");
+  protected Measure mRedisStatsHits = new Measure(mgRedisInfo, "Stats - keyspace_hits");
+  protected Measure mRedisStatsMiss = new Measure(mgRedisInfo, "Stats - keyspace_misses");
+  protected Measure mRedisClientsConn = new Measure(mgRedisInfo, "Clients - connected_clients");
+  protected Measure mRedisMemoryUsed = new Measure(mgRedisInfo, "Memory - used_memory");
+  protected Measure mRedisMemoryPeak = new Measure(mgRedisInfo, "Memory - used_memory_peak");
+  protected Measure mRedisMemoryOverhead = new Measure(mgRedisInfo, "Memory - used_memory_overhead");
+  protected Measure mRedisReplicationLastIO = new Measure(mgRedisInfo, "Replication - master_last_io_seconds_ago");
+  protected Measure mRedisReplicationSyncIn = new Measure(mgRedisInfo, "Replication - master_sync_in_progress");
+  protected Measure mRedisReplicationSlaves = new Measure(mgRedisInfo, "Replication - connected_slaves");
+  protected Measure mRedisKeyspaceKeys = new Measure(mgRedisInfo, "Keyspace - keys");
+  protected Measure mRedisRDBLstSave = new Measure(mgRedisInfo, "Persistence - rdb_last_bgsave_time_sec");
+  protected Measure mRedisRDBBkgSave = new Measure(mgRedisInfo, "Persistence - rdb_bgsave_in_progress");
+  protected Measure mRedisRDBChanges = new Measure(mgRedisInfo, "Persistence - rdb_changes_since_last_save");
 
-  protected IDerivedMeasure mRedisHitRatio = new HitMissRatioMeasure(mgRedisInfo, "Redis - Keyspace Hit Ratio", mRedisStatsHits, mRedisStatsMiss);
+  protected IDerivedMeasure mRedisHitRatio = new HitMissRatioMeasure(mgRedisInfo, "Keyspace Hit Ratio", mRedisStatsHits, mRedisStatsMiss);
+  protected IDerivedMeasure mRedisHitsPerSec = new RateMeasure(mgRedisInfo, "Keyspace Hit Rate", mRedisStatsHits, TimeUnit.SECONDS, 0.0);
+  protected IDerivedMeasure mRedisMissPerSec = new RateMeasure(mgRedisInfo, "Keyspace Miss Rate", mRedisStatsMiss, TimeUnit.SECONDS, 0.0);
 
   protected Map<String, Measure> mapping = new HashMap<>();
 

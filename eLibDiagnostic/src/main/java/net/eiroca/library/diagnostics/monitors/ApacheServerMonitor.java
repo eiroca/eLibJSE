@@ -16,6 +16,8 @@
  **/
 package net.eiroca.library.diagnostics.monitors;
 
+import java.net.InetAddress;
+import java.net.URL;
 import java.util.List;
 import java.util.StringTokenizer;
 import net.eiroca.ext.library.http.utils.URLFetcherConfig;
@@ -57,12 +59,22 @@ public class ApacheServerMonitor extends WebServerMonitor {
   public SimpleMeasure sbOpenSlot = new Measure(mgApacheScoreboard, "Open Slot");
 
   @Override
+  public boolean preCheck(final InetAddress host) throws CommandException {
+    final boolean ok = super.preCheck(host);
+    if (ok) {
+      final URL baseURL = getURL(ApacheServerMonitor.CONFIG_MODSTATUSURL, host.getHostName());
+      context.info("ElasticSearch URL: " + baseURL);
+      fetcher.setURL(baseURL);
+      fetcher.setMethod(URLFetcherConfig.METHOD_GET, null);
+    }
+    return ok;
+  }
+
+  @Override
   public boolean runCheck() throws CommandException {
     if (urlCheck) {
       super.runCheck();
     }
-    fetcher.setURL(getURL(ApacheServerMonitor.CONFIG_MODSTATUSURL, targetHost.getHostString()));
-    fetcher.setMethod(URLFetcherConfig.METHOD_GET, null);
     context.info("Loading mod_status: ", fetcher.getURL());
     String result;
     try {

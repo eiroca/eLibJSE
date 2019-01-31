@@ -28,7 +28,7 @@ import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.diagnostics.validators.GenericValidator;
 import net.eiroca.library.system.IContext;
 
-public class GenericHTTPMonitor extends TCPServerMonitor {
+public class GenericHTTPMonitor extends ServerMonitor {
 
   protected URLFetcher fetcher;
   protected GenericValidator validator;
