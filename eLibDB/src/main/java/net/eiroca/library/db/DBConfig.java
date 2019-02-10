@@ -261,4 +261,10 @@ public class DBConfig {
     this.database = database;
   }
 
+  @Override
+  public String toString() {
+    return "DBConfig [SQLType=" + SQLType + ", server=" + server + ", port=" + port + ", database=" + database + ", username=" + username + ", password=" + password + ", sid=" + sid + ", URL=" + URL + ", windows=" + windows + ", DB2schema=" + DB2schema + ", connectionUrl=" + connectionUrl
+        + ", sqlclass=" + sqlclass + ", prepared=" + prepared + ", lastError=" + lastError + ", context=" + context + "]";
+  }
+
 }

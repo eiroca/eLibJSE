@@ -117,6 +117,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
     }
     validateColumn = context.getConfigString(DatabaseMonitor.CONFIG_VALIDATECOLUMN, null);
     runSQL = context.getConfigBoolean(DatabaseMonitor.CONFIG_RUNSQL, true);
+    context.info("Config: " + config);
   }
 
   @Override
