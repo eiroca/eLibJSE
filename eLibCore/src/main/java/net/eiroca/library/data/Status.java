@@ -16,42 +16,46 @@
  **/
 package net.eiroca.library.data;
 
-public class WeightedWord {
+public class Status {
 
-  double weight;
-  String word;
+  public static final Status OK = new Status(0, "OK");
 
-  public double getWeight() {
-    return weight;
+  private final int code;
+  private final String message;
+
+  public Status(int code, String message) {
+    this.code = code;
+    this.message = message;
   }
 
-  public String getWord() {
-    return word;
+  public Status(Status s) {
+    this.code = s.code;
+    this.message = s.message;
   }
 
-  public WeightedWord(final String word, final double weight) {
-    super();
-    this.weight = weight;
-    this.word = word;
+  public int getCode() {
+    return code;
+  }
+
+  public String getMessage() {
+    return message;
+  }
+
+  @Override
+  public int hashCode() {
+    return code;
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (!(o instanceof Status)) { return false; }
+    final Status os = (Status)o;
+    return this.getCode() == os.getCode();
   }
 
   @Override
   public String toString() {
-    return "WeightedWord [weight=" + weight + ", word='" + word + "']";
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    WeightedWord other = (WeightedWord)obj;
-    if (Double.doubleToLongBits(weight) != Double.doubleToLongBits(other.weight)) return false;
-    if (word == null) {
-      if (other.word != null) return false;
-    }
-    else if (!word.equals(other.word)) return false;
-    return true;
+    return "Status [code=" + code + ", message='" + message + "']";
   }
 
 }
