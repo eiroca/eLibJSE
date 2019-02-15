@@ -20,7 +20,7 @@ import java.io.IOException;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.BasicHttpContext;
@@ -54,7 +54,7 @@ public class ElasticSenderThread implements Runnable {
   @Override
   public void run() {
     ElasticSenderThread.logger.debug("Running...");
-    final HttpPut httpPut = new HttpPut(owner.elasticServer);
+    final HttpPost httpPut = new HttpPost(owner.elasticServer);
     httpPut.setEntity(entity);
     httpPut.setHeader(ElasticSenderThread.HEADER_ACCEPT, ElasticSenderThread.STR_APPLICATIONJSON);
     httpPut.setHeader(ElasticSenderThread.HEADER_CONTENT_TYPE, ElasticSenderThread.STR_BULKMIMETYPE + ElasticSenderThread.STR_CHARSET + entity.getContentEncoding());

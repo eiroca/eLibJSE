@@ -24,11 +24,11 @@ public class Registry {
   private final HashMap<String, String> names = new HashMap<>();
 
   public void addEntry(final String classname) {
-    names.put(defaultName, classname);
+    names.put(defaultName.toLowerCase(), classname);
   }
 
   public void addEntry(final String name, final String classname) {
-    names.put(name, classname);
+    names.put(name.toLowerCase(), classname);
   }
 
   public String defaultName() {
