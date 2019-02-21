@@ -2,16 +2,16 @@
  *
  * Copyright (C) 2001-2019 eIrOcA (eNrIcO Croce & sImOnA Burzio) - AGPL >= 3.0
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General
- * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this program. If not, see
- * <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
 package net.eiroca.ext.library.gson;
@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -108,6 +109,16 @@ public class SimpleJson {
     final String propertyName = getPropertyName(name);
     final JsonObject node = getNode(name);
     node.addProperty(propertyName, value);
+  }
+
+  public void addProperty(String name, String[] value) {
+    final String propertyName = getPropertyName(name);
+    final JsonObject node = getNode(name);
+    JsonArray e = new JsonArray();
+    for (String s : value) {
+      e.add(s);
+    }
+    node.add(propertyName, e);
   }
 
   public void addProperty(final String name, final Date value, final SimpleDateFormat sdf) {

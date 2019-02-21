@@ -80,7 +80,7 @@ public class ElasticBulk {
     }
   }
 
-  private void flush() throws Exception {
+  public void flush() throws Exception {
     if (data.size() < 1) { return; }
     final long flushStartTime = System.currentTimeMillis();
     final StringBuilder body = new StringBuilder();
