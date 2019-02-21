@@ -60,7 +60,7 @@ public class MeasureGroup {
 
   public Measure find(final String measureName, final boolean createIfMissing) {
     Measure m = null;
-    for (Measure cur : metrics) {
+    for (final Measure cur : metrics) {
       if (cur.getName().equals(measureName)) {
         m = cur;
         break;

@@ -44,19 +44,19 @@ public class DeltaMeasure extends Measure implements IDerivedMeasure {
   @Override
   public void refresh() {
     super.reset();
-    MeasureSnapshot oldSnap = SnapshotStorage.get(id);
+    final MeasureSnapshot oldSnap = SnapshotStorage.get(id);
     SnapshotStorage.put(id, new MeasureSnapshot(observed));
-    if (oldSnap == null) return;
+    if (oldSnap == null) { return; }
     setValue(observed.getValue() - oldSnap.datum.value);
     if (observed.hasSplittings()) {
-      for (MeasureSplitting ms : observed.getSplittings()) {
-        String splitName = ms.getName();
-        Map<String, Datum> split = oldSnap.splittings.get(splitName);
+      for (final MeasureSplitting ms : observed.getSplittings()) {
+        final String splitName = ms.getName();
+        final Map<String, Datum> split = oldSnap.splittings.get(splitName);
         if (split != null) {
-          MeasureSplitting dms = getSplitting(splitName);
-          for (SimpleMeasure mm : ms.getSplits()) {
-            String splitKey = mm.getName();
-            Datum old = split.get(splitKey);
+          final MeasureSplitting dms = getSplitting(splitName);
+          for (final SimpleMeasure mm : ms.getSplits()) {
+            final String splitKey = mm.getName();
+            final Datum old = split.get(splitKey);
             if (old != null) {
               dms.setValue(splitKey, mm.getValue() - old.value);
             }

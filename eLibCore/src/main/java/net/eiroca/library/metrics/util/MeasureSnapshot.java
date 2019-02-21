@@ -28,12 +28,12 @@ public class MeasureSnapshot {
   public Datum datum;
   public Map<String, Map<String, Datum>> splittings = new HashMap<>();
 
-  public MeasureSnapshot(Measure m) {
+  public MeasureSnapshot(final Measure m) {
     datum = new Datum(m);
     if (m.hasSplittings()) {
-      for (MeasureSplitting ms : m.getSplittings()) {
-        Map<String, Datum> snap = splittings.put(ms.getName(), new HashMap<>());
-        for (SimpleMeasure mm : ms.getSplits()) {
+      for (final MeasureSplitting ms : m.getSplittings()) {
+        final Map<String, Datum> snap = splittings.put(ms.getName(), new HashMap<>());
+        for (final SimpleMeasure mm : ms.getSplits()) {
           snap.put(mm.getName(), new Datum(mm));
         }
       }

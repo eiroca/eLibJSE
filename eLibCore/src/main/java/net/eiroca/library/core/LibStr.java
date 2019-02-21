@@ -175,13 +175,13 @@ final public class LibStr {
     return sb.toString();
   }
 
-  final public static String fixPath(String path) {
+  final public static String fixPath(final String path) {
     if (path == null) { return "/"; }
     if (!path.startsWith("/")) { return "/" + path; }
     return path;
   }
 
-  final public static String fixPathWithSlash(String path) {
+  final public static String fixPathWithSlash(final String path) {
     if (path == null) { return "/"; }
     if (!path.endsWith("/")) { return path + "/"; }
     return path;

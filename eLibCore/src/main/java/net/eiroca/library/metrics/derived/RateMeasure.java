@@ -36,7 +36,7 @@ public class RateMeasure extends Measure implements IDerivedMeasure {
   private final TimeUnit timeUnit;
   private final Double minRate;
 
-  public RateMeasure(final MeasureGroup mg, final String name, final Measure observed, TimeUnit timeUnit, Double minRate) {
+  public RateMeasure(final MeasureGroup mg, final String name, final Measure observed, final TimeUnit timeUnit, final Double minRate) {
     super(mg, name);
     this.observed = observed;
     this.timeUnit = timeUnit;
@@ -46,30 +46,34 @@ public class RateMeasure extends Measure implements IDerivedMeasure {
   @Override
   public void refresh() {
     super.reset();
-    MeasureSnapshot oldSnap = SnapshotStorage.get(id);
+    final MeasureSnapshot oldSnap = SnapshotStorage.get(id);
     SnapshotStorage.put(id, new MeasureSnapshot(observed));
-    if (oldSnap == null) return;
-    long duration = observed.getTimeStamp() - oldSnap.datum.timeStamp;
+    if (oldSnap == null) { return; }
+    final long duration = observed.getTimeStamp() - oldSnap.datum.timeStamp;
     double diff = observed.getValue() - oldSnap.datum.value;
-    double timeDivisor = ((double)duration) / timeUnit.toMillis(1);
+    final double timeDivisor = ((double)duration) / timeUnit.toMillis(1);
     double rate = 0;
-    if (timeDivisor > ZERO) {
+    if (timeDivisor > RateMeasure.ZERO) {
       rate = diff / timeDivisor;
-      if ((minRate != null) && (rate < minRate)) rate = minRate;
+      if ((minRate != null) && (rate < minRate)) {
+        rate = minRate;
+      }
       setValue(rate);
       if (observed.hasSplittings()) {
-        for (MeasureSplitting ms : observed.getSplittings()) {
-          String splitName = ms.getName();
-          Map<String, Datum> split = oldSnap.splittings.get(splitName);
+        for (final MeasureSplitting ms : observed.getSplittings()) {
+          final String splitName = ms.getName();
+          final Map<String, Datum> split = oldSnap.splittings.get(splitName);
           if (split != null) {
-            MeasureSplitting dms = getSplitting(splitName);
-            for (SimpleMeasure mm : ms.getSplits()) {
-              String splitKey = mm.getName();
-              Datum old = split.get(splitKey);
+            final MeasureSplitting dms = getSplitting(splitName);
+            for (final SimpleMeasure mm : ms.getSplits()) {
+              final String splitKey = mm.getName();
+              final Datum old = split.get(splitKey);
               if (old != null) {
                 diff = mm.getValue() - old.value;
                 rate = diff / timeDivisor;
-                if ((minRate != null) && (rate < minRate)) rate = minRate;
+                if ((minRate != null) && (rate < minRate)) {
+                  rate = minRate;
+                }
                 dms.setValue(splitKey, rate);
               }
             }

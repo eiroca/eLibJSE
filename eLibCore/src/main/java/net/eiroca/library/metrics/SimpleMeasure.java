@@ -77,13 +77,15 @@ public class SimpleMeasure {
   }
 
   public void setValue(final double value) {
-    this.datum.value = value;
+    datum.value = value;
     datum.timeStamp = System.nanoTime();
   }
 
   public void addValue(final double value) {
-    if (datum.timeStamp == 0) datum.timeStamp = System.nanoTime();
-    this.datum.value += value;
+    if (datum.timeStamp == 0) {
+      datum.timeStamp = System.nanoTime();
+    }
+    datum.value += value;
   }
 
   public long getTimeStamp() {

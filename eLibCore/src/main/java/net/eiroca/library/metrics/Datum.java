@@ -24,14 +24,14 @@ public class Datum {
   public Datum() {
   }
 
-  public Datum(SimpleMeasure m) {
+  public Datum(final SimpleMeasure m) {
     if (m.hasValue()) {
-      this.timeStamp = m.getTimeStamp();
-      this.value = m.getValue();
+      timeStamp = m.getTimeStamp();
+      value = m.getValue();
     }
     else {
-      this.timeStamp = System.currentTimeMillis();
-      this.value = 0;
+      timeStamp = System.currentTimeMillis();
+      value = 0;
     }
   }
 

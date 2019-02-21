@@ -41,30 +41,30 @@ public class GrowMeasure extends Measure implements IDerivedMeasure {
   @Override
   public void refresh() {
     super.reset();
-    MeasureSnapshot snap = SnapshotStorage.get(id);
+    final MeasureSnapshot snap = SnapshotStorage.get(id);
     SnapshotStorage.put(id, new MeasureSnapshot(observed));
-    if (snap == null) return;
+    if (snap == null) { return; }
     double diff = observed.getValue() - snap.datum.value;
     double base = snap.datum.value;
     double rate = 0;
-    if (base > ZERO) {
-      rate = diff / base - 1;
+    if (base > GrowMeasure.ZERO) {
+      rate = (diff / base) - 1;
       setValue(rate);
     }
     if (observed.hasSplittings()) {
-      for (MeasureSplitting ms : observed.getSplittings()) {
-        String splitName = ms.getName();
-        Map<String, Datum> split = snap.splittings.get(splitName);
+      for (final MeasureSplitting ms : observed.getSplittings()) {
+        final String splitName = ms.getName();
+        final Map<String, Datum> split = snap.splittings.get(splitName);
         if (split != null) {
-          MeasureSplitting dms = getSplitting(splitName);
-          for (SimpleMeasure mm : ms.getSplits()) {
-            String splitKey = mm.getName();
-            Datum old = split.get(splitKey);
+          final MeasureSplitting dms = getSplitting(splitName);
+          for (final SimpleMeasure mm : ms.getSplits()) {
+            final String splitKey = mm.getName();
+            final Datum old = split.get(splitKey);
             if (old != null) {
               diff = mm.getValue() - old.value;
               base = old.value;
-              if (base > ZERO) {
-                rate = diff / base - 1;
+              if (base > GrowMeasure.ZERO) {
+                rate = (diff / base) - 1;
                 dms.setValue(splitKey, rate);
               }
             }

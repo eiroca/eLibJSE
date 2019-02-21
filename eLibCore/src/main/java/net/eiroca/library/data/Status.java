@@ -23,14 +23,14 @@ public class Status {
   private final int code;
   private final String message;
 
-  public Status(int code, String message) {
+  public Status(final int code, final String message) {
     this.code = code;
     this.message = message;
   }
 
-  public Status(Status s) {
-    this.code = s.code;
-    this.message = s.message;
+  public Status(final Status s) {
+    code = s.code;
+    message = s.message;
   }
 
   public int getCode() {
@@ -50,7 +50,7 @@ public class Status {
   public boolean equals(final Object o) {
     if (!(o instanceof Status)) { return false; }
     final Status os = (Status)o;
-    return this.getCode() == os.getCode();
+    return getCode() == os.getCode();
   }
 
   @Override

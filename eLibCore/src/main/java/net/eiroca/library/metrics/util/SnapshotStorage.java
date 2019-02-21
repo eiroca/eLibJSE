@@ -23,15 +23,15 @@ public class SnapshotStorage {
 
   private static HashMap<UUID, MeasureSnapshot> store = new HashMap<>();
 
-  public static MeasureSnapshot put(UUID id, MeasureSnapshot snap) {
-    synchronized (store) {
-      return store.put(id, snap);
+  public static MeasureSnapshot put(final UUID id, final MeasureSnapshot snap) {
+    synchronized (SnapshotStorage.store) {
+      return SnapshotStorage.store.put(id, snap);
     }
   }
 
-  public static MeasureSnapshot get(UUID id) {
-    synchronized (store) {
-      return store.get(id);
+  public static MeasureSnapshot get(final UUID id) {
+    synchronized (SnapshotStorage.store) {
+      return SnapshotStorage.store.get(id);
     }
   }
 

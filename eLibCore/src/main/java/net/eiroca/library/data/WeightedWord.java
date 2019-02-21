@@ -41,16 +41,16 @@ public class WeightedWord {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) return true;
-    if (obj == null) return false;
-    if (getClass() != obj.getClass()) return false;
-    WeightedWord other = (WeightedWord)obj;
-    if (Double.doubleToLongBits(weight) != Double.doubleToLongBits(other.weight)) return false;
+  public boolean equals(final Object obj) {
+    if (this == obj) { return true; }
+    if (obj == null) { return false; }
+    if (getClass() != obj.getClass()) { return false; }
+    final WeightedWord other = (WeightedWord)obj;
+    if (Double.doubleToLongBits(weight) != Double.doubleToLongBits(other.weight)) { return false; }
     if (word == null) {
-      if (other.word != null) return false;
+      if (other.word != null) { return false; }
     }
-    else if (!word.equals(other.word)) return false;
+    else if (!word.equals(other.word)) { return false; }
     return true;
   }
 
