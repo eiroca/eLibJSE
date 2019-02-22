@@ -2,16 +2,16 @@
  *
  * Copyright (C) 2001-2019 eIrOcA (eNrIcO Croce & sImOnA Burzio) - AGPL >= 3.0
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General
- * Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
- * later version.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU Affero General Public License as published by the Free Software Foundation, either version 3
+ * of the License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
- * details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Affero General Public License along with this program. If not, see
- * <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License along with this program.
+ * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
 package net.eiroca.library.db;
@@ -126,15 +126,16 @@ public class DBConfig {
   }
 
   /**
-   * setConnectionConfig Formats and sets the 'connectionUrl' and 'sqlclass' variables based on the configuration data
-   * set for the plugin.
+   * setConnectionConfig Formats and sets the 'connectionUrl' and 'sqlclass' variables based on the
+   * configuration data set for the plugin.
    *
-   * Returns null if everything worked ok Status with error code if the data entered by the user was determined to be
-   * invalid.
+   * Returns null if everything worked ok Status with error code if the data entered by the user was
+   * determined to be invalid.
    */
   public boolean prepareConnection() {
     /*
-     * Format the connection URL to use to connect to the database, and determine which sql driver should be used.
+     * Format the connection URL to use to connect to the database, and determine which sql driver
+     * should be used.
      */
     lastError = null;
     connectionUrl = null;

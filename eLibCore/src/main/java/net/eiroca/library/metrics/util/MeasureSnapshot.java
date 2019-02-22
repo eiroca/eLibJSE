@@ -32,7 +32,7 @@ public class MeasureSnapshot {
     datum = new Datum(m);
     if (m.hasSplittings()) {
       for (final MeasureSplitting ms : m.getSplittings()) {
-        final Map<String, Datum> snap = splittings.put(ms.getName(), new HashMap<>());
+        final Map<String, Datum> snap = splittings.put(ms.getName(), new HashMap<String, Datum>());
         for (final SimpleMeasure mm : ms.getSplits()) {
           snap.put(mm.getName(), new Datum(mm));
         }

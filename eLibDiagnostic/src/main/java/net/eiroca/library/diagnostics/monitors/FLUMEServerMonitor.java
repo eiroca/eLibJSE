@@ -122,13 +122,13 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
   public URL getURL(final InetAddress host) throws MalformedURLException {
     final String port = "" + context.getConfigInt(FLUMEServerMonitor.CONFIG_PORT, 2000);
     final String urlStr = MessageFormat.format("http://{0}:{1}/metrics", host.getHostName(), port);
-    context.info("URL: ", urlStr);
+    context.debug("FLUME URL: ", urlStr);
     return new URL(urlStr);
   }
 
   @Override
   public void parseJSON(final JSONObject obj) {
-    context.info("Parsing JSON: ", obj);
+    context.debug("Parsing JSON: ", obj);
     for (final String key : obj.keySet()) {
       final JSONObject node = obj.getJSONObject(key);
       final String type = node.getString("Type");
@@ -142,7 +142,7 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
           if (mapping != null) {
             final Measure m = mapping.measure;
             final MeasureSplitting ms = m.getSplitting(type);
-            context.logF(ILog.LogLevel.info, "{0} [{1}({2})] -> {3}", m.getName(), ms.getName(), name, val * mapping.scale);
+            context.logF(ILog.LogLevel.debug, "{0} [{1}({2})] -> {3}", m.getName(), ms.getName(), name, val * mapping.scale);
             ms.setValue(name, val * mapping.scale);
           }
         }

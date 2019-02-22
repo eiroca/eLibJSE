@@ -32,7 +32,6 @@ import javax.net.ssl.SSLContext;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
-import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
@@ -59,7 +58,6 @@ import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.protocol.HTTP;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EncodingUtils;
@@ -75,6 +73,7 @@ public class URLFetcher implements AutoCloseable {
   private CloseableHttpClient httpClient;
   private CredentialsProvider credsProvider;
   private URLFetcherConfig config;
+  private VirtualHostInterception virtualHostInterceptor;
 
   public int httpStatusCode = 0;
   public long responseSize = 0;
@@ -115,6 +114,8 @@ public class URLFetcher implements AutoCloseable {
     this.config = config;
     credsProvider = new BasicCredentialsProvider();
     httpClient = getHttpClient();
+    virtualHostInterceptor = (config.virtualHost != null) ? new VirtualHostInterception(config.virtualHost) : null;
+
   }
 
   @Override
@@ -142,11 +143,9 @@ public class URLFetcher implements AutoCloseable {
     httpClientBuilder.setUserAgent(config.userAgent);
     httpClientBuilder.setDefaultCredentialsProvider(credsProvider);
     httpClientBuilder.setDefaultRequestConfig(reqConfig.build());
-    httpClientBuilder.addInterceptorLast((HttpRequestInterceptor)(request, context) -> {
-      if (config.virtualHost != null) {
-        request.setHeader(HTTP.TARGET_HOST, config.virtualHost);
-      }
-    });
+    if (virtualHostInterceptor != null) {
+      httpClientBuilder.addInterceptorLast(virtualHostInterceptor);
+    }
     httpClientBuilder.setRetryHandler(new DefaultHttpRequestRetryHandler(0, false));
     // set proxy and credentials
     if (config.useProxy) {

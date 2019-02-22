@@ -111,11 +111,11 @@ public class SimpleJson {
     node.addProperty(propertyName, value);
   }
 
-  public void addProperty(String name, String[] value) {
+  public void addProperty(final String name, final String[] value) {
     final String propertyName = getPropertyName(name);
     final JsonObject node = getNode(name);
-    JsonArray e = new JsonArray();
-    for (String s : value) {
+    final JsonArray e = new JsonArray();
+    for (final String s : value) {
       e.add(s);
     }
     node.add(propertyName, e);

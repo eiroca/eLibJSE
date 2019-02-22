@@ -77,7 +77,7 @@ public class JSONHelper {
     return result;
   }
 
-  public static int getInt(final JsonObject json, final String name, int defVal) {
+  public static int getInt(final JsonObject json, final String name, final int defVal) {
     final JsonElement e = json.get(name);
     if (e != null) {
       final String data = e.getAsString();

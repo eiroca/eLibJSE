@@ -17,6 +17,7 @@
 package net.eiroca.library.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import net.eiroca.library.core.Helper;
@@ -70,7 +71,7 @@ public class MultipleWords implements Comparator<WeightedWord> {
 
   private synchronized void sort() {
     if (words.size() > 1) {
-      words.sort(this);
+      Collections.sort(words, this);
     }
   }
 

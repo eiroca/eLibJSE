@@ -16,13 +16,24 @@
  **/
 package net.eiroca.ext.library.http.utils;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
+import java.io.IOException;
+import org.apache.http.HttpException;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.protocol.HttpContext;
 
-class DumbHostVerifier implements HostnameVerifier {
+public class VirtualHostInterception implements HttpRequestInterceptor {
+
+  private final String virtualHost;
+
+  public VirtualHostInterception(final String virtualHost) {
+    this.virtualHost = virtualHost;
+  }
 
   @Override
-  public boolean verify(final String s, final SSLSession sslSession) {
-    return true;
+  public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
+    request.setHeader(HTTP.TARGET_HOST, virtualHost);
   }
+
 }

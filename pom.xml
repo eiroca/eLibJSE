@@ -11,7 +11,7 @@
 		<url>www.eiroca.net</url>
 	</organization>
 	<properties>
-		<jdk.version>1.8</jdk.version>
+		<jdk.version>1.7</jdk.version>
 		<eJDBCDrivers.version>0.0.2</eJDBCDrivers.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<servlet.version>3.1.0</servlet.version>

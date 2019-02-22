@@ -28,7 +28,6 @@ public class RESTServerMonitor extends WebServerMonitor {
 
   @Override
   public boolean preCheck(final InetAddress host) throws CommandException {
-    super.preCheck(host);
     URL url;
     try {
       url = getURL(host);
@@ -43,7 +42,7 @@ public class RESTServerMonitor extends WebServerMonitor {
 
   @Override
   public void parseResponse(final ReturnObject response) throws CommandException {
-    context.info("Parsing JSON");
+    context.debug("Parsing JSON");
     try {
       final JSONObject obj = new JSONObject(response.getOutput());
       parseJSON(obj);
