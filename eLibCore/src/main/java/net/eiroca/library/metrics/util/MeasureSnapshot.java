@@ -21,7 +21,7 @@ import java.util.Map;
 import net.eiroca.library.metrics.Datum;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MeasureSplitting;
-import net.eiroca.library.metrics.SimpleMeasure;
+import net.eiroca.library.metrics.SplittedDatum;
 
 public class MeasureSnapshot {
 
@@ -29,12 +29,12 @@ public class MeasureSnapshot {
   public Map<String, Map<String, Datum>> splittings = new HashMap<>();
 
   public MeasureSnapshot(final Measure m) {
-    datum = new Datum(m);
+    datum = new Datum(m.getDatum());
     if (m.hasSplittings()) {
       for (final MeasureSplitting ms : m.getSplittings()) {
         final Map<String, Datum> snap = splittings.put(ms.getName(), new HashMap<String, Datum>());
-        for (final SimpleMeasure mm : ms.getSplits()) {
-          snap.put(mm.getName(), new Datum(mm));
+        for (final SplittedDatum mm : ms.getSplitings()) {
+          snap.put(mm.getName(), new Datum(mm.getDatum()));
         }
       }
     }

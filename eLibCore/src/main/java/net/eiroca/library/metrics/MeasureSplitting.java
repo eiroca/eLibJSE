@@ -19,10 +19,11 @@ package net.eiroca.library.metrics;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 public class MeasureSplitting {
 
-  HashMap<String, SimpleMeasure> metrics = new HashMap<>();
+  HashMap<String, Datum> metrics = new HashMap<>();
   String spitName;
 
   public MeasureSplitting(final String splitName) {
@@ -30,11 +31,11 @@ public class MeasureSplitting {
   }
 
   public void setValue(final String split, final double value) {
-    SimpleMeasure m;
+    Datum m;
     synchronized (metrics) {
       m = metrics.get(split);
       if (m == null) {
-        m = new SimpleMeasure(split);
+        m = new Datum();
         metrics.put(split, m);
       }
     }
@@ -42,11 +43,11 @@ public class MeasureSplitting {
   }
 
   public void addValue(final String split, final double value) {
-    SimpleMeasure m;
+    Datum m;
     synchronized (metrics) {
       m = metrics.get(split);
       if (m == null) {
-        m = new SimpleMeasure(split);
+        m = new Datum();
         metrics.put(split, m);
       }
     }
@@ -54,7 +55,7 @@ public class MeasureSplitting {
   }
 
   public double getValue(final String split, final double defVal) {
-    SimpleMeasure m;
+    Datum m;
     double res = defVal;
     synchronized (metrics) {
       m = metrics.get(split);
@@ -69,18 +70,26 @@ public class MeasureSplitting {
     return spitName;
   }
 
-  public List<SimpleMeasure> getSplits() {
-    final List<SimpleMeasure> result = new ArrayList<>();
-    for (final SimpleMeasure m : metrics.values()) {
-      result.add(m);
+  public List<Datum> _getSplits() {
+    final List<Datum> result = new ArrayList<>();
+    for (final Entry<String, Datum> split : metrics.entrySet()) {
+      result.add(split.getValue());
     }
     return result;
   }
 
   public List<String> getSplitNames() {
     final List<String> result = new ArrayList<>();
-    for (final SimpleMeasure m : metrics.values()) {
-      result.add(m.getName());
+    for (final Entry<String, Datum> split : metrics.entrySet()) {
+      result.add(split.getKey());
+    }
+    return result;
+  }
+
+  public List<SplittedDatum> getSplitings() {
+    final List<SplittedDatum> result = new ArrayList<>();
+    for (final Entry<String, Datum> split : metrics.entrySet()) {
+      result.add(new SplittedDatum(split));
     }
     return result;
   }

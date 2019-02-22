@@ -26,7 +26,6 @@ import net.eiroca.library.diagnostics.CommandError;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.SimpleMeasure;
 
 public class ApacheServerMonitor extends WebServerMonitor {
 
@@ -34,29 +33,29 @@ public class ApacheServerMonitor extends WebServerMonitor {
 
   // measurement variables
   public MeasureGroup mgApachePerformance = new MeasureGroup("Apache Performance", "Apache - {0}");
-  public SimpleMeasure totalAccesses = new Measure(mgApachePerformance, "TotalAccesses");
-  public SimpleMeasure totalkBytes = new Measure(mgApachePerformance, "TotalBytes");
-  public SimpleMeasure cpuLoad = new Measure(mgApachePerformance, "CPULoad");
-  public SimpleMeasure uptime = new Measure(mgApachePerformance, "Uptime");
-  public SimpleMeasure reqPerSec = new Measure(mgApachePerformance, "ReqPerSec");
-  public SimpleMeasure bytesPerSec = new Measure(mgApachePerformance, "BytesPerSec");
-  public SimpleMeasure bytesPerReq = new Measure(mgApachePerformance, "BytesPerReq");
-  public SimpleMeasure busyWorkers = new Measure(mgApachePerformance, "BusyWorkers");
-  public SimpleMeasure idleWorkers = new Measure(mgApachePerformance, "IdleWorkers");
-  public SimpleMeasure workersUtilization = new Measure(mgApachePerformance, "WorkersUtilization");
+  public Measure totalAccesses = mgApachePerformance.createMeasure("TotalAccesses");
+  public Measure totalkBytes = mgApachePerformance.createMeasure("TotalBytes");
+  public Measure cpuLoad = mgApachePerformance.createMeasure("CPULoad");
+  public Measure uptime = mgApachePerformance.createMeasure("Uptime");
+  public Measure reqPerSec = mgApachePerformance.createMeasure("ReqPerSec");
+  public Measure bytesPerSec = mgApachePerformance.createMeasure("BytesPerSec");
+  public Measure bytesPerReq = mgApachePerformance.createMeasure("BytesPerReq");
+  public Measure busyWorkers = mgApachePerformance.createMeasure("BusyWorkers");
+  public Measure idleWorkers = mgApachePerformance.createMeasure("IdleWorkers");
+  public Measure workersUtilization = mgApachePerformance.createMeasure("WorkersUtilization");
 
   public MeasureGroup mgApacheScoreboard = new MeasureGroup("Apache Scoreboard", "Apache - Scoreboard - {0}");
-  public SimpleMeasure sbWaitingForConnection = new Measure(mgApacheScoreboard, "Waiting");
-  public SimpleMeasure sbStartingUp = new Measure(mgApacheScoreboard, "Starting up");
-  public SimpleMeasure sbReadingRequest = new Measure(mgApacheScoreboard, "Reading Request");
-  public SimpleMeasure sbSendingReply = new Measure(mgApacheScoreboard, "Sending Reply");
-  public SimpleMeasure sbKeepAlive = new Measure(mgApacheScoreboard, "Keepalive (read)");
-  public SimpleMeasure sbDnsLookup = new Measure(mgApacheScoreboard, "DNS Lookup");
-  public SimpleMeasure sbClosingConnection = new Measure(mgApacheScoreboard, "Closing connection");
-  public SimpleMeasure sbLogging = new Measure(mgApacheScoreboard, "Logging");
-  public SimpleMeasure sbGracefullyFinishing = new Measure(mgApacheScoreboard, "Gracefully finishing");
-  public SimpleMeasure sbIdleCleanupOfWorker = new Measure(mgApacheScoreboard, "Idle cleanup of worker");
-  public SimpleMeasure sbOpenSlot = new Measure(mgApacheScoreboard, "Open Slot");
+  public Measure sbWaitingForConnection = mgApacheScoreboard.createMeasure("Waiting");
+  public Measure sbStartingUp = mgApacheScoreboard.createMeasure("Starting up");
+  public Measure sbReadingRequest = mgApacheScoreboard.createMeasure("Reading Request");
+  public Measure sbSendingReply = mgApacheScoreboard.createMeasure("Sending Reply");
+  public Measure sbKeepAlive = mgApacheScoreboard.createMeasure("Keepalive (read)");
+  public Measure sbDnsLookup = mgApacheScoreboard.createMeasure("DNS Lookup");
+  public Measure sbClosingConnection = mgApacheScoreboard.createMeasure("Closing connection");
+  public Measure sbLogging = mgApacheScoreboard.createMeasure("Logging");
+  public Measure sbGracefullyFinishing = mgApacheScoreboard.createMeasure("Gracefully finishing");
+  public Measure sbIdleCleanupOfWorker = mgApacheScoreboard.createMeasure("Idle cleanup of worker");
+  public Measure sbOpenSlot = mgApacheScoreboard.createMeasure("Open Slot");
 
   @Override
   public boolean preCheck(final InetAddress host) throws CommandException {

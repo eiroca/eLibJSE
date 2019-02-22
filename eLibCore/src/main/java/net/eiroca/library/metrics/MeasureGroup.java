@@ -16,16 +16,19 @@
  **/
 package net.eiroca.library.metrics;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import net.eiroca.library.metrics.derived.IDerivedMeasure;
 
 public class MeasureGroup {
 
-  List<Measure> metrics = new ArrayList<>();
-  String name;
-  String measureNameFormat = "{0}";
+  private final List<Measure> metrics = new ArrayList<>();
+  private String name;
+  private String measureNameFormat = "{0}";
+
+  public String getMeasureNameFormat() {
+    return measureNameFormat;
+  }
 
   public String getName() {
     return name;
@@ -48,17 +51,17 @@ public class MeasureGroup {
     this.measureNameFormat = measureNameFormat;
   }
 
-  public SimpleMeasure add(final Measure metric) {
+  public Measure add(final Measure metric) {
     metrics.add(metric);
     return metric;
   }
 
-  public SimpleMeasure remove(final Measure metric) {
+  public Measure remove(final Measure metric) {
     metrics.remove(metric);
     return metric;
   }
 
-  public Measure find(final String measureName, final boolean createIfMissing) {
+  private Measure find(final String measureName, final boolean createIfMissing) {
     Measure m = null;
     for (final Measure cur : metrics) {
       if (cur.getName().equals(measureName)) {
@@ -67,7 +70,7 @@ public class MeasureGroup {
       }
     }
     if ((m == null) && createIfMissing) {
-      m = new Measure(this, measureName);
+      m = createMeasure(measureName, 0);
     }
     return m;
   }
@@ -89,16 +92,12 @@ public class MeasureGroup {
     }
   }
 
-  public String getMeasureName(final String name) {
-    return MessageFormat.format(measureNameFormat, name);
-  }
-
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
     sb.append('"').append(name).append("\":{");
     boolean first = true;
-    for (final SimpleMeasure m : metrics) {
+    for (final Measure m : metrics) {
       if (!first) {
         sb.append(',');
       }
@@ -118,4 +117,16 @@ public class MeasureGroup {
       }
     }
   }
+
+  public Measure createMeasure(final String name) {
+    final MeasureMetadata definition = new MeasureMetadata(name, measureNameFormat, 0);
+    return new Measure(this, definition);
+  }
+
+  public Measure createMeasure(final String name, final double defValue) {
+    final MeasureMetadata definition = new MeasureMetadata(name, measureNameFormat, defValue);
+    return new Measure(this, definition);
+
+  }
+
 }

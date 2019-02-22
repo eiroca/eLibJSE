@@ -37,30 +37,30 @@ public class TestJSON1 {
   }
 
   public MeasureGroup mgeSysAdm = new MeasureGroup("eSysAdm Monitor", "FLUME - {0}");
-  public Measure mAppendAcceptedCount = new Measure(mgeSysAdm, "AppendAcceptedCount");
-  public Measure mAppendBatchAcceptedCount = new Measure(mgeSysAdm, "AppendBatchAcceptedCount");
-  public Measure mAppendBatchReceivedCount = new Measure(mgeSysAdm, "AppendBatchReceivedCount");
-  public Measure mAppendReceivedCount = new Measure(mgeSysAdm, "AppendReceivedCount");
-  public Measure mBatchCompleteCount = new Measure(mgeSysAdm, "BatchCompleteCount");
-  public Measure mBatchEmptyCount = new Measure(mgeSysAdm, "BatchEmptyCount");
-  public Measure mBatchUnderflowCount = new Measure(mgeSysAdm, "BatchUnderflowCount");
-  public Measure mChannelCapacity = new Measure(mgeSysAdm, "ChannelCapacity");
-  public Measure mChannelFillPercentage = new Measure(mgeSysAdm, "ChannelFillPercentage");
-  public Measure mChannelSize = new Measure(mgeSysAdm, "ChannelSize");
-  public Measure mConnectionClosedCount = new Measure(mgeSysAdm, "ConnectionClosedCount");
-  public Measure mConnectionCreatedCount = new Measure(mgeSysAdm, "ConnectionCreatedCount");
-  public Measure mConnectionFailedCount = new Measure(mgeSysAdm, "ConnectionFailedCount");
-  public Measure mEventAcceptedCount = new Measure(mgeSysAdm, "EventAcceptedCount");
-  public Measure mEventDrainAttemptCount = new Measure(mgeSysAdm, "EventDrainAttemptCount");
-  public Measure mEventDrainSuccessCount = new Measure(mgeSysAdm, "EventDrainSuccessCount");
-  public Measure mEventPutAttemptCount = new Measure(mgeSysAdm, "EventPutAttemptCount");
-  public Measure mEventPutSuccessCount = new Measure(mgeSysAdm, "EventPutSuccessCount");
-  public Measure mEventReceivedCount = new Measure(mgeSysAdm, "EventReceivedCount");
-  public Measure mEventTakeAttemptCount = new Measure(mgeSysAdm, "EventTakeAttemptCount");
-  public Measure mEventTakeSuccessCount = new Measure(mgeSysAdm, "EventTakeSuccessCount");
-  public Measure mOpenConnectionCount = new Measure(mgeSysAdm, "OpenConnectionCount");
-  public Measure mStartTime = new Measure(mgeSysAdm, "StartTime");
-  public Measure mStopTime = new Measure(mgeSysAdm, "StopTime");
+  public Measure mAppendAcceptedCount = mgeSysAdm.createMeasure("AppendAcceptedCount");
+  public Measure mAppendBatchAcceptedCount = mgeSysAdm.createMeasure("AppendBatchAcceptedCount");
+  public Measure mAppendBatchReceivedCount = mgeSysAdm.createMeasure("AppendBatchReceivedCount");
+  public Measure mAppendReceivedCount = mgeSysAdm.createMeasure("AppendReceivedCount");
+  public Measure mBatchCompleteCount = mgeSysAdm.createMeasure("BatchCompleteCount");
+  public Measure mBatchEmptyCount = mgeSysAdm.createMeasure("BatchEmptyCount");
+  public Measure mBatchUnderflowCount = mgeSysAdm.createMeasure("BatchUnderflowCount");
+  public Measure mChannelCapacity = mgeSysAdm.createMeasure("ChannelCapacity");
+  public Measure mChannelFillPercentage = mgeSysAdm.createMeasure("ChannelFillPercentage");
+  public Measure mChannelSize = mgeSysAdm.createMeasure("ChannelSize");
+  public Measure mConnectionClosedCount = mgeSysAdm.createMeasure("ConnectionClosedCount");
+  public Measure mConnectionCreatedCount = mgeSysAdm.createMeasure("ConnectionCreatedCount");
+  public Measure mConnectionFailedCount = mgeSysAdm.createMeasure("ConnectionFailedCount");
+  public Measure mEventAcceptedCount = mgeSysAdm.createMeasure("EventAcceptedCount");
+  public Measure mEventDrainAttemptCount = mgeSysAdm.createMeasure("EventDrainAttemptCount");
+  public Measure mEventDrainSuccessCount = mgeSysAdm.createMeasure("EventDrainSuccessCount");
+  public Measure mEventPutAttemptCount = mgeSysAdm.createMeasure("EventPutAttemptCount");
+  public Measure mEventPutSuccessCount = mgeSysAdm.createMeasure("EventPutSuccessCount");
+  public Measure mEventReceivedCount = mgeSysAdm.createMeasure("EventReceivedCount");
+  public Measure mEventTakeAttemptCount = mgeSysAdm.createMeasure("EventTakeAttemptCount");
+  public Measure mEventTakeSuccessCount = mgeSysAdm.createMeasure("EventTakeSuccessCount");
+  public Measure mOpenConnectionCount = mgeSysAdm.createMeasure("OpenConnectionCount");
+  public Measure mStartTime = mgeSysAdm.createMeasure("StartTime");
+  public Measure mStopTime = mgeSysAdm.createMeasure("StopTime");
 
   public Map<String, JSONMapping> mappigns = new HashMap<>();
 

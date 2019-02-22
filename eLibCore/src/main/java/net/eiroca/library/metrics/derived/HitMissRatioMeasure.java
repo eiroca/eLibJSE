@@ -18,8 +18,9 @@ package net.eiroca.library.metrics.derived;
 
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MeasureGroup;
+import net.eiroca.library.metrics.MeasureMetadata;
 import net.eiroca.library.metrics.MeasureSplitting;
-import net.eiroca.library.metrics.SimpleMeasure;
+import net.eiroca.library.metrics.SplittedDatum;
 
 public class HitMissRatioMeasure extends Measure implements IDerivedMeasure {
 
@@ -28,7 +29,7 @@ public class HitMissRatioMeasure extends Measure implements IDerivedMeasure {
   public Measure missMeasure;
 
   public HitMissRatioMeasure(final MeasureGroup mg, final String name, final Measure hitMeasure, final Measure missMeasure) {
-    super(mg, name);
+    super(mg, new MeasureMetadata(name, mg.getMeasureNameFormat(), 0));
     this.hitMeasure = hitMeasure;
     this.missMeasure = missMeasure;
   }
@@ -48,7 +49,7 @@ public class HitMissRatioMeasure extends Measure implements IDerivedMeasure {
         final String splitGroup = hitSplit.getName();
         final MeasureSplitting result = getSplitting(splitGroup);
         final MeasureSplitting denoms = missMeasure.getSplitting(splitGroup);
-        for (final SimpleMeasure split : hitSplit.getSplits()) {
+        for (final SplittedDatum split : hitSplit.getSplitings()) {
           final String splitName = split.getName();
           final double num = split.getValue();
           final double den = denoms.getValue(splitName, 0) + num;

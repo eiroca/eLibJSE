@@ -33,14 +33,14 @@ public abstract class ServerMonitor implements IServerMonitor {
 
   // measure constants
   protected MeasureGroup mgServerInfo = new MeasureGroup("Server Monitor");
-  protected Measure mServerReachable = new Measure(mgServerInfo, "HostReachable");
-  protected Measure mServerConnectionTimeout = new Measure(mgServerInfo, "ConnectionTimedOut");
-  protected Measure mServerLatency = new Measure(mgServerInfo, "ServerLatency");
-  protected Measure mServerResponseTime = new Measure(mgServerInfo, "Response Time");
-  protected Measure mServerStatus = new Measure(mgServerInfo, "Status"); // 0 = OK
-  protected Measure mServerSocketTimeout = new Measure(mgServerInfo, "SocketTimedOut");
-  protected Measure mServerResult = new Measure(mgServerInfo, "Result");
-  protected Measure mServerVerified = new Measure(mgServerInfo, "ContentVerified");
+  protected Measure mServerReachable = mgServerInfo.createMeasure("HostReachable");
+  protected Measure mServerConnectionTimeout = mgServerInfo.createMeasure("ConnectionTimedOut");
+  protected Measure mServerLatency = mgServerInfo.createMeasure("ServerLatency");
+  protected Measure mServerResponseTime = mgServerInfo.createMeasure("Response Time");
+  protected Measure mServerStatus = mgServerInfo.createMeasure("Status"); // 0 = OK
+  protected Measure mServerSocketTimeout = mgServerInfo.createMeasure("SocketTimedOut");
+  protected Measure mServerResult = mgServerInfo.createMeasure("Result");
+  protected Measure mServerVerified = mgServerInfo.createMeasure("ContentVerified");
 
   protected IContext context;
 

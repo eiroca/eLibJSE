@@ -65,8 +65,8 @@ public class DatabaseMonitor extends TCPServerMonitor {
   private static final String CONFIG_RUNSQL = "runSQL";
 
   MeasureGroup mgDBMonitor = new MeasureGroup("Database Monitor", "Database - {0}");
-  Measure mDBQueryTime = new Measure(mgDBMonitor, "Query Time");
-  Measure mDBQueryRows = new Measure(mgDBMonitor, "Query Rows");
+  Measure mDBQueryTime = mgDBMonitor.createMeasure("Query Time");
+  Measure mDBQueryRows = mgDBMonitor.createMeasure("Query Rows");
 
   protected GenericValidator validator;
   protected DBConfig config;

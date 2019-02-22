@@ -17,23 +17,21 @@
 package net.eiroca.library.metrics.derived;
 
 import java.util.Map;
-import java.util.UUID;
 import net.eiroca.library.metrics.Datum;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MeasureGroup;
+import net.eiroca.library.metrics.MeasureMetadata;
 import net.eiroca.library.metrics.MeasureSplitting;
-import net.eiroca.library.metrics.SimpleMeasure;
+import net.eiroca.library.metrics.SplittedDatum;
 import net.eiroca.library.metrics.util.MeasureSnapshot;
 import net.eiroca.library.metrics.util.SnapshotStorage;
 
 public class DeltaMeasure extends Measure implements IDerivedMeasure {
 
-  public UUID id;
   public Measure observed;
 
   public DeltaMeasure(final MeasureGroup mg, final String name, final Measure observed) {
-    super(mg, name);
-    id = UUID.randomUUID();
+    super(mg, new MeasureMetadata(name, mg.getMeasureNameFormat(), 0));
     this.observed = observed;
   }
 
@@ -54,7 +52,7 @@ public class DeltaMeasure extends Measure implements IDerivedMeasure {
         final Map<String, Datum> split = oldSnap.splittings.get(splitName);
         if (split != null) {
           final MeasureSplitting dms = getSplitting(splitName);
-          for (final SimpleMeasure mm : ms.getSplits()) {
+          for (final SplittedDatum mm : ms.getSplitings()) {
             final String splitKey = mm.getName();
             final Datum old = split.get(splitKey);
             if (old != null) {

@@ -53,30 +53,30 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
 
   // measurement variables
   public MeasureGroup mgFLUME = new MeasureGroup("FLUME Monitor", "FLUME - {0}");
-  public Measure mAppendAcceptedCount = new Measure(mgFLUME, "Append Accepted");
-  public Measure mAppendBatchAcceptedCount = new Measure(mgFLUME, "Append Batch Accepted");
-  public Measure mAppendBatchReceivedCount = new Measure(mgFLUME, "Append Batch Received");
-  public Measure mAppendReceivedCount = new Measure(mgFLUME, "Append Received");
-  public Measure mBatchCompleteCount = new Measure(mgFLUME, "Batch Complete");
-  public Measure mBatchEmptyCount = new Measure(mgFLUME, "Batch Empty");
-  public Measure mBatchUnderflowCount = new Measure(mgFLUME, "Batch Underflow");
-  public Measure mChannelCapacity = new Measure(mgFLUME, "Channel Capacity");
-  public Measure mChannelFillPercentage = new Measure(mgFLUME, "Channel Fill");
-  public Measure mChannelSize = new Measure(mgFLUME, "Channel Size");
-  public Measure mConnectionClosedCount = new Measure(mgFLUME, "Connection Closed");
-  public Measure mConnectionCreatedCount = new Measure(mgFLUME, "Connection Created");
-  public Measure mConnectionFailedCount = new Measure(mgFLUME, "Connection Failed");
-  public Measure mEventAcceptedCount = new Measure(mgFLUME, "Event Accepted");
-  public Measure mEventDrainAttemptCount = new Measure(mgFLUME, "Event Drain Attempt");
-  public Measure mEventDrainSuccessCount = new Measure(mgFLUME, "Event Drain Success");
-  public Measure mEventPutAttemptCount = new Measure(mgFLUME, "Event Put Attempt");
-  public Measure mEventPutSuccessCount = new Measure(mgFLUME, "Event Put Success");
-  public Measure mEventReceivedCount = new Measure(mgFLUME, "Event Received");
-  public Measure mEventTakeAttemptCount = new Measure(mgFLUME, "Event Take Attempt");
-  public Measure mEventTakeSuccessCount = new Measure(mgFLUME, "Event Take Success");
-  public Measure mOpenConnectionCount = new Measure(mgFLUME, "Open Connection");
-  public Measure mStartTime = new Measure(mgFLUME, "Start Time");
-  public Measure mStopTime = new Measure(mgFLUME, "Stop Time");
+  public Measure mAppendAcceptedCount = mgFLUME.createMeasure("Append Accepted");
+  public Measure mAppendBatchAcceptedCount = mgFLUME.createMeasure("Append Batch Accepted");
+  public Measure mAppendBatchReceivedCount = mgFLUME.createMeasure("Append Batch Received");
+  public Measure mAppendReceivedCount = mgFLUME.createMeasure("Append Received");
+  public Measure mBatchCompleteCount = mgFLUME.createMeasure("Batch Complete");
+  public Measure mBatchEmptyCount = mgFLUME.createMeasure("Batch Empty");
+  public Measure mBatchUnderflowCount = mgFLUME.createMeasure("Batch Underflow");
+  public Measure mChannelCapacity = mgFLUME.createMeasure("Channel Capacity");
+  public Measure mChannelFillPercentage = mgFLUME.createMeasure("Channel Fill");
+  public Measure mChannelSize = mgFLUME.createMeasure("Channel Size");
+  public Measure mConnectionClosedCount = mgFLUME.createMeasure("Connection Closed");
+  public Measure mConnectionCreatedCount = mgFLUME.createMeasure("Connection Created");
+  public Measure mConnectionFailedCount = mgFLUME.createMeasure("Connection Failed");
+  public Measure mEventAcceptedCount = mgFLUME.createMeasure("Event Accepted");
+  public Measure mEventDrainAttemptCount = mgFLUME.createMeasure("Event Drain Attempt");
+  public Measure mEventDrainSuccessCount = mgFLUME.createMeasure("Event Drain Success");
+  public Measure mEventPutAttemptCount = mgFLUME.createMeasure("Event Put Attempt");
+  public Measure mEventPutSuccessCount = mgFLUME.createMeasure("Event Put Success");
+  public Measure mEventReceivedCount = mgFLUME.createMeasure("Event Received");
+  public Measure mEventTakeAttemptCount = mgFLUME.createMeasure("Event Take Attempt");
+  public Measure mEventTakeSuccessCount = mgFLUME.createMeasure("Event Take Success");
+  public Measure mOpenConnectionCount = mgFLUME.createMeasure("Open Connection");
+  public Measure mStartTime = mgFLUME.createMeasure("Start Time");
+  public Measure mStopTime = mgFLUME.createMeasure("Stop Time");
 
   public Map<String, JSONMapping> mappigns = new HashMap<>();
 

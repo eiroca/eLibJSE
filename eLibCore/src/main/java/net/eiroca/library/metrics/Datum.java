@@ -22,9 +22,11 @@ public class Datum {
   public double value;
 
   public Datum() {
+    value = 0;
+    timeStamp = 0;
   }
 
-  public Datum(final SimpleMeasure m) {
+  public Datum(final Datum m) {
     if (m.hasValue()) {
       timeStamp = m.getTimeStamp();
       value = m.getValue();
@@ -33,6 +35,46 @@ public class Datum {
       timeStamp = System.currentTimeMillis();
       value = 0;
     }
+  }
+
+  public void reset() {
+    timeStamp = 0;
+  }
+
+  public void reset(final double defVal) {
+    timeStamp = 0;
+    value = defVal;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(value);
+    return sb.toString();
+  }
+
+  public long getTimeStamp() {
+    return timeStamp;
+  }
+
+  public boolean hasValue() {
+    return timeStamp != 0;
+  }
+
+  public double getValue() {
+    return value;
+  }
+
+  public void setValue(final double value) {
+    this.value = value;
+    timeStamp = System.nanoTime();
+  }
+
+  public void addValue(final double value) {
+    if (timeStamp == 0) {
+      timeStamp = System.nanoTime();
+    }
+    this.value += value;
   }
 
 }

@@ -18,8 +18,9 @@ package net.eiroca.library.metrics.derived;
 
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MeasureGroup;
+import net.eiroca.library.metrics.MeasureMetadata;
 import net.eiroca.library.metrics.MeasureSplitting;
-import net.eiroca.library.metrics.SimpleMeasure;
+import net.eiroca.library.metrics.SplittedDatum;
 
 public class RatioMeasure extends Measure implements IDerivedMeasure {
 
@@ -28,7 +29,7 @@ public class RatioMeasure extends Measure implements IDerivedMeasure {
   public Measure denMeasure;
 
   public RatioMeasure(final MeasureGroup mg, final String name, final Measure numMeasure, final Measure denMeasure) {
-    super(mg, name);
+    super(mg, new MeasureMetadata(name, mg.getMeasureNameFormat(), 0));
     this.numMeasure = numMeasure;
     this.denMeasure = denMeasure;
   }
@@ -49,10 +50,10 @@ public class RatioMeasure extends Measure implements IDerivedMeasure {
         final MeasureSplitting nums = numMeasure.getSplitting(splitGroup);
         final MeasureSplitting dens = denMeasure.getSplitting(splitGroup);
         final MeasureSplitting result = getSplitting(splitGroup);
-        for (final SimpleMeasure split : denSplit.getSplits()) {
+        for (final SplittedDatum split : denSplit.getSplitings()) {
           final String splitName = split.getName();
           final double num = nums.getValue(splitName, 0);
-          final double den = dens.getValue(split.getName(), 0);
+          final double den = dens.getValue(splitName, 0);
           if (den > RatioMeasure.ZERO) {
             result.setValue(splitName, num / den);
           }

@@ -37,25 +37,25 @@ public class RedisMonitor extends TCPServerMonitor {
 
   protected MeasureGroup mgRedisInfo = new MeasureGroup("Redis Statistics", "Redis - {0}");
 
-  protected Measure mServerResult = new Measure(mgServerInfo, "Result");
-  protected Measure mServerStatus = new Measure(mgServerInfo, "Status");
+  protected Measure mServerResult = mgServerInfo.createMeasure("Result");
+  protected Measure mServerStatus = mgServerInfo.createMeasure("Status");
 
-  protected Measure mRedisServerUptime = new Measure(mgRedisInfo, "Server - uptime");
-  protected Measure mRedisStatsOps = new Measure(mgRedisInfo, "Stats - instantaneous_ops_per_sec");
-  protected Measure mRedisStatsCmds = new Measure(mgRedisInfo, "Stats - total_commands_processed");
-  protected Measure mRedisStatsHits = new Measure(mgRedisInfo, "Stats - keyspace_hits");
-  protected Measure mRedisStatsMiss = new Measure(mgRedisInfo, "Stats - keyspace_misses");
-  protected Measure mRedisClientsConn = new Measure(mgRedisInfo, "Clients - connected_clients");
-  protected Measure mRedisMemoryUsed = new Measure(mgRedisInfo, "Memory - used_memory");
-  protected Measure mRedisMemoryPeak = new Measure(mgRedisInfo, "Memory - used_memory_peak");
-  protected Measure mRedisMemoryOverhead = new Measure(mgRedisInfo, "Memory - used_memory_overhead");
-  protected Measure mRedisReplicationLastIO = new Measure(mgRedisInfo, "Replication - master_last_io_seconds_ago");
-  protected Measure mRedisReplicationSyncIn = new Measure(mgRedisInfo, "Replication - master_sync_in_progress");
-  protected Measure mRedisReplicationSlaves = new Measure(mgRedisInfo, "Replication - connected_slaves");
-  protected Measure mRedisKeyspaceKeys = new Measure(mgRedisInfo, "Keyspace - keys");
-  protected Measure mRedisRDBLstSave = new Measure(mgRedisInfo, "Persistence - rdb_last_bgsave_time_sec");
-  protected Measure mRedisRDBBkgSave = new Measure(mgRedisInfo, "Persistence - rdb_bgsave_in_progress");
-  protected Measure mRedisRDBChanges = new Measure(mgRedisInfo, "Persistence - rdb_changes_since_last_save");
+  protected Measure mRedisServerUptime = mgRedisInfo.createMeasure("Server - uptime");
+  protected Measure mRedisStatsOps = mgRedisInfo.createMeasure("Stats - instantaneous_ops_per_sec");
+  protected Measure mRedisStatsCmds = mgRedisInfo.createMeasure("Stats - total_commands_processed");
+  protected Measure mRedisStatsHits = mgRedisInfo.createMeasure("Stats - keyspace_hits");
+  protected Measure mRedisStatsMiss = mgRedisInfo.createMeasure("Stats - keyspace_misses");
+  protected Measure mRedisClientsConn = mgRedisInfo.createMeasure("Clients - connected_clients");
+  protected Measure mRedisMemoryUsed = mgRedisInfo.createMeasure("Memory - used_memory");
+  protected Measure mRedisMemoryPeak = mgRedisInfo.createMeasure("Memory - used_memory_peak");
+  protected Measure mRedisMemoryOverhead = mgRedisInfo.createMeasure("Memory - used_memory_overhead");
+  protected Measure mRedisReplicationLastIO = mgRedisInfo.createMeasure("Replication - master_last_io_seconds_ago");
+  protected Measure mRedisReplicationSyncIn = mgRedisInfo.createMeasure("Replication - master_sync_in_progress");
+  protected Measure mRedisReplicationSlaves = mgRedisInfo.createMeasure("Replication - connected_slaves");
+  protected Measure mRedisKeyspaceKeys = mgRedisInfo.createMeasure("Keyspace - keys");
+  protected Measure mRedisRDBLstSave = mgRedisInfo.createMeasure("Persistence - rdb_last_bgsave_time_sec");
+  protected Measure mRedisRDBBkgSave = mgRedisInfo.createMeasure("Persistence - rdb_bgsave_in_progress");
+  protected Measure mRedisRDBChanges = mgRedisInfo.createMeasure("Persistence - rdb_changes_since_last_save");
 
   protected IDerivedMeasure mRedisHitRatio = new HitMissRatioMeasure(mgRedisInfo, "Keyspace Hit Ratio", mRedisStatsHits, mRedisStatsMiss);
   protected IDerivedMeasure mRedisHitsPerSec = new RateMeasure(mgRedisInfo, "Keyspace Hit Rate", mRedisStatsHits, TimeUnit.SECONDS, 0.0);

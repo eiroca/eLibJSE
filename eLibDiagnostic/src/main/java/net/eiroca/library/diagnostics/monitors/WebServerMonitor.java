@@ -36,16 +36,16 @@ public class WebServerMonitor extends GenericHTTPMonitor {
   protected static final String CONFIG_PROBEPARSING = "parseProbe";
 
   MeasureGroup mgHTTPMonitor = new MeasureGroup("HTTP Monitor", "WebServer - {0}");
-  Measure smHeaderSize = new Measure(mgHTTPMonitor, "HeaderSize");
-  Measure smResponseSize = new Measure(mgHTTPMonitor, "Response Size");
-  Measure smResponseThroughput = new Measure(mgHTTPMonitor, "Throughput");
-  Measure smHTTPStatusCode = new Measure(mgHTTPMonitor, "HttpStatusCode");
-  Measure smConnCloseDelay = new Measure(mgHTTPMonitor, "ConnectionCloseDelay");
+  Measure smHeaderSize = mgHTTPMonitor.createMeasure("HeaderSize");
+  Measure smResponseSize = mgHTTPMonitor.createMeasure("Response Size");
+  Measure smResponseThroughput = mgHTTPMonitor.createMeasure("Throughput");
+  Measure smHTTPStatusCode = mgHTTPMonitor.createMeasure("HttpStatusCode");
+  Measure smConnCloseDelay = mgHTTPMonitor.createMeasure("ConnectionCloseDelay");
 
   MeasureGroup mgProbe = new MeasureGroup("Query");
-  Measure smProbeResult = new Measure(mgProbe, "Result");
-  Measure smProbeStatus = new Measure(mgProbe, "Status");
-  Measure smProbeRows = new Measure(mgProbe, "Rows");
+  Measure smProbeResult = mgProbe.createMeasure("Result");
+  Measure smProbeStatus = mgProbe.createMeasure("Status");
+  Measure smProbeRows = mgProbe.createMeasure("Rows");
 
   protected boolean urlCheck;
 

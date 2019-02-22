@@ -42,10 +42,10 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
 
   // measurement variables
   public MeasureGroup mgeSysAdm = new MeasureGroup("eSysAdm Monitor", "eSysAdm - {0}");
-  public Measure mMetrics = new Measure(mgeSysAdm, "Metrics");
-  public Measure mAlerts = new Measure(mgeSysAdm, "Alerts");
-  public Measure mKPIs = new Measure(mgeSysAdm, "KPIs");
-  public Measure mTimings = new Measure(mgeSysAdm, "Timings");
+  public Measure mMetrics = mgeSysAdm.createMeasure("Metrics");
+  public Measure mAlerts = mgeSysAdm.createMeasure("Alerts");
+  public Measure mKPIs = mgeSysAdm.createMeasure("KPIs");
+  public Measure mTimings = mgeSysAdm.createMeasure("Timings");
 
   @Override
   public void loadMetricGroup(final List<MeasureGroup> groups) {

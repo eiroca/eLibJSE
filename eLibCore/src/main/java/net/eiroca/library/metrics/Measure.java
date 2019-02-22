@@ -18,24 +18,27 @@ package net.eiroca.library.metrics;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-public class Measure extends SimpleMeasure {
+public class Measure {
 
-  MeasureGroup group;
-  List<MeasureSplitting> splittings = new ArrayList<>();
+  private static final String NONAME = "-";
+  private static final double VALUE_TRUE = 1.0;
+  private static final double VALUE_FALSE = 0.0;
 
-  public Measure(final MeasureGroup owner, final String name) {
-    this(owner, name, 0.0);
-  }
+  protected final UUID id = UUID.randomUUID();
+  protected MeasureGroup group;
+  protected MeasureMetadata metadata;
+  protected Datum datum = new Datum();
+  protected List<MeasureSplitting> splittings = new ArrayList<>();
 
-  public Measure(final MeasureGroup owner, final String name, final double defValue) {
-    super(name, defValue);
+  public Measure(final MeasureGroup owner, final MeasureMetadata metadata) {
     setGroup(owner);
+    this.metadata = metadata;
   }
 
-  @Override
   public void reset() {
-    super.reset();
+    datum.reset((metadata != null) ? metadata.getDefValue() : 0);
     if (splittings != null) {
       splittings.clear();
     }
@@ -80,15 +83,15 @@ public class Measure extends SimpleMeasure {
     return splittings;
   }
 
-  @Override
   public String getName() {
-    return (group != null) ? group.getMeasureName(name) : super.getName();
+    final String name = metadata != null ? metadata.getName() : Measure.NONAME;
+    return name;
   }
 
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder();
-    sb.append('"').append(name).append("\":").append(datum.value);
+    sb.append('"').append(getName()).append("\":").append(datum.value);
     if (splittings.size() > 0) {
       sb.append(",");
       boolean first = true;
@@ -102,4 +105,33 @@ public class Measure extends SimpleMeasure {
     }
     return sb.toString();
   }
+
+  public Datum getDatum() {
+    return datum;
+  }
+
+  public void setValue(final boolean value) {
+    setValue(value ? Measure.VALUE_TRUE : Measure.VALUE_FALSE);
+  }
+
+  public void setValue(final double value) {
+    datum.setValue(value);
+  }
+
+  public void addValue(final double value) {
+    datum.addValue(value);
+  }
+
+  public boolean hasValue() {
+    return datum.hasValue();
+  }
+
+  public double getValue() {
+    return datum.getValue();
+  }
+
+  public long getTimeStamp() {
+    return datum.getTimeStamp();
+  }
+
 }
