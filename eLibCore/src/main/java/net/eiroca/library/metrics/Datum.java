@@ -67,12 +67,19 @@ public class Datum {
 
   public void setValue(final double value) {
     this.value = value;
-    timeStamp = System.nanoTime();
+    timeStamp = System.currentTimeMillis();
+  }
+
+  public void addValue(final Datum datum) {
+    if (timeStamp == 0) {
+      timeStamp = datum.timeStamp != 0 ? datum.timeStamp : System.currentTimeMillis();
+    }
+    this.value += datum.value;
   }
 
   public void addValue(final double value) {
     if (timeStamp == 0) {
-      timeStamp = System.nanoTime();
+      timeStamp = System.currentTimeMillis();
     }
     this.value += value;
   }
