@@ -14,37 +14,19 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.metrics;
+package net.eiroca.library.metrics.datum;
 
-import java.text.MessageFormat;
+public interface IDatum {
 
-public class MeasureMetadata {
+  public void init(final double defVal);
 
-  private String name;
-  private String nameFormat = null;
-  private double defValue;
+  public boolean hasValue();
 
-  public MeasureMetadata(final String name, final String nameFormat, final double defValue) {
-    super();
-    this.name = name;
-    this.nameFormat = nameFormat;
-    this.defValue = defValue;
-  }
+  public double getValue();
 
-  public String getName() {
-    return (nameFormat == null) ? name : MessageFormat.format(nameFormat, name);
-  }
+  public void setValue(final double value);
 
-  public void setName(final String name) {
-    this.name = name;
-  }
+  public void addValue(final double value);
 
-  public double getDefValue() {
-    return defValue;
-  }
-
-  public void setDefValue(final double defValue) {
-    this.defValue = defValue;
-  }
-
+  public void toJson(StringBuilder sb, boolean simple);
 }

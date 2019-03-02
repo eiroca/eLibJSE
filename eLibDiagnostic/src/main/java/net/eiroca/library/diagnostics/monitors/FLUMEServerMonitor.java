@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Map;
 import org.json.JSONObject;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.MeasureSplitting;
+import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.ILog;
 
 public class FLUMEServerMonitor extends RESTServerMonitor {
@@ -52,7 +51,7 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
   private static final String CONFIG_PORT = "port";
 
   // measurement variables
-  public MeasureGroup mgFLUME = new MeasureGroup("FLUME Monitor", "FLUME - {0}");
+  public MetricGroup mgFLUME = new MetricGroup("FLUME Monitor", "FLUME - {0}");
   public Measure mAppendAcceptedCount = mgFLUME.createMeasure("Append Accepted");
   public Measure mAppendBatchAcceptedCount = mgFLUME.createMeasure("Append Batch Accepted");
   public Measure mAppendBatchReceivedCount = mgFLUME.createMeasure("Append Batch Received");
@@ -113,7 +112,7 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
   }
 
   @Override
-  public void loadMetricGroup(final List<MeasureGroup> groups) {
+  public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
     groups.add(mgFLUME);
   }
@@ -141,7 +140,7 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
           mapping = mappigns.get(alias);
           if (mapping != null) {
             final Measure m = mapping.measure;
-            final MeasureSplitting ms = m.getSplitting(type);
+            final Measure ms = m.getSplitting(type);
             context.logF(ILog.LogLevel.debug, "{0} [{1}({2})] -> {3}", m.getName(), ms.getName(), name, val * mapping.scale);
             ms.setValue(name, val * mapping.scale);
           }

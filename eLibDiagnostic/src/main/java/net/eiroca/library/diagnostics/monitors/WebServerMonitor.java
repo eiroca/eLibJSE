@@ -26,8 +26,7 @@ import net.eiroca.library.core.LibStr;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.MeasureSplitting;
+import net.eiroca.library.metrics.MetricGroup;
 
 public class WebServerMonitor extends GenericHTTPMonitor {
 
@@ -35,14 +34,14 @@ public class WebServerMonitor extends GenericHTTPMonitor {
   protected static final String CONFIG_PROBEURL = "probeURL";
   protected static final String CONFIG_PROBEPARSING = "parseProbe";
 
-  MeasureGroup mgHTTPMonitor = new MeasureGroup("HTTP Monitor", "WebServer - {0}");
+  MetricGroup mgHTTPMonitor = new MetricGroup("HTTP Monitor", "WebServer - {0}");
   Measure smHeaderSize = mgHTTPMonitor.createMeasure("HeaderSize");
   Measure smResponseSize = mgHTTPMonitor.createMeasure("Response Size");
   Measure smResponseThroughput = mgHTTPMonitor.createMeasure("Throughput");
   Measure smHTTPStatusCode = mgHTTPMonitor.createMeasure("HttpStatusCode");
   Measure smConnCloseDelay = mgHTTPMonitor.createMeasure("ConnectionCloseDelay");
 
-  MeasureGroup mgProbe = new MeasureGroup("Query");
+  MetricGroup mgProbe = new MetricGroup("Query");
   Measure smProbeResult = mgProbe.createMeasure("Result");
   Measure smProbeStatus = mgProbe.createMeasure("Status");
   Measure smProbeRows = mgProbe.createMeasure("Rows");
@@ -50,7 +49,7 @@ public class WebServerMonitor extends GenericHTTPMonitor {
   protected boolean urlCheck;
 
   @Override
-  public void loadMetricGroup(final List<MeasureGroup> groups) {
+  public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
     groups.add(mgHTTPMonitor);
     groups.add(mgProbe);
@@ -104,7 +103,7 @@ public class WebServerMonitor extends GenericHTTPMonitor {
     int max = 0;
     if (obj != null) {
       final JSONArray arr = obj.getJSONArray("infos");
-      final MeasureSplitting checkInfo = smProbeResult.getSplitting("check");
+      final Measure checkInfo = smProbeResult.getSplitting("check");
       smProbeRows.setValue(arr.length());
       for (int i = 0; i < arr.length(); i++) {
         final JSONObject o = arr.getJSONObject(i);

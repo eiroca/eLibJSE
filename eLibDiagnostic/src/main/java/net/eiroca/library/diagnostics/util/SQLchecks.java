@@ -17,13 +17,13 @@
 package net.eiroca.library.diagnostics.util;
 
 import java.text.MessageFormat;
-import net.eiroca.library.metrics.MeasureGroup;
+import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.LibFile;
 
 public class SQLchecks {
 
   public String SQLscript;
-  public MeasureGroup mg;
+  public MetricGroup mg;
   public int type;
   public String param;
 
@@ -32,7 +32,7 @@ public class SQLchecks {
   }
 
   public SQLchecks(final String measureGroupName, final String format, final String SQLscript, final int type, final String param) {
-    mg = new MeasureGroup(measureGroupName, format);
+    mg = new MetricGroup(measureGroupName, format);
     this.type = type;
     this.param = param;
     this.SQLscript = SQLscript;

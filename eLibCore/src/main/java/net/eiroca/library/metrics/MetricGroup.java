@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.eiroca.library.metrics.derived.IDerivedMeasure;
 
-public class MeasureGroup {
+public class MetricGroup {
 
   private final List<Measure> metrics = new ArrayList<>();
   private String name;
@@ -42,11 +42,11 @@ public class MeasureGroup {
     return metrics;
   }
 
-  public MeasureGroup(final String name) {
+  public MetricGroup(final String name) {
     this(name, "{0}");
   }
 
-  public MeasureGroup(final String name, final String measureNameFormat) {
+  public MetricGroup(final String name, final String measureNameFormat) {
     this.name = name;
     this.measureNameFormat = measureNameFormat;
   }
@@ -82,7 +82,7 @@ public class MeasureGroup {
 
   public void setValue(final String metricName, final String splitName, final String split, final double metricValue) {
     final Measure m = find(metricName, true);
-    final MeasureSplitting ms = m.getSplitting(splitName);
+    final Measure ms = m.getSplitting(splitName);
     ms.setValue(split, metricValue);
   }
 
@@ -118,15 +118,20 @@ public class MeasureGroup {
     }
   }
 
+  public Measure define(final String name, final Measure m) {
+    final MetricMetadata definition = new MetricMetadata(name, measureNameFormat, 0);
+    m.metadata = definition;
+    return add(m);
+  }
+
   public Measure createMeasure(final String name) {
-    final MeasureMetadata definition = new MeasureMetadata(name, measureNameFormat, 0);
-    return new Measure(this, definition);
+    final MetricMetadata definition = new MetricMetadata(name, measureNameFormat, 0);
+    return add(new Measure(definition));
   }
 
   public Measure createMeasure(final String name, final double defValue) {
-    final MeasureMetadata definition = new MeasureMetadata(name, measureNameFormat, defValue);
-    return new Measure(this, definition);
-
+    final MetricMetadata definition = new MetricMetadata(name, measureNameFormat, defValue);
+    return add(new Measure(definition));
   }
 
 }

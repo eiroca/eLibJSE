@@ -29,7 +29,7 @@ import net.eiroca.library.core.LibStr;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
+import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.metrics.derived.RateMeasure;
 
 public class ElasticSearchMonitor extends GenericHTTPMonitor {
@@ -45,7 +45,7 @@ public class ElasticSearchMonitor extends GenericHTTPMonitor {
 
   protected static final String CONFIG_ELASTICURL = "elasticURL";
 
-  MeasureGroup mgElasticSearch = new MeasureGroup("ElasticSearch Statistics", "ElasticSearch - {0}");
+  MetricGroup mgElasticSearch = new MetricGroup("ElasticSearch Statistics", "ElasticSearch - {0}");
 
   Measure mActivePrimaryShards = mgElasticSearch.createMeasure("ActivePrimaryShards");
   Measure mActiveShards = mgElasticSearch.createMeasure("ActiveShards");
@@ -55,9 +55,9 @@ public class ElasticSearchMonitor extends GenericHTTPMonitor {
   Measure mDelayedUnassignedShards = mgElasticSearch.createMeasure("DelayedUnassignedShards");
   Measure mDeleteCurrent = mgElasticSearch.createMeasure("DeleteCurrent");
   Measure mDeletedCount = mgElasticSearch.createMeasure("DeletedCount");
-  RateMeasure mDocumentDeletedRate = new RateMeasure(mgElasticSearch, "DeletedCountPerSecond", mDeletedCount, TimeUnit.SECONDS, 0.0);
+  Measure mDocumentDeletedRate = mgElasticSearch.define("DeletedCountPerSecond", new RateMeasure(mDeletedCount, TimeUnit.SECONDS, 0.0));
   Measure mDocumentCount = mgElasticSearch.createMeasure("DocCount");
-  RateMeasure mDocumentRate = new RateMeasure(mgElasticSearch, "DocCountPerSecond", mDocumentCount, TimeUnit.SECONDS, 0.0);
+  Measure mDocumentRate = mgElasticSearch.define("DocCountPerSecond", new RateMeasure(mDocumentCount, TimeUnit.SECONDS, 0.0));
   Measure mFetchCurrent = mgElasticSearch.createMeasure("FetchCurrent");
   Measure mFieldDataEvictions = mgElasticSearch.createMeasure("FieldDataEvictions");
   Measure mFiledDataSize = mgElasticSearch.createMeasure("FieldDataSize");
@@ -95,7 +95,7 @@ public class ElasticSearchMonitor extends GenericHTTPMonitor {
   String baseURL;
 
   @Override
-  public void loadMetricGroup(final List<MeasureGroup> groups) {
+  public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
     groups.add(mgElasticSearch);
   }

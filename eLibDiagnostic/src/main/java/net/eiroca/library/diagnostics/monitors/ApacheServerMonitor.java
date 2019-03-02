@@ -25,14 +25,14 @@ import net.eiroca.ext.library.http.utils.URLFetcherException;
 import net.eiroca.library.diagnostics.CommandError;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
+import net.eiroca.library.metrics.MetricGroup;
 
 public class ApacheServerMonitor extends WebServerMonitor {
 
   private static final String CONFIG_MODSTATUSURL = "modStatusURL";
 
   // measurement variables
-  public MeasureGroup mgApachePerformance = new MeasureGroup("Apache Performance", "Apache - {0}");
+  public MetricGroup mgApachePerformance = new MetricGroup("Apache Performance", "Apache - {0}");
   public Measure totalAccesses = mgApachePerformance.createMeasure("TotalAccesses");
   public Measure totalkBytes = mgApachePerformance.createMeasure("TotalBytes");
   public Measure cpuLoad = mgApachePerformance.createMeasure("CPULoad");
@@ -44,7 +44,7 @@ public class ApacheServerMonitor extends WebServerMonitor {
   public Measure idleWorkers = mgApachePerformance.createMeasure("IdleWorkers");
   public Measure workersUtilization = mgApachePerformance.createMeasure("WorkersUtilization");
 
-  public MeasureGroup mgApacheScoreboard = new MeasureGroup("Apache Scoreboard", "Apache - Scoreboard - {0}");
+  public MetricGroup mgApacheScoreboard = new MetricGroup("Apache Scoreboard", "Apache - Scoreboard - {0}");
   public Measure sbWaitingForConnection = mgApacheScoreboard.createMeasure("Waiting");
   public Measure sbStartingUp = mgApacheScoreboard.createMeasure("Starting up");
   public Measure sbReadingRequest = mgApacheScoreboard.createMeasure("Reading Request");
@@ -122,7 +122,7 @@ public class ApacheServerMonitor extends WebServerMonitor {
   }
 
   @Override
-  public void loadMetricGroup(final List<MeasureGroup> groups) {
+  public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
     groups.add(mgApachePerformance);
     groups.add(mgApacheScoreboard);

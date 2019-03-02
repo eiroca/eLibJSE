@@ -17,47 +17,24 @@
 package net.eiroca.library.metrics.derived;
 
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.MeasureMetadata;
-import net.eiroca.library.metrics.MeasureSplitting;
-import net.eiroca.library.metrics.SplittedDatum;
+import net.eiroca.library.metrics.MetricMetadata;
+import net.eiroca.library.metrics.datum.Datum;
 
-public class HitMissRatioMeasure extends Measure implements IDerivedMeasure {
+public class HitMissRatioMeasure extends RatioMeasure {
 
-  private static final double ZERO = 0.00001;
-  public Measure hitMeasure;
-  public Measure missMeasure;
+  public HitMissRatioMeasure(final Measure hitMeasure, final Measure missMeasure) {
+    super(hitMeasure, missMeasure);
+  }
 
-  public HitMissRatioMeasure(final MeasureGroup mg, final String name, final Measure hitMeasure, final Measure missMeasure) {
-    super(mg, new MeasureMetadata(name, mg.getMeasureNameFormat(), 0));
-    this.hitMeasure = hitMeasure;
-    this.missMeasure = missMeasure;
+  public HitMissRatioMeasure(final MetricMetadata metadata, final Measure hitMeasure, final Measure missMeasure) {
+    super(metadata, hitMeasure, missMeasure);
   }
 
   @Override
-  public void refresh() {
-    reset();
-    if (hitMeasure.hasValue()) {
-      final double num = hitMeasure.getValue();
-      final double den = missMeasure.getValue() + num;
-      if (den > HitMissRatioMeasure.ZERO) {
-        setValue(num / den);
-      }
-    }
-    if (hitMeasure.hasSplittings()) {
-      for (final MeasureSplitting hitSplit : hitMeasure.getSplittings()) {
-        final String splitGroup = hitSplit.getName();
-        final MeasureSplitting result = getSplitting(splitGroup);
-        final MeasureSplitting denoms = missMeasure.getSplitting(splitGroup);
-        for (final SplittedDatum split : hitSplit.getSplitings()) {
-          final String splitName = split.getName();
-          final double num = split.getValue();
-          final double den = denoms.getValue(splitName, 0) + num;
-          if (den > HitMissRatioMeasure.ZERO) {
-            result.setValue(splitName, num / den);
-          }
-        }
-      }
+  protected void update(final Datum dest, final double num, final double den) {
+    final double tot = den + num;
+    if (tot > RatioMeasure.ZERO) {
+      dest.setValue(num / tot);
     }
   }
 

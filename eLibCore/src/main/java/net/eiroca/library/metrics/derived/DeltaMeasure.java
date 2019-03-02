@@ -16,52 +16,25 @@
  **/
 package net.eiroca.library.metrics.derived;
 
-import java.util.Map;
-import net.eiroca.library.metrics.Datum;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.MeasureMetadata;
-import net.eiroca.library.metrics.MeasureSplitting;
-import net.eiroca.library.metrics.SplittedDatum;
-import net.eiroca.library.metrics.util.MeasureSnapshot;
-import net.eiroca.library.metrics.util.SnapshotStorage;
+import net.eiroca.library.metrics.MetricMetadata;
+import net.eiroca.library.metrics.datum.Datum;
 
-public class DeltaMeasure extends Measure implements IDerivedMeasure {
+public class DeltaMeasure extends SnappedMeasure {
 
   public Measure observed;
 
-  public DeltaMeasure(final MeasureGroup mg, final String name, final Measure observed) {
-    super(mg, new MeasureMetadata(name, mg.getMeasureNameFormat(), 0));
-    this.observed = observed;
+  public DeltaMeasure(final Measure observed) {
+    super(observed);
+  }
+
+  public DeltaMeasure(final MetricMetadata metadata, final Measure observed) {
+    super(metadata, observed);
   }
 
   @Override
-  public void reset() {
-  }
-
-  @Override
-  public void refresh() {
-    super.reset();
-    final MeasureSnapshot oldSnap = SnapshotStorage.get(id);
-    SnapshotStorage.put(id, new MeasureSnapshot(observed));
-    if (oldSnap == null) { return; }
-    setValue(observed.getValue() - oldSnap.datum.value);
-    if (observed.hasSplittings()) {
-      for (final MeasureSplitting ms : observed.getSplittings()) {
-        final String splitName = ms.getName();
-        final Map<String, Datum> split = oldSnap.splittings.get(splitName);
-        if (split != null) {
-          final MeasureSplitting dms = getSplitting(splitName);
-          for (final SplittedDatum mm : ms.getSplitings()) {
-            final String splitKey = mm.getName();
-            final Datum old = split.get(splitKey);
-            if (old != null) {
-              dms.setValue(splitKey, mm.getValue() - old.value);
-            }
-          }
-        }
-      }
-    }
+  protected void update(final Datum dest, final Datum newDatum, final Datum oldDatum) {
+    dest.setValue(newDatum.value - oldDatum.value);
   }
 
 }

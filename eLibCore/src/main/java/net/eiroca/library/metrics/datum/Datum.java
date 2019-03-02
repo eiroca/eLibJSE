@@ -14,9 +14,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.metrics;
+package net.eiroca.library.metrics.datum;
 
-public class Datum {
+public class Datum implements IDatum {
 
   public long timeStamp;
   public double value;
@@ -37,11 +37,8 @@ public class Datum {
     }
   }
 
-  public void reset() {
-    timeStamp = 0;
-  }
-
-  public void reset(final double defVal) {
+  @Override
+  public void init(final double defVal) {
     timeStamp = 0;
     value = defVal;
   }
@@ -57,14 +54,17 @@ public class Datum {
     return timeStamp;
   }
 
+  @Override
   public boolean hasValue() {
     return timeStamp != 0;
   }
 
+  @Override
   public double getValue() {
     return value;
   }
 
+  @Override
   public void setValue(final double value) {
     this.value = value;
     timeStamp = System.currentTimeMillis();
@@ -74,14 +74,29 @@ public class Datum {
     if (timeStamp == 0) {
       timeStamp = datum.timeStamp != 0 ? datum.timeStamp : System.currentTimeMillis();
     }
-    this.value += datum.value;
+    value += datum.value;
   }
 
+  @Override
   public void addValue(final double value) {
     if (timeStamp == 0) {
       timeStamp = System.currentTimeMillis();
     }
     this.value += value;
+  }
+
+  @Override
+  public void toJson(final StringBuilder sb, final boolean simple) {
+    if (!simple) {
+      sb.append('{');
+      sb.append("\"date:\"");
+      sb.append(timeStamp);
+      sb.append(",\"value:\"");
+    }
+    sb.append(value);
+    if (!simple) {
+      sb.append('}');
+    }
   }
 
 }

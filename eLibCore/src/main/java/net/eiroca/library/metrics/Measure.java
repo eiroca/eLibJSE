@@ -16,118 +16,40 @@
  **/
 package net.eiroca.library.metrics;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import net.eiroca.library.metrics.datum.Datum;
 
-public class Measure {
+public class Measure extends Metric<Measure, Datum> {
 
-  private static final String NONAME = "-";
   private static final double VALUE_TRUE = 1.0;
   private static final double VALUE_FALSE = 0.0;
 
-  protected final UUID id = UUID.randomUUID();
-  protected MeasureGroup group;
-  protected MeasureMetadata metadata;
-  protected Datum datum = new Datum();
-  protected List<MeasureSplitting> splittings = new ArrayList<>();
+  protected MetricGroup group;
 
-  public Measure(final MeasureGroup owner, final MeasureMetadata metadata) {
-    setGroup(owner);
+  public Measure() {
+    this((MetricMetadata)null);
+  }
+
+  public Measure(final String name) {
+    this(new MetricMetadata(name));
+  }
+
+  public Measure(final MetricMetadata metadata) {
     this.metadata = metadata;
-  }
-
-  public void reset() {
-    datum.reset((metadata != null) ? metadata.getDefValue() : 0);
-    if (splittings != null) {
-      splittings.clear();
-    }
-  }
-
-  public void setGroup(final MeasureGroup aGroup) {
-    if (group != null) {
-      group.remove(this);
-    }
-    if (aGroup != null) {
-      aGroup.add(this);
-    }
-    group = aGroup;
-  }
-
-  public MeasureGroup getGroup() {
-    return group;
-  }
-
-  public boolean hasSplittings() {
-    return splittings.size() > 0;
-  }
-
-  public synchronized MeasureSplitting getSplitting(final String splitName) {
-    int idx = -1;
-    MeasureSplitting split = null;
-    for (int i = 0; i < splittings.size(); i++) {
-      split = splittings.get(i);
-      if (split.getName().equals(splitName)) {
-        idx = i;
-        break;
-      }
-    }
-    if (idx < 0) {
-      split = new MeasureSplitting(splitName);
-      splittings.add(split);
-    }
-    return split;
-  }
-
-  public List<MeasureSplitting> getSplittings() {
-    return splittings;
-  }
-
-  public String getName() {
-    final String name = metadata != null ? metadata.getName() : Measure.NONAME;
-    return name;
+    datum = newDatum();
   }
 
   @Override
-  public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append('"').append(getName()).append("\":").append(datum.value);
-    if (splittings.size() > 0) {
-      sb.append(",");
-      boolean first = true;
-      for (final MeasureSplitting ms : splittings) {
-        if (!first) {
-          sb.append(',');
-        }
-        sb.append(ms.toString());
-        first = false;
-      }
-    }
-    return sb.toString();
+  public Datum newDatum() {
+    return new Datum();
   }
 
-  public Datum getDatum() {
-    return datum;
+  @Override
+  public Measure newSplit(final String name) {
+    return new Measure(metadata);
   }
 
   public void setValue(final boolean value) {
     setValue(value ? Measure.VALUE_TRUE : Measure.VALUE_FALSE);
-  }
-
-  public void setValue(final double value) {
-    datum.setValue(value);
-  }
-
-  public void addValue(final double value) {
-    datum.addValue(value);
-  }
-
-  public boolean hasValue() {
-    return datum.hasValue();
-  }
-
-  public double getValue() {
-    return datum.getValue();
   }
 
   public long getTimeStamp() {

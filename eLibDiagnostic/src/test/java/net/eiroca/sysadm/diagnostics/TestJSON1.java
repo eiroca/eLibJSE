@@ -20,8 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.json.JSONObject;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.MeasureSplitting;
+import net.eiroca.library.metrics.MetricGroup;
 
 public class TestJSON1 {
 
@@ -36,7 +35,7 @@ public class TestJSON1 {
     }
   }
 
-  public MeasureGroup mgeSysAdm = new MeasureGroup("eSysAdm Monitor", "FLUME - {0}");
+  public MetricGroup mgeSysAdm = new MetricGroup("eSysAdm Monitor", "FLUME - {0}");
   public Measure mAppendAcceptedCount = mgeSysAdm.createMeasure("AppendAcceptedCount");
   public Measure mAppendBatchAcceptedCount = mgeSysAdm.createMeasure("AppendBatchAcceptedCount");
   public Measure mAppendBatchReceivedCount = mgeSysAdm.createMeasure("AppendBatchReceivedCount");
@@ -109,7 +108,7 @@ public class TestJSON1 {
           val = node.getDouble(alias);
           mapping = me.mappigns.get(alias);
           if (mapping != null) {
-            final MeasureSplitting m = mapping.measure.getSplitting(type);
+            final Measure m = mapping.measure.getSplitting(type);
             m.setValue(name, val * mapping.scale);
           }
         }

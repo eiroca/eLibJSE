@@ -16,27 +16,39 @@
  **/
 package net.eiroca.library.metrics;
 
-import java.util.Map.Entry;
+import java.text.MessageFormat;
 
-public class SplittedDatum {
+public class MetricMetadata {
 
-  final private Entry<String, Datum> split;
+  private String name;
+  private String displayFormat = "{0}";
+  private double defValue = 0;
 
-  public SplittedDatum(final Entry<String, Datum> split) {
+  public MetricMetadata(final String name) {
+    this.name = name;
+  }
+
+  public MetricMetadata(final String name, final String displayFormat, final double defValue) {
     super();
-    this.split = split;
+    this.name = name;
+    this.displayFormat = (displayFormat == null) ? "{0}" : displayFormat;
+    this.defValue = defValue;
   }
 
-  public String getName() {
-    return split.getKey();
+  public String getDisplayName() {
+    return MessageFormat.format(displayFormat, name);
   }
 
-  public Datum getDatum() {
-    return split.getValue();
+  public void setName(final String name) {
+    this.name = name;
   }
 
-  public double getValue() {
-    return split.getValue().getValue();
+  public double getDefValue() {
+    return defValue;
+  }
+
+  public void setDefValue(final double defValue) {
+    this.defValue = defValue;
   }
 
 }

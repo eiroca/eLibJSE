@@ -16,20 +16,23 @@
  **/
 package net.eiroca.library.metrics.derived;
 
+import java.util.Map.Entry;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.MeasureMetadata;
-import net.eiroca.library.metrics.MeasureSplitting;
-import net.eiroca.library.metrics.SplittedDatum;
+import net.eiroca.library.metrics.MetricMetadata;
+import net.eiroca.library.metrics.datum.Datum;
 
 public class RatioMeasure extends Measure implements IDerivedMeasure {
 
-  private static final double ZERO = 0.00001;
+  protected static final double ZERO = 0.00001;
   public Measure numMeasure;
   public Measure denMeasure;
 
-  public RatioMeasure(final MeasureGroup mg, final String name, final Measure numMeasure, final Measure denMeasure) {
-    super(mg, new MeasureMetadata(name, mg.getMeasureNameFormat(), 0));
+  public RatioMeasure(final Measure numMeasure, final Measure denMeasure) {
+    this(null, numMeasure, denMeasure);
+  }
+
+  public RatioMeasure(final MetricMetadata metadata, final Measure numMeasure, final Measure denMeasure) {
+    super(metadata);
     this.numMeasure = numMeasure;
     this.denMeasure = denMeasure;
   }
@@ -37,28 +40,30 @@ public class RatioMeasure extends Measure implements IDerivedMeasure {
   @Override
   public void refresh() {
     reset();
+    iterate(this, numMeasure, denMeasure);
+  }
+
+  private void iterate(final Measure ratioMeasure, final Measure num, final Measure den) {
     if (denMeasure.hasValue()) {
-      final double num = numMeasure.getValue();
-      final double den = denMeasure.getValue();
-      if (den > RatioMeasure.ZERO) {
-        setValue(num / den);
-      }
+      update(getDatum(), numMeasure.getValue(), denMeasure.getValue());
     }
     if (denMeasure.hasSplittings()) {
-      for (final MeasureSplitting denSplit : denMeasure.getSplittings()) {
-        final String splitGroup = denSplit.getName();
-        final MeasureSplitting nums = numMeasure.getSplitting(splitGroup);
-        final MeasureSplitting dens = denMeasure.getSplitting(splitGroup);
-        final MeasureSplitting result = getSplitting(splitGroup);
-        for (final SplittedDatum split : denSplit.getSplitings()) {
-          final String splitName = split.getName();
-          final double num = nums.getValue(splitName, 0);
-          final double den = dens.getValue(splitName, 0);
-          if (den > RatioMeasure.ZERO) {
-            result.setValue(splitName, num / den);
-          }
+      for (final Entry<String, Measure> ms : denMeasure.getSplittings().entrySet()) {
+        final String splitGroup = ms.getKey();
+        final Measure dens = ms.getValue();
+        final Measure nums = numMeasure.getSplitting(splitGroup);
+        final Measure result = getSplitting(splitGroup);
+        update(result.getDatum(), nums.getValue(), dens.getValue());
+        if (denMeasure.hasSplittings()) {
+          iterate(result, nums, dens);
         }
       }
+    }
+  }
+
+  protected void update(final Datum dest, final double num, final double den) {
+    if (den > RatioMeasure.ZERO) {
+      dest.setValue(num / den);
     }
   }
 

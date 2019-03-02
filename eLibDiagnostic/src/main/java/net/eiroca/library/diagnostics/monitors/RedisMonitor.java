@@ -24,9 +24,8 @@ import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
+import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.metrics.derived.HitMissRatioMeasure;
-import net.eiroca.library.metrics.derived.IDerivedMeasure;
 import net.eiroca.library.metrics.derived.RateMeasure;
 import redis.clients.jedis.Jedis;
 
@@ -35,7 +34,7 @@ public class RedisMonitor extends TCPServerMonitor {
   public static final String CONFIG_PORT = "port";
   public static final String CONFIG_AUTH = "redisAuth";
 
-  protected MeasureGroup mgRedisInfo = new MeasureGroup("Redis Statistics", "Redis - {0}");
+  protected MetricGroup mgRedisInfo = new MetricGroup("Redis Statistics", "Redis - {0}");
 
   protected Measure mServerResult = mgServerInfo.createMeasure("Result");
   protected Measure mServerStatus = mgServerInfo.createMeasure("Status");
@@ -57,9 +56,9 @@ public class RedisMonitor extends TCPServerMonitor {
   protected Measure mRedisRDBBkgSave = mgRedisInfo.createMeasure("Persistence - rdb_bgsave_in_progress");
   protected Measure mRedisRDBChanges = mgRedisInfo.createMeasure("Persistence - rdb_changes_since_last_save");
 
-  protected IDerivedMeasure mRedisHitRatio = new HitMissRatioMeasure(mgRedisInfo, "Keyspace Hit Ratio", mRedisStatsHits, mRedisStatsMiss);
-  protected IDerivedMeasure mRedisHitsPerSec = new RateMeasure(mgRedisInfo, "Keyspace Hit Rate", mRedisStatsHits, TimeUnit.SECONDS, 0.0);
-  protected IDerivedMeasure mRedisMissPerSec = new RateMeasure(mgRedisInfo, "Keyspace Miss Rate", mRedisStatsMiss, TimeUnit.SECONDS, 0.0);
+  protected Measure mRedisHitRatio = mgRedisInfo.define("Keyspace Hit Ratio", new HitMissRatioMeasure(mRedisStatsHits, mRedisStatsMiss));
+  protected Measure mRedisHitsPerSec = mgRedisInfo.define("Keyspace Hit Rate", new RateMeasure(mRedisStatsHits, TimeUnit.SECONDS, 0.0));
+  protected Measure mRedisMissPerSec = mgRedisInfo.define("Keyspace Miss Rate", new RateMeasure(mRedisStatsMiss, TimeUnit.SECONDS, 0.0));
 
   protected Map<String, Measure> mapping = new HashMap<>();
 
@@ -86,7 +85,7 @@ public class RedisMonitor extends TCPServerMonitor {
   }
 
   @Override
-  public void loadMetricGroup(final List<MeasureGroup> groups) {
+  public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
     groups.add(mgRedisInfo);
   }

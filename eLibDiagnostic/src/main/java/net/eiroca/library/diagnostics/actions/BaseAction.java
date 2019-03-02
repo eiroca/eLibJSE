@@ -35,8 +35,7 @@ import net.eiroca.library.diagnostics.converters.WindowsScriptConverter;
 import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.diagnostics.validators.GenericValidator;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.MeasureSplitting;
+import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.parameter.ListParameter;
 import net.eiroca.library.parameter.StringParameter;
 import net.eiroca.library.system.ContextParameters;
@@ -54,12 +53,12 @@ public abstract class BaseAction implements IAction<ActionData, ReturnObject>, I
   }
 
   // measurement variables
-  public MeasureGroup mgResult = new MeasureGroup("Generic Execution Monitor");
+  public MetricGroup mgResult = new MetricGroup("Generic Execution Monitor");
   protected Measure mStatus = mgResult.createMeasure("Status");
   protected Measure mResult = mgResult.createMeasure("Result");
   protected Measure mVerified = mgResult.createMeasure("ContentVerified");
 
-  public static final String SPLIT_VALUES = "Values";
+  public static final String SPLIT_GROUP = "Values";
 
   // Config
   protected ContextParameters params = new ContextParameters();
@@ -114,7 +113,7 @@ public abstract class BaseAction implements IAction<ActionData, ReturnObject>, I
   }
 
   @Override
-  public void loadMetricGroup(final List<MeasureGroup> groups) {
+  public void loadMetricGroup(final List<MetricGroup> groups) {
     groups.add(mgResult);
   }
 
@@ -154,7 +153,7 @@ public abstract class BaseAction implements IAction<ActionData, ReturnObject>, I
     final String[] metricNames = pMetricNames.get();
     if (metricNames == null) { return; }
     final int numVal = returnedValues.length;
-    final MeasureSplitting m = mResult.getSplitting(BaseAction.SPLIT_VALUES);
+    final Measure m = mResult.getSplitting(BaseAction.SPLIT_GROUP);
     for (int i = 0; i < metricNames.length; i++) {
       final String name = metricNames[i];
       Double d;

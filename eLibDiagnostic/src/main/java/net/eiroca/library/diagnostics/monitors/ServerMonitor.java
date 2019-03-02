@@ -26,13 +26,13 @@ import net.eiroca.library.diagnostics.IServerMonitor;
 import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.diagnostics.validators.GenericValidator;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
+import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.IContext;
 
 public abstract class ServerMonitor implements IServerMonitor {
 
   // measure constants
-  protected MeasureGroup mgServerInfo = new MeasureGroup("Server Monitor");
+  protected MetricGroup mgServerInfo = new MetricGroup("Server Monitor");
   protected Measure mServerReachable = mgServerInfo.createMeasure("HostReachable");
   protected Measure mServerConnectionTimeout = mgServerInfo.createMeasure("ConnectionTimedOut");
   protected Measure mServerLatency = mgServerInfo.createMeasure("ServerLatency");
@@ -119,16 +119,16 @@ public abstract class ServerMonitor implements IServerMonitor {
   @Override
   public void setup(final IContext context) throws CommandException {
     this.context = context;
-    final List<MeasureGroup> groups = new ArrayList<>();
+    final List<MetricGroup> groups = new ArrayList<>();
     loadMetricGroup(groups);
-    for (final MeasureGroup mg : groups) {
+    for (final MetricGroup mg : groups) {
       mg.reset();
     }
     readConf();
   }
 
   @Override
-  public void loadMetricGroup(final List<MeasureGroup> groups) {
+  public void loadMetricGroup(final List<MetricGroup> groups) {
     groups.add(mgServerInfo);
   }
 
@@ -136,10 +136,10 @@ public abstract class ServerMonitor implements IServerMonitor {
   public String toString() {
     final StringBuilder sb = new StringBuilder(256);
     sb.append("{\"monitor\": \"").append(getClass().getSimpleName()).append("\",\"measures\":{");
-    final List<MeasureGroup> groups = new ArrayList<>();
+    final List<MetricGroup> groups = new ArrayList<>();
     loadMetricGroup(groups);
     boolean first = true;
-    for (final MeasureGroup g : groups) {
+    for (final MetricGroup g : groups) {
       if (!first) {
         sb.append(',');
       }

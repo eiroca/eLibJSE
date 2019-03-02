@@ -111,7 +111,7 @@ public class WebServiceAction extends HTTPAction {
     WebServiceAction.BINDING_ID_MAP.put("SOAP11", SOAPBinding.SOAP11HTTP_BINDING);
     WebServiceAction.BINDING_ID_MAP.put("SOAP12", SOAPBinding.SOAP12HTTP_BINDING);
     WebServiceAction.BINDING_ID_MAP.put("HTTP", HTTPBinding.HTTP_BINDING);
-  };
+  }
 
   final StringParameter pWSDL = new StringParameter(params, "wsdl", null, true, false);
   final StringParameter pOperation = new StringParameter(params, "wsOperation", null, true, false);

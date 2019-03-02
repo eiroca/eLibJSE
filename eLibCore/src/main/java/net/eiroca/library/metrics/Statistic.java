@@ -14,13 +14,38 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.diagnostics;
+package net.eiroca.library.metrics;
 
-import java.util.List;
-import net.eiroca.library.metrics.MetricGroup;
+import java.util.Collection;
+import net.eiroca.library.metrics.datum.StatisticDatum;
 
-public interface IMonitor {
+public class Statistic extends Metric<Statistic, StatisticDatum> {
 
-  public void loadMetricGroup(final List<MetricGroup> groups);
+  public Statistic() {
+    this((MetricMetadata)null);
+  }
+
+  public Statistic(final String name) {
+    this(new MetricMetadata(name));
+  }
+
+  public Statistic(final MetricMetadata metadata) {
+    this.metadata = metadata;
+    datum = newDatum();
+  }
+
+  @Override
+  public StatisticDatum newDatum() {
+    return new StatisticDatum();
+  }
+
+  @Override
+  public Statistic newSplit(final String name) {
+    return new Statistic();
+  }
+
+  public Collection<Statistic> getSplitMeasures() {
+    return splittings == null ? null : splittings.values();
+  }
 
 }

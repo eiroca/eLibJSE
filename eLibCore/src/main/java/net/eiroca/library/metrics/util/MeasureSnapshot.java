@@ -18,26 +18,29 @@ package net.eiroca.library.metrics.util;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.eiroca.library.metrics.Datum;
+import java.util.Map.Entry;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureSplitting;
-import net.eiroca.library.metrics.SplittedDatum;
+import net.eiroca.library.metrics.datum.Datum;
 
 public class MeasureSnapshot {
 
   public Datum datum;
-  public Map<String, Map<String, Datum>> splittings = new HashMap<>();
+  public Map<String, MeasureSnapshot> splittings = null;
 
   public MeasureSnapshot(final Measure m) {
     datum = new Datum(m.getDatum());
     if (m.hasSplittings()) {
-      for (final MeasureSplitting ms : m.getSplittings()) {
-        final Map<String, Datum> snap = splittings.put(ms.getName(), new HashMap<String, Datum>());
-        for (final SplittedDatum mm : ms.getSplitings()) {
-          snap.put(mm.getName(), new Datum(mm.getDatum()));
-        }
+      splittings = new HashMap<>();
+      for (final Entry<String, Measure> ms : m.getSplittings().entrySet()) {
+        final String splitName = ms.getKey();
+        final Measure split = ms.getValue();
+        splittings.put(splitName, new MeasureSnapshot(split));
       }
     }
+  }
+
+  public boolean hasSplittings() {
+    return (splittings != null) && (splittings.size() > 0);
   }
 
 }

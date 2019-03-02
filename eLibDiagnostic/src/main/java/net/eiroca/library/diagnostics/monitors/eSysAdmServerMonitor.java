@@ -25,8 +25,7 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.MeasureSplitting;
+import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.ILog.LogLevel;
 
 public class eSysAdmServerMonitor extends RESTServerMonitor {
@@ -41,14 +40,14 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
   }
 
   // measurement variables
-  public MeasureGroup mgeSysAdm = new MeasureGroup("eSysAdm Monitor", "eSysAdm - {0}");
+  public MetricGroup mgeSysAdm = new MetricGroup("eSysAdm Monitor", "eSysAdm - {0}");
   public Measure mMetrics = mgeSysAdm.createMeasure("Metrics");
   public Measure mAlerts = mgeSysAdm.createMeasure("Alerts");
   public Measure mKPIs = mgeSysAdm.createMeasure("KPIs");
   public Measure mTimings = mgeSysAdm.createMeasure("Timings");
 
   @Override
-  public void loadMetricGroup(final List<MeasureGroup> groups) {
+  public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
     groups.add(mgeSysAdm);
   }
@@ -165,11 +164,11 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
       }
       context.info("M: ", m);
       if (splittings != null) {
-        final Iterator<String> splittingsKeys = splittings.keys();
-        while (splittingsKeys.hasNext()) {
-          final String splittingKey = splittingsKeys.next();
-          data = splittings.getJSONObject(splittingKey);
-          final MeasureSplitting ms = m.getSplitting(splittingKey);
+        final Iterator<String> splittingsGroups = splittings.keys();
+        while (splittingsGroups.hasNext()) {
+          final String splittingGroup = splittingsGroups.next();
+          data = splittings.getJSONObject(splittingGroup);
+          final Measure ms = m.getSplitting(splittingGroup);
           final JSONObject splittingSubKeysObj = data.optJSONObject("splittings");
           final Iterator<String> splittingsSubKeys = splittingSubKeysObj.keys();
           while (splittingsSubKeys.hasNext()) {
@@ -177,7 +176,7 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
             data = splittingSubKeysObj.getJSONObject(splittingsSubKey);
             final Double splitVal = getValue(data, splitAggregation);
             if (splitVal != null) {
-              context.logF(LogLevel.info, "{0}.{1}={2}", splittingKey, splittingsSubKey, splitVal);
+              context.logF(LogLevel.info, "{0}.{1}={2}", splittingGroup, splittingsSubKey, splitVal);
               ms.setValue(splittingsSubKey, splitVal);
             }
           }

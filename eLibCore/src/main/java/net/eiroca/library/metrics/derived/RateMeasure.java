@@ -16,40 +16,32 @@
  **/
 package net.eiroca.library.metrics.derived;
 
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import net.eiroca.library.metrics.Datum;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.MeasureMetadata;
-import net.eiroca.library.metrics.MeasureSplitting;
-import net.eiroca.library.metrics.SplittedDatum;
-import net.eiroca.library.metrics.util.MeasureSnapshot;
-import net.eiroca.library.metrics.util.SnapshotStorage;
+import net.eiroca.library.metrics.MetricMetadata;
+import net.eiroca.library.metrics.datum.Datum;
 
-public class RateMeasure extends Measure implements IDerivedMeasure {
+public class RateMeasure extends SnappedMeasure {
 
   private static final double ZERO = 0.00001;
 
-  private final Measure observed;
   private final TimeUnit timeUnit;
   private final Double minRate;
 
-  public RateMeasure(final MeasureGroup mg, final String name, final Measure observed, final TimeUnit timeUnit, final Double minRate) {
-    super(mg, new MeasureMetadata(name, mg.getMeasureNameFormat(), 0));
-    this.observed = observed;
+  public RateMeasure(final Measure observed, final TimeUnit timeUnit, final Double minRate) {
+    this(null, observed, timeUnit, minRate);
+  }
+
+  public RateMeasure(final MetricMetadata metadata, final Measure observed, final TimeUnit timeUnit, final Double minRate) {
+    super(metadata, observed);
     this.timeUnit = timeUnit;
     this.minRate = minRate;
   }
 
   @Override
-  public void refresh() {
-    super.reset();
-    final MeasureSnapshot oldSnap = SnapshotStorage.get(id);
-    SnapshotStorage.put(id, new MeasureSnapshot(observed));
-    if (oldSnap == null) { return; }
-    final long duration = observed.getTimeStamp() - oldSnap.datum.timeStamp;
-    double diff = observed.getValue() - oldSnap.datum.value;
+  protected void update(final Datum dest, final Datum newDatum, final Datum oldDatum) {
+    final long duration = newDatum.getTimeStamp() - oldDatum.getTimeStamp();
+    final double diff = newDatum.getValue() - oldDatum.getValue();
     final double timeDivisor = ((double)duration) / timeUnit.toMillis(1);
     double rate = 0;
     if (timeDivisor > RateMeasure.ZERO) {
@@ -57,28 +49,10 @@ public class RateMeasure extends Measure implements IDerivedMeasure {
       if ((minRate != null) && (rate < minRate)) {
         rate = minRate;
       }
-      setValue(rate);
-      if (observed.hasSplittings()) {
-        for (final MeasureSplitting ms : observed.getSplittings()) {
-          final String splitName = ms.getName();
-          final Map<String, Datum> split = oldSnap.splittings.get(splitName);
-          if (split != null) {
-            final MeasureSplitting dms = getSplitting(splitName);
-            for (final SplittedDatum mm : ms.getSplitings()) {
-              final String splitKey = mm.getName();
-              final Datum old = split.get(splitKey);
-              if (old != null) {
-                diff = mm.getValue() - old.value;
-                rate = diff / timeDivisor;
-                if ((minRate != null) && (rate < minRate)) {
-                  rate = minRate;
-                }
-                dms.setValue(splitKey, rate);
-              }
-            }
-          }
-        }
-      }
+      dest.setValue(rate);
+    }
+    else {
+      // No rate
     }
   }
 

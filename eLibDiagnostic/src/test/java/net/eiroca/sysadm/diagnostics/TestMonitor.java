@@ -21,7 +21,7 @@ import java.util.List;
 import net.eiroca.library.diagnostics.monitors.RedisMonitor;
 import net.eiroca.library.diagnostics.monitors.TCPServerMonitor;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
+import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.Context;
 
 public class TestMonitor {
@@ -34,9 +34,9 @@ public class TestMonitor {
     try {
       monitor.setup(context);
       monitor.check("it255avr.it.sedc.internal.vodafone.com");
-      final List<MeasureGroup> groups = new ArrayList<>();
+      final List<MetricGroup> groups = new ArrayList<>();
       monitor.loadMetricGroup(groups);
-      for (final MeasureGroup g : groups) {
+      for (final MetricGroup g : groups) {
         context.debug("processing group: ", g.getName());
         g.refresh();
         for (final Measure m : g.getMetrics()) {

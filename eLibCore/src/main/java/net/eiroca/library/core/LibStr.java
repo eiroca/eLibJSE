@@ -187,4 +187,51 @@ final public class LibStr {
     return path;
   }
 
+  final public static void encodeJson(final StringBuffer sb, final String string) {
+    if ((string == null) || string.isEmpty()) {
+      sb.append("\"\"");
+      return;
+    }
+    char oldCh;
+    char ch = 0;
+    sb.append('"');
+    for (int i = 0; i < string.length(); i++) {
+      oldCh = ch;
+      ch = string.charAt(i);
+      switch (ch) {
+        case '\\':
+        case '"':
+          sb.append('\\');
+          sb.append(ch);
+          break;
+        case '/':
+          if (oldCh == '<') {
+            sb.append('\\');
+          }
+          sb.append(ch);
+          break;
+        case '\b':
+        case '\t':
+        case '\n':
+        case '\f':
+        case '\r':
+          sb.append(ch);
+          break;
+        default:
+          if ((ch < ' ') || ((ch >= '\u0080') && (ch < '\u00a0')) || ((ch >= '\u2000') && (ch < '\u2100'))) {
+            sb.append("\\u");
+            final String hhhh = Integer.toHexString(ch);
+            for (int l = 0; l < (4 - hhhh.length()); l++) {
+              sb.append('0');
+            }
+            sb.append(hhhh);
+          }
+          else {
+            sb.append(ch);
+          }
+      }
+    }
+    sb.append('"');
+  }
+
 }

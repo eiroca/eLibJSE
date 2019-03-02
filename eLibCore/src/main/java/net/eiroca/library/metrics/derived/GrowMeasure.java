@@ -16,60 +16,29 @@
  **/
 package net.eiroca.library.metrics.derived;
 
-import java.util.Map;
-import net.eiroca.library.metrics.Datum;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.MeasureMetadata;
-import net.eiroca.library.metrics.MeasureSplitting;
-import net.eiroca.library.metrics.SplittedDatum;
-import net.eiroca.library.metrics.util.MeasureSnapshot;
-import net.eiroca.library.metrics.util.SnapshotStorage;
+import net.eiroca.library.metrics.MetricMetadata;
+import net.eiroca.library.metrics.datum.Datum;
 
-public class GrowMeasure extends Measure implements IDerivedMeasure {
+public class GrowMeasure extends SnappedMeasure {
 
   private static final double ZERO = 0.00001;
 
-  private final Measure observed;
+  public GrowMeasure(final Measure observed) {
+    super(observed);
+  }
 
-  public GrowMeasure(final MeasureGroup mg, final String name, final Measure observed) {
-    super(mg, new MeasureMetadata(name, mg.getMeasureNameFormat(), 0));
-    this.observed = observed;
+  public GrowMeasure(final MetricMetadata metadata, final Measure observed) {
+    super(metadata, observed);
   }
 
   @Override
-  public void refresh() {
-    super.reset();
-    final MeasureSnapshot snap = SnapshotStorage.get(id);
-    SnapshotStorage.put(id, new MeasureSnapshot(observed));
-    if (snap == null) { return; }
-    double diff = observed.getValue() - snap.datum.value;
-    double base = snap.datum.value;
-    double rate = 0;
+  protected void update(final Datum dest, final Datum newDatum, final Datum oldDatum) {
+    final double diff = newDatum.value - oldDatum.value;
+    final double base = oldDatum.value;
     if (base > GrowMeasure.ZERO) {
-      rate = (diff / base) - 1;
-      setValue(rate);
-    }
-    if (observed.hasSplittings()) {
-      for (final MeasureSplitting ms : observed.getSplittings()) {
-        final String splitName = ms.getName();
-        final Map<String, Datum> split = snap.splittings.get(splitName);
-        if (split != null) {
-          final MeasureSplitting dms = getSplitting(splitName);
-          for (final SplittedDatum mm : ms.getSplitings()) {
-            final String splitKey = mm.getName();
-            final Datum old = split.get(splitKey);
-            if (old != null) {
-              diff = mm.getValue() - old.value;
-              base = old.value;
-              if (base > GrowMeasure.ZERO) {
-                rate = (diff / base) - 1;
-                dms.setValue(splitKey, rate);
-              }
-            }
-          }
-        }
-      }
+      final double rate = (diff / base) - 1;
+      dest.setValue(rate);
     }
   }
 

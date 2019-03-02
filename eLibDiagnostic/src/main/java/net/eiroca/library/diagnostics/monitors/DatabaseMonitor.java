@@ -34,8 +34,7 @@ import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.diagnostics.util.SQLchecks;
 import net.eiroca.library.diagnostics.validators.GenericValidator;
 import net.eiroca.library.metrics.Measure;
-import net.eiroca.library.metrics.MeasureGroup;
-import net.eiroca.library.metrics.MeasureSplitting;
+import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.IContext;
 import net.eiroca.library.system.ILog.LogLevel;
 import net.eiroca.library.system.LibSystem;
@@ -64,7 +63,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
 
   private static final String CONFIG_RUNSQL = "runSQL";
 
-  MeasureGroup mgDBMonitor = new MeasureGroup("Database Monitor", "Database - {0}");
+  MetricGroup mgDBMonitor = new MetricGroup("Database Monitor", "Database - {0}");
   Measure mDBQueryTime = mgDBMonitor.createMeasure("Query Time");
   Measure mDBQueryRows = mgDBMonitor.createMeasure("Query Rows");
 
@@ -129,7 +128,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
   }
 
   @Override
-  public void loadMetricGroup(final List<MeasureGroup> groups) {
+  public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
     groups.add(mgDBMonitor);
     if (checks != null) {
@@ -240,7 +239,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
       ok = dbSQL.fetchRecord(data);
       if (ok) {
         if (captureMode == CaputeMode.COLUMNS) {
-          final MeasureSplitting ms = mServerResult.getSplitting(metricGroup);
+          final Measure ms = mServerResult.getSplitting(metricGroup);
           for (int i = 0; i < data.length; i++) {
             final String splitName = dbSQL.getColumnsName(i);
             final Double val = net.eiroca.library.core.Helper.getDouble(data[i], 0.0);
@@ -266,7 +265,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
               }
               final Double val = net.eiroca.library.core.Helper.getDouble(valStr, 0.0);
               context.logF(LogLevel.debug, "{0}[{1}]={2}", splitGroup, splitName, val);
-              final MeasureSplitting ms = mServerResult.getSplitting(splitGroup);
+              final Measure ms = mServerResult.getSplitting(splitGroup);
               ms.setValue(splitName, val);
               queryResult += val;
             }
@@ -284,7 +283,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
             }
             final Double val = net.eiroca.library.core.Helper.getDouble(valStr, 0.0);
             context.logF(LogLevel.debug, "{0}[{1}]={2}", splitGroup, splitName, val);
-            final MeasureSplitting ms = mServerResult.getSplitting(splitGroup);
+            final Measure ms = mServerResult.getSplitting(splitGroup);
             ms.setValue(splitName, val);
             queryResult += val;
           }
@@ -353,7 +352,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
     }
   }
 
-  public void populateSimpleMetrics(final MeasureGroup mg, final Connection con, String query, final Object[] params) throws Exception {
+  public void populateSimpleMetrics(final MetricGroup mg, final Connection con, String query, final Object[] params) throws Exception {
     ResultSet rs = null;
     PreparedStatement st = null;
     if ((params != null) && (query.contains("{"))) {
@@ -382,7 +381,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
     }
   }
 
-  public void populateSplittedMetrics(final MeasureGroup mg, final String splitName, final Connection con, String query, final Object[] params) throws Exception {
+  public void populateSplittedMetrics(final MetricGroup mg, final String splitName, final Connection con, String query, final Object[] params) throws Exception {
     ResultSet rs = null;
     PreparedStatement st = null;
     if ((params != null) && (query.contains("{"))) {

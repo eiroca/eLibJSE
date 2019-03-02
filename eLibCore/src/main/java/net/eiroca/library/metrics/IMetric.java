@@ -14,13 +14,25 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.diagnostics;
+package net.eiroca.library.metrics;
 
-import java.util.List;
-import net.eiroca.library.metrics.MetricGroup;
+import java.util.UUID;
+import net.eiroca.library.metrics.datum.IDatum;
 
-public interface IMonitor {
+public interface IMetric<D extends IDatum> {
 
-  public void loadMetricGroup(final List<MetricGroup> groups);
+  public void reset();
+
+  public UUID getId();
+
+  public D newDatum();
+
+  public D getDatum();
+
+  public MetricMetadata getMetadata();
+
+  public IMetric<D> getSplitting(final String splitName);
+
+  public void toJson(StringBuilder sb);
 
 }
