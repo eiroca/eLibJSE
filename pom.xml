@@ -117,6 +117,7 @@
 		<module>eLibUI</module>
 		<module>eLibDiagnostic</module>
 		<module>eLibExt</module>
+		<module>eLibSysAdm</module>
 		<module>eExtLib</module>
 	</modules>
 </project>

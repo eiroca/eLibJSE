@@ -14,26 +14,18 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.server;
+package net.eiroca.library.sysadm.monitoring.api;
 
-public class ResultResponse extends ServerResponse {
+import java.util.Map;
+import net.eiroca.library.metrics.datum.Datum;
+import net.eiroca.library.system.IContext;
 
-  private Object result;
+public interface IMeasureConsumer {
 
-  public ResultResponse(final int status) {
-    this(status, null, null);
-  }
+  public void setup(final IContext context) throws Exception;
 
-  public ResultResponse(final int status, final String message, final Object result) {
-    super(status, message);
-    this.result = result;
-  }
+  public void teardown() throws Exception;
 
-  public Object getResult() {
-    return result;
-  }
+  public boolean exportData(final String group, final String metric, final String splitGroup, final String splitName, final Datum datum, Map<String, Object> meta);
 
-  public void setResult(final Object result) {
-    this.result = result;
-  }
 }

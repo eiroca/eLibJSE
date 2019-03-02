@@ -14,26 +14,14 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.server;
+package net.eiroca.library.sysadm.monitoring.api;
 
-public class ResultResponse extends ServerResponse {
+import net.eiroca.library.system.IContext;
 
-  private Object result;
+public interface IMeasureProducer extends Runnable {
 
-  public ResultResponse(final int status) {
-    this(status, null, null);
-  }
+  public void setup(IContext context) throws Exception;
 
-  public ResultResponse(final int status, final String message, final Object result) {
-    super(status, message);
-    this.result = result;
-  }
+  public void teardown() throws Exception;
 
-  public Object getResult() {
-    return result;
-  }
-
-  public void setResult(final Object result) {
-    this.result = result;
-  }
 }

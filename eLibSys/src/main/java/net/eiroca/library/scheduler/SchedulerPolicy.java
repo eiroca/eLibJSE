@@ -14,26 +14,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.server;
+package net.eiroca.library.scheduler;
 
-public class ResultResponse extends ServerResponse {
+public interface SchedulerPolicy {
 
-  private Object result;
+  long next(long lastTime);
 
-  public ResultResponse(final int status) {
-    this(status, null, null);
-  }
-
-  public ResultResponse(final int status, final String message, final Object result) {
-    super(status, message);
-    this.result = result;
-  }
-
-  public Object getResult() {
-    return result;
-  }
-
-  public void setResult(final Object result) {
-    this.result = result;
-  }
 }

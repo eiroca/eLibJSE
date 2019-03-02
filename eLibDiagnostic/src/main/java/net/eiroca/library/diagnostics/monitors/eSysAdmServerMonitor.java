@@ -24,7 +24,9 @@ import java.util.Iterator;
 import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
+import net.eiroca.library.core.LibMath;
 import net.eiroca.library.metrics.Measure;
+import net.eiroca.library.metrics.MetricAggregation;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.ILog.LogLevel;
 
@@ -34,10 +36,6 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
   private static final String CONFIG_NAMESPACE = "namespace";
   private static final String CONFIG_AGGREGATION_MEASURE = "aggregation";
   private static final String CONFIG_AGGREGATION_SPLIT = "splitting_aggregation";
-
-  enum MetricAggregation {
-    average, min, max, first, last, count, sum
-  }
 
   // measurement variables
   public MetricGroup mgeSysAdm = new MetricGroup("eSysAdm Monitor", "eSysAdm - {0}");
@@ -62,6 +60,7 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
   }
 
   public Double getValue(final JSONObject data, final MetricAggregation aggregation) {
+    if (data == null) return null;
     double val = 0;
     boolean ok = true;
     try {
@@ -85,13 +84,11 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
           val = data.getDouble("count");
           break;
         case average:
-          final long cnt = data.getLong("count");
-          if (cnt > 0) {
-            val = data.getDouble("sumX") / cnt;
-          }
-          else {
-            ok = false;
-          }
+          val = LibMath.average(data.getLong("count"), data.getDouble("sumX"));
+          break;
+        case stddev:
+          val = LibMath.stddev(data.getLong("count"), data.getDouble("sumX"), data.getDouble("sumX2"));
+          break;
       }
     }
     catch (final JSONException e) {
@@ -158,7 +155,8 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
       }
       JSONObject data = result.getJSONObject(metric);
       final JSONObject splittings = data.optJSONObject("splittings");
-      final Double val = getValue(data, measureAggregation);
+      JSONObject value = data.optJSONObject("value");
+      final Double val = getValue(value, measureAggregation);
       if (val != null) {
         m.setValue(val);
       }
@@ -166,18 +164,19 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
       if (splittings != null) {
         final Iterator<String> splittingsGroups = splittings.keys();
         while (splittingsGroups.hasNext()) {
-          final String splittingGroup = splittingsGroups.next();
-          data = splittings.getJSONObject(splittingGroup);
-          final Measure ms = m.getSplitting(splittingGroup);
+          final String splitGroup = splittingsGroups.next();
+          data = splittings.getJSONObject(splitGroup);
+          final Measure ms = m.getSplitting(splitGroup);
           final JSONObject splittingSubKeysObj = data.optJSONObject("splittings");
           final Iterator<String> splittingsSubKeys = splittingSubKeysObj.keys();
           while (splittingsSubKeys.hasNext()) {
-            final String splittingsSubKey = splittingsSubKeys.next();
-            data = splittingSubKeysObj.getJSONObject(splittingsSubKey);
-            final Double splitVal = getValue(data, splitAggregation);
+            final String splitName = splittingsSubKeys.next();
+            data = splittingSubKeysObj.getJSONObject(splitName);
+            value = data.optJSONObject("value");
+            final Double splitVal = getValue(value, splitAggregation);
             if (splitVal != null) {
-              context.logF(LogLevel.info, "{0}.{1}={2}", splittingGroup, splittingsSubKey, splitVal);
-              ms.setValue(splittingsSubKey, splitVal);
+              context.logF(LogLevel.info, "{0}.{1}={2}", splitGroup, splitName, splitVal);
+              ms.setValue(splitName, splitVal);
             }
           }
         }

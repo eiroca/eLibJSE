@@ -36,7 +36,6 @@ public class TestMetrics {
     m.setValue(1);
     m.addValue(3);
     assertEqual(m.getValue(), 4.0);
-    //    Assert.assertTrue(m.toString().equals("{}"));
   }
 
   @Test
@@ -64,7 +63,9 @@ public class TestMetrics {
     s.setValue("B", 2);
     s = m.getSplitting("Split2");
     s.setValue(4);
-    Assert.assertTrue("{\"value:\"4.0,\"Split1\":{\"A\":2.0,\"B\":2.0},\"Split2\":4.0}".equals(m.toString()));
+    final String expected = "{\"value\":4.0,\"splittings\":{\"Split1\":{\"splittings\":{\"A\":{\"value\":2.0},\"B\":{\"value\":2.0}}},\"Split2\":{\"value\":4.0}}}";
+    final String json = m.toString();
+    Assert.assertTrue(expected.equals(json));
   }
 
   @Test
@@ -77,9 +78,9 @@ public class TestMetrics {
     s.setValue("B", 2);
     s = m.getSplitting("Split2");
     s.setValue(4);
-    Assert.assertTrue(
-        "{\"value:\"{\"count\":2,\"first\":1.0,\"last\":3.0,\"min\":1.0,\"max\":3.0,\"sumX\":4.0,\"sumX2\":10.0,\"sumX3\":28.0},\"Split1\":{\"A\":{\"count\":1,\"first\":2.0,\"last\":2.0,\"min\":2.0,\"max\":2.0,\"sumX\":2.0,\"sumX2\":4.0,\"sumX3\":8.0},\"B\":{\"count\":1,\"first\":2.0,\"last\":2.0,\"min\":2.0,\"max\":2.0,\"sumX\":2.0,\"sumX2\":4.0,\"sumX3\":8.0}},\"Split2\":{\"count\":1,\"first\":4.0,\"last\":4.0,\"min\":4.0,\"max\":4.0,\"sumX\":4.0,\"sumX2\":16.0,\"sumX3\":64.0}}"
-            .equals(m.toString()));
+    final String expected = "{\"value\":{\"count\":2,\"first\":1.0,\"last\":3.0,\"min\":1.0,\"max\":3.0,\"sumX\":4.0,\"sumX2\":10.0,\"sumX3\":28.0},\"splittings\":{\"Split1\":{\"splittings\":{\"A\":{\"value\":{\"count\":1,\"first\":2.0,\"last\":2.0,\"min\":2.0,\"max\":2.0,\"sumX\":2.0,\"sumX2\":4.0,\"sumX3\":8.0}},\"B\":{\"value\":{\"count\":1,\"first\":2.0,\"last\":2.0,\"min\":2.0,\"max\":2.0,\"sumX\":2.0,\"sumX2\":4.0,\"sumX3\":8.0}}}},\"Split2\":{\"value\":{\"count\":1,\"first\":4.0,\"last\":4.0,\"min\":4.0,\"max\":4.0,\"sumX\":4.0,\"sumX2\":16.0,\"sumX3\":64.0}}}}";
+    final String json = m.toString();
+    Assert.assertTrue(expected.equals(json));
   }
 
   @Test

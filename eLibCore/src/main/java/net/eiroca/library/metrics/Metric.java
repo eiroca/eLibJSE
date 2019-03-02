@@ -24,8 +24,12 @@ import net.eiroca.library.metrics.datum.IDatum;
 
 public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements IMetric<D> {
 
-  protected final UUID id = UUID.randomUUID();
-  protected MetricMetadata metadata = null;
+  private static final String HEADER_SPLITTINGS = "\"splittings\"";
+  private static final String HEADER_VALUE = "\"value\"";
+  private static final String TAG_EMPTY = "null";
+
+  transient protected MetricMetadata metadata = null;
+  protected UUID id = UUID.randomUUID();
   protected D datum = null;
   protected Map<String, M> splittings = null;
 
@@ -121,29 +125,22 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
 
   @Override
   public void toJson(final StringBuilder sb) {
-    final String name = getName();
     final boolean hasVal = datum.hasValue();
-    final boolean hasName = name != null;
     final boolean hasSplit = splittings != null;
-    if (hasName || hasSplit) {
-      sb.append("{");
+    if (!hasVal && !hasSplit) {
+      sb.append(Metric.TAG_EMPTY);
+      return;
     }
+    sb.append('{');
     if (hasVal) {
-      if (hasName) {
-        sb.append('\"');
-        sb.append(name);
-        sb.append('\"');
-        sb.append(":");
-      }
-      else if (hasSplit) {
-        sb.append("\"value:\"");
-      }
+      sb.append(Metric.HEADER_VALUE).append(':');
       datum.toJson(sb, true);
     }
     if (hasSplit) {
       if (hasVal) {
         sb.append(',');
       }
+      sb.append(Metric.HEADER_SPLITTINGS).append(":{");
       boolean first = true;
       for (final Entry<String, M> splitting : splittings.entrySet()) {
         if (first) {
@@ -158,12 +155,9 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
         sb.append(":");
         splitting.getValue().toJson(sb);
       }
-      if (hasVal) {
-      }
+      sb.append("}");
     }
-    if (hasName || hasSplit) {
-      sb.append('}');
-    }
+    sb.append('}');
   }
 
   @Override

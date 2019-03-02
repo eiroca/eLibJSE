@@ -14,26 +14,27 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.server;
+package net.eiroca.library.scheduler;
 
-public class ResultResponse extends ServerResponse {
+import java.util.concurrent.TimeUnit;
 
-  private Object result;
+public class FixedFrequencyPolicy implements SchedulerPolicy {
 
-  public ResultResponse(final int status) {
-    this(status, null, null);
+  long freq;
+
+  @Override
+  public long next(final long lastTime) {
+    return ((int)(lastTime / freq) + 1) * freq;
   }
 
-  public ResultResponse(final int status, final String message, final Object result) {
-    super(status, message);
-    this.result = result;
+  public FixedFrequencyPolicy(final long freq, final long unit, final TimeUnit tu) {
+    super();
+    this.freq = tu.toMillis(unit) / freq;
   }
 
-  public Object getResult() {
-    return result;
+  public FixedFrequencyPolicy(final long unit, final TimeUnit tu) {
+    super();
+    freq = tu.toMillis(unit);
   }
 
-  public void setResult(final Object result) {
-    this.result = result;
-  }
 }

@@ -17,7 +17,9 @@
 package net.eiroca.library.core;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import net.eiroca.library.data.Pair;
 
 public class LibFormat {
 
@@ -38,6 +40,70 @@ public class LibFormat {
       LibFormat.simpleDateFormatCache.set(localCache);
     }
     return simpleDateFormat;
+  }
+
+  private static ArrayList<Pair<String, Double>> MODIFIERSTR = new ArrayList<>();
+  static {
+    LibFormat.MODIFIERSTR.add(new Pair<>("%", 1.0 / 100.0));
+    LibFormat.MODIFIERSTR.add(new Pair<>("ns", 1 / 1000.0));
+    LibFormat.MODIFIERSTR.add(new Pair<>("ms", 1.0));
+    LibFormat.MODIFIERSTR.add(new Pair<>("s", 1000.0));
+    LibFormat.MODIFIERSTR.add(new Pair<>("\"", 1000.0));
+    LibFormat.MODIFIERSTR.add(new Pair<>("'", 60000.0));
+    LibFormat.MODIFIERSTR.add(new Pair<>("m", 60000.0));
+    LibFormat.MODIFIERSTR.add(new Pair<>("h", 3600000.0));
+  }
+
+  private static HashMap<String, Double> STRVALUE = new HashMap<>();
+  static {
+    LibFormat.STRVALUE.put("true", 1.0);
+    LibFormat.STRVALUE.put("false", 0.0);
+    LibFormat.STRVALUE.put("ok", 0.0);
+    LibFormat.STRVALUE.put("ko", 1.0);
+    LibFormat.STRVALUE.put("on", 1.0);
+    LibFormat.STRVALUE.put("off", 0.0);
+  }
+
+  public static final Double getValue(String value) {
+    if (value == null) { return null; }
+    value = value.trim().toLowerCase();
+    boolean negated = false;
+    double modifier = 1.0;
+    Double val = null;
+    if (value.endsWith("!")) {
+      negated = true;
+      value = value.substring(0, value.length() - 1);
+    }
+    for (final String strVal : LibFormat.STRVALUE.keySet()) {
+      if (value.startsWith(strVal)) {
+        val = LibFormat.STRVALUE.get(strVal);
+        value = value.substring(strVal.length());
+        break;
+      }
+    }
+    for (final Pair<String, Double> strVal : LibFormat.MODIFIERSTR) {
+      if (value.endsWith(strVal.getLeft())) {
+        modifier = strVal.getRight().doubleValue();
+        value = value.substring(0, value.length() - strVal.getLeft().length());
+        break;
+      }
+    }
+    if (val == null) {
+      try {
+        val = new Double(Double.parseDouble(value) * modifier);
+      }
+      catch (final NumberFormatException e) {
+      }
+    }
+    if (negated) {
+      if (Math.abs(val) < 0.000001) {
+        val = 1.0;
+      }
+      else {
+        val = 0.0;
+      }
+    }
+    return val;
   }
 
 }

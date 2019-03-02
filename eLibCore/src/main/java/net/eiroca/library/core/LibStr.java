@@ -17,6 +17,7 @@
 package net.eiroca.library.core;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -26,7 +27,8 @@ import java.util.List;
 
 final public class LibStr {
 
-  final public static String DEFAULT_ENCODING = System.getProperty("file.encoding", "UTF-8");
+  private static final String UTF8 = "UTF-8";
+  final public static String DEFAULT_ENCODING = System.getProperty("file.encoding", LibStr.UTF8);
   final public static String NL = System.getProperty("line.separator");
 
   final public static String EMPTY_STRING = "";
@@ -138,10 +140,22 @@ final public class LibStr {
     return var.equals(value);
   }
 
+  public final static String urlDecode(final String data) {
+    if (data == null) { return null; }
+    String result;
+    try {
+      result = URLDecoder.decode(data, LibStr.UTF8);
+    }
+    catch (final UnsupportedEncodingException e) {
+      result = data;
+    }
+    return result;
+  }
+
   public static String urlEncode(String data) {
     if (data == null) { return null; }
     try {
-      data = URLEncoder.encode(data, "utf-8");
+      data = URLEncoder.encode(data, LibStr.UTF8);
     }
     catch (final UnsupportedEncodingException e) {
       data = "?";
@@ -187,7 +201,7 @@ final public class LibStr {
     return path;
   }
 
-  final public static void encodeJson(final StringBuffer sb, final String string) {
+  final public static void encodeJson(final StringBuilder sb, final String string) {
     if ((string == null) || string.isEmpty()) {
       sb.append("\"\"");
       return;

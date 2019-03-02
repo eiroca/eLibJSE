@@ -14,26 +14,16 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.server;
+package net.eiroca.library.core;
 
-public class ResultResponse extends ServerResponse {
+public class LibMath {
 
-  private Object result;
-
-  public ResultResponse(final int status) {
-    this(status, null, null);
+  public static double average(final long count, final double sumX) {
+    return (count > 0) ? sumX / count : 0;
   }
 
-  public ResultResponse(final int status, final String message, final Object result) {
-    super(status, message);
-    this.result = result;
+  public static double stddev(final long count, final double sumX, final double sumX2) {
+    return (count > 0) ? Math.sqrt((count * sumX2) - (sumX * sumX)) / count : 0;
   }
 
-  public Object getResult() {
-    return result;
-  }
-
-  public void setResult(final Object result) {
-    this.result = result;
-  }
 }

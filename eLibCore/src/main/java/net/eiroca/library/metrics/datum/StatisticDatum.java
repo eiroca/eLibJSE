@@ -16,6 +16,9 @@
  **/
 package net.eiroca.library.metrics.datum;
 
+import net.eiroca.library.core.LibMath;
+import net.eiroca.library.metrics.MetricAggregation;
+
 public class StatisticDatum implements IDatum {
 
   public int count;
@@ -82,6 +85,37 @@ public class StatisticDatum implements IDatum {
     return getAverage();
   }
 
+  public double getValue(final MetricAggregation aggregation) {
+    double val = 0;
+    switch (aggregation) {
+      case min:
+        val = min;
+        break;
+      case max:
+        val = max;
+        break;
+      case first:
+        val = first;
+        break;
+      case last:
+        val = last;
+        break;
+      case sum:
+        val = sumX;
+        break;
+      case count:
+        val = count;
+        break;
+      case average:
+        val = getAverage();
+        break;
+      case stddev:
+        val = getStdDev();
+        break;
+    }
+    return val;
+  }
+
   @Override
   public void setValue(final double value) {
     addValue(value);
@@ -117,7 +151,7 @@ public class StatisticDatum implements IDatum {
   }
 
   public double getStdDev() {
-    return (count > 0) ? Math.sqrt((count * sumX2) - (sumX * sumX)) / count : 0;
+    return LibMath.stddev(count, sumX, sumX2);
   }
 
   @Override
