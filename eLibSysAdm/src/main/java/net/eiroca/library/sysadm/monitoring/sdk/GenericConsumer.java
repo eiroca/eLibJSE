@@ -29,6 +29,7 @@ import com.google.gson.JsonElement;
 import net.eiroca.ext.library.elastic.ElasticBulk;
 import net.eiroca.ext.library.gson.SimpleJson;
 import net.eiroca.library.core.Helper;
+import net.eiroca.library.core.LibStr;
 import net.eiroca.library.metrics.datum.Datum;
 import net.eiroca.library.sysadm.monitoring.api.IMeasureConsumer;
 import net.eiroca.library.system.IContext;
@@ -36,25 +37,36 @@ import net.eiroca.library.system.Logs;
 
 public class GenericConsumer implements IMeasureConsumer, Runnable {
 
+  private static final String CFG_EXPORTER_ELASTIC = "elasticURL";
+  private static final String CFG_EXPORTER_ELASTICINDEX = "elasticIndex";
+  private static final String CFG_EXPORTER_LOGGER = "logger";
+
   private static final String ARRAY_SUFFIX = "[]";
-  private static final String IDX_METRICS = "metrics-";
   private static final SimpleDateFormat ISO8601_FULL = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-  protected IContext context;
-  protected Logger metricLog = Logs.getLogger("Metrics");
-  protected ElasticBulk elasticServer;
+  private String configElasticServerURL;
+  private String configElasticIndex;
+  private String configLoggerName;
+
+  protected IContext context = null;
+  protected Logger metricLog = null;
+  protected ElasticBulk elasticServer = null;
 
   private final Object dataLock = new Object();
   private List<SimpleJson> buffer = new ArrayList<>();
 
-  public GenericConsumer(final String elasticServerURL) {
+  public GenericConsumer() {
     super();
-    elasticServer = elasticServerURL != null ? new ElasticBulk(elasticServerURL) : null;
   }
 
   @Override
   public void setup(final IContext context) throws Exception {
     this.context = context;
+    configElasticServerURL = context.getConfigString(CFG_EXPORTER_ELASTIC, null);
+    configElasticIndex = context.getConfigString(CFG_EXPORTER_ELASTICINDEX, "metrics-");
+    configLoggerName = context.getConfigString(CFG_EXPORTER_LOGGER, "Metrics");
+    metricLog = LibStr.isNotEmptyOrNull(configLoggerName) ? Logs.getLogger(configLoggerName) : null;
+    elasticServer = LibStr.isNotEmptyOrNull(configElasticServerURL) ? new ElasticBulk(configElasticServerURL) : null;
     if (elasticServer != null) {
       elasticServer.open();
     }
@@ -66,6 +78,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     context.info(this.getClass().getName(), " teardown");
     if (elasticServer != null) {
       elasticServer.close();
+      elasticServer = null;
     }
   }
 
@@ -109,13 +122,13 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     final String _pipeline = null;
     for (final SimpleJson json : events) {
       final String _doc = json.toString();
-      metricLog.info(_doc);
       try {
+        if (metricLog != null) metricLog.info(_doc);
         if (elasticServer != null) {
           final JsonElement dateJson = json.getRoot().get("datetime");
           if (dateJson != null) {
             final String eventDate = dateJson.getAsString().substring(0, 10);
-            final String _indexName = GenericConsumer.IDX_METRICS + eventDate;
+            final String _indexName = configElasticIndex + eventDate;
             final String _id = UUID.randomUUID().toString();
             elasticServer.add(_indexName, _type, _id, _pipeline, _doc);
           }
@@ -150,20 +163,21 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     else {
       json.addProperty("master", true);
     }
-    for (final Map.Entry<String, Object> metadata : meta.entrySet()) {
-      String key = metadata.getKey();
-      final Object val = metadata.getValue();
-      if (val == null) {
-        continue;
+    if (meta != null) {
+      for (final Map.Entry<String, Object> metadata : meta.entrySet()) {
+        String key = metadata.getKey();
+        final Object val = metadata.getValue();
+        if (val == null) {
+          continue;
+        }
+        if (key.endsWith(GenericConsumer.ARRAY_SUFFIX)) {
+          key = key.substring(0, key.length() - GenericConsumer.ARRAY_SUFFIX.length());
+          json.addProperty(key, (String[])val);
+        }
+        else {
+          json.addProperty(key, val.toString());
+        }
       }
-      if (key.endsWith(GenericConsumer.ARRAY_SUFFIX)) {
-        key = key.substring(0, key.length() - GenericConsumer.ARRAY_SUFFIX.length());
-        json.addProperty(key, (String[])val);
-      }
-      else {
-        json.addProperty(key, val.toString());
-      }
-
     }
     addMeasure(json);
     return true;

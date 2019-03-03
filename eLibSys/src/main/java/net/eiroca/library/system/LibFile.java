@@ -34,6 +34,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
@@ -289,6 +290,34 @@ final public class LibFile {
     final Path path = file.toPath();
     final String key = LibFile.getFileKey(path);
     return key;
+  }
+
+  public static InputStream findResource(String... paths) {
+    InputStream inputStream = null;
+    String foundPath = null;
+    for (final String path : paths) {
+      if (Files.exists(Paths.get(path))) {
+        foundPath = path;
+        break;
+      }
+    }
+    if (foundPath != null) {
+      try {
+        inputStream = new FileInputStream(foundPath);
+        return inputStream;
+      }
+      catch (FileNotFoundException e) {
+        // should never happen
+      }
+    }
+    // look inside the classpath
+    for (final String path : paths) {
+      inputStream = LibFile.getResourceStream(path, null);
+      if (inputStream != null) {
+        break;
+      }
+    }
+    return inputStream;
   }
 
 }

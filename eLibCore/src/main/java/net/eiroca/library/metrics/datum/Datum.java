@@ -26,6 +26,10 @@ public class Datum implements IDatum {
     timeStamp = 0;
   }
 
+  public Datum(double value) {
+    setValue(value);
+  }
+
   public Datum(final Datum m) {
     if (m.hasValue()) {
       timeStamp = m.getTimeStamp();
