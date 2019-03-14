@@ -52,6 +52,7 @@ public class Measure extends Metric<Measure, Datum> {
     setValue(value ? Measure.VALUE_TRUE : Measure.VALUE_FALSE);
   }
 
+  @Override
   public long getTimeStamp() {
     return datum.getTimeStamp();
   }

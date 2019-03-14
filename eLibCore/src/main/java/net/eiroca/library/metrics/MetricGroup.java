@@ -61,9 +61,9 @@ public class MetricGroup {
     return measure;
   }
 
-  public boolean isNamed(IMetric<?> m, String name) {
+  public boolean isNamed(final IMetric<?> m, final String name) {
     if (m.getMetadata() != null) {
-      String x = m.getMetadata().getInternalName();
+      final String x = m.getMetadata().getInternalName();
       return x.equals(name);
     }
     return false;

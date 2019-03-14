@@ -63,7 +63,7 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
   @Override
   public IMetric<D> getSplitting(final String... splitNames) {
     IMetric<D> result = this;
-    for (String splitName : splitNames) {
+    for (final String splitName : splitNames) {
       result = result.getSplitting(splitName);
     }
     return result;
@@ -110,8 +110,6 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
     splitMeasure.setValue(value);
   }
 
-
-
   @Override
   public void toJson(final StringBuilder sb) {
     final boolean hasVal = datum.hasValue();
@@ -157,31 +155,38 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
   }
 
   // IDatum Interface
+  @Override
   public void init(final double defVal) {
     datum.init(defVal);
   }
 
+  @Override
   public long getTimeStamp() {
     return datum.getTimeStamp();
   }
 
+  @Override
   public boolean hasValue() {
     return datum.hasValue();
   }
 
+  @Override
   public double getValue() {
     return datum.getValue();
   }
 
+  @Override
   public void setValue(final double value) {
     datum.setValue(value);
   }
 
+  @Override
   public void addValue(final double value) {
     datum.addValue(value);
   }
 
-  public void toJson(StringBuilder sb, boolean simple) {
+  @Override
+  public void toJson(final StringBuilder sb, final boolean simple) {
     datum.toJson(sb, simple);
   }
 
