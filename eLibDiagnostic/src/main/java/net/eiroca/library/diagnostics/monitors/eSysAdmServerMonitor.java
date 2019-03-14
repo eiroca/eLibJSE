@@ -25,6 +25,7 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 import net.eiroca.library.core.LibMath;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricAggregation;
 import net.eiroca.library.metrics.MetricGroup;
@@ -60,7 +61,7 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
   }
 
   public Double getValue(final JSONObject data, final MetricAggregation aggregation) {
-    if (data == null) return null;
+    if (data == null) { return null; }
     double val = 0;
     boolean ok = true;
     try {
@@ -166,7 +167,7 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
         while (splittingsGroups.hasNext()) {
           final String splitGroup = splittingsGroups.next();
           data = splittings.getJSONObject(splitGroup);
-          final Measure ms = m.getSplitting(splitGroup);
+          final IMetric<?> ms = m.getSplitting(splitGroup);
           final JSONObject splittingSubKeysObj = data.optJSONObject("splittings");
           final Iterator<String> splittingsSubKeys = splittingSubKeysObj.keys();
           while (splittingsSubKeys.hasNext()) {
@@ -176,7 +177,8 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
             final Double splitVal = getValue(value, splitAggregation);
             if (splitVal != null) {
               context.logF(LogLevel.info, "{0}.{1}={2}", splitGroup, splitName, splitVal);
-              ms.setValue(splitName, splitVal);
+              final IMetric<?> mm = ms.getSplitting(splitName);
+              mm.setValue(splitVal);
             }
           }
         }

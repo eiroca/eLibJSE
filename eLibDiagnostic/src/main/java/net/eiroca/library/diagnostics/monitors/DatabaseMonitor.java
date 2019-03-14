@@ -33,6 +33,7 @@ import net.eiroca.library.db.DBQuery;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.diagnostics.util.SQLchecks;
 import net.eiroca.library.diagnostics.validators.GenericValidator;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.IContext;
@@ -239,13 +240,14 @@ public class DatabaseMonitor extends TCPServerMonitor {
       ok = dbSQL.fetchRecord(data);
       if (ok) {
         if (captureMode == CaputeMode.COLUMNS) {
-          final Measure ms = mServerResult.getSplitting(metricGroup);
+          final IMetric<?> ms = mServerResult.getSplitting(metricGroup);
           for (int i = 0; i < data.length; i++) {
             final String splitName = dbSQL.getColumnsName(i);
             final Double val = net.eiroca.library.core.Helper.getDouble(data[i], 0.0);
-            ms.setValue(splitName, val);
+            final IMetric<?> mm = ms.getSplitting(splitName);
+            mm.setValue(val);
             queryResult += val;
-            context.logF(LogLevel.debug, "{0}[{1}]={2}", ms.getName(), splitName, val);
+            context.logF(LogLevel.debug, "{0}[{1}]={2}", metricGroup, splitName, val);
           }
           break;
         }
@@ -265,8 +267,8 @@ public class DatabaseMonitor extends TCPServerMonitor {
               }
               final Double val = net.eiroca.library.core.Helper.getDouble(valStr, 0.0);
               context.logF(LogLevel.debug, "{0}[{1}]={2}", splitGroup, splitName, val);
-              final Measure ms = mServerResult.getSplitting(splitGroup);
-              ms.setValue(splitName, val);
+              final IMetric<?> ms = mServerResult.getSplitting(splitGroup, splitName);
+              ms.setValue(val);
               queryResult += val;
             }
           }
@@ -283,8 +285,8 @@ public class DatabaseMonitor extends TCPServerMonitor {
             }
             final Double val = net.eiroca.library.core.Helper.getDouble(valStr, 0.0);
             context.logF(LogLevel.debug, "{0}[{1}]={2}", splitGroup, splitName, val);
-            final Measure ms = mServerResult.getSplitting(splitGroup);
-            ms.setValue(splitName, val);
+            final IMetric<?> ms = mServerResult.getSplitting(splitGroup, splitName);
+            ms.setValue(val);
             queryResult += val;
           }
         }

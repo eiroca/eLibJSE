@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.eiroca.library.diagnostics.monitors.RedisMonitor;
 import net.eiroca.library.diagnostics.monitors.TCPServerMonitor;
-import net.eiroca.library.metrics.Measure;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.Context;
 
@@ -39,7 +39,7 @@ public class TestMonitor {
       for (final MetricGroup g : groups) {
         context.debug("processing group: ", g.getName());
         g.refresh();
-        for (final Measure m : g.getMetrics()) {
+        for (final IMetric<?> m : g.getMetrics()) {
           context.info(m.toString());
         }
       }

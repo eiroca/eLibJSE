@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.json.JSONObject;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.ILog;
@@ -39,7 +40,7 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
    */
   static public class JSONMapping {
 
-    Measure measure;
+    IMetric<?> measure;
     double scale;
 
     public JSONMapping(final Measure measure, final double scale) {
@@ -51,7 +52,7 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
   private static final String CONFIG_PORT = "port";
 
   // measurement variables
-  public MetricGroup mgFLUME = new MetricGroup("FLUME Monitor", "FLUME - {0}");
+  public MetricGroup mgFLUME = new MetricGroup("FLUME Statistics", "FLUME - {0}");
   public Measure mAppendAcceptedCount = mgFLUME.createMeasure("Append Accepted");
   public Measure mAppendBatchAcceptedCount = mgFLUME.createMeasure("Append Batch Accepted");
   public Measure mAppendBatchReceivedCount = mgFLUME.createMeasure("Append Batch Received");
@@ -139,10 +140,10 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
           val = node.getDouble(alias);
           mapping = mappigns.get(alias);
           if (mapping != null) {
-            final Measure m = mapping.measure;
-            final Measure ms = m.getSplitting(type);
-            context.logF(ILog.LogLevel.debug, "{0} [{1}({2})] -> {3}", m.getName(), ms.getName(), name, val * mapping.scale);
-            ms.setValue(name, val * mapping.scale);
+            final IMetric<?> m = mapping.measure;
+            final IMetric<?> ms = m.getSplitting(type, name);
+            ms.setValue(val * mapping.scale);
+            context.logF(ILog.LogLevel.debug, "{0} [{1}({2})] -> {3}", m.getMetadata().getDisplayName(), type, name, val * mapping.scale);
           }
         }
         catch (final Exception e) {

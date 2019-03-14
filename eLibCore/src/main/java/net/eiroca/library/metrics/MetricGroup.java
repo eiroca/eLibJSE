@@ -22,7 +22,7 @@ import net.eiroca.library.metrics.derived.IDerivedMeasure;
 
 public class MetricGroup {
 
-  private final List<Measure> metrics = new ArrayList<>();
+  private final List<IMetric<?>> metrics = new ArrayList<>();
   private String name;
   private String measureNameFormat = "{0}";
 
@@ -38,7 +38,7 @@ public class MetricGroup {
     this.name = name;
   }
 
-  public List<Measure> getMetrics() {
+  public List<IMetric<?>> getMetrics() {
     return metrics;
   }
 
@@ -51,20 +51,28 @@ public class MetricGroup {
     this.measureNameFormat = measureNameFormat;
   }
 
-  public Measure add(final Measure metric) {
-    metrics.add(metric);
-    return metric;
+  public Measure add(final Measure measure) {
+    metrics.add(measure);
+    return measure;
   }
 
-  public Measure remove(final Measure metric) {
-    metrics.remove(metric);
-    return metric;
+  public Measure remove(final Measure measure) {
+    metrics.remove(measure);
+    return measure;
   }
 
-  private Measure find(final String measureName, final boolean createIfMissing) {
-    Measure m = null;
-    for (final Measure cur : metrics) {
-      if (cur.getName().equals(measureName)) {
+  public boolean isNamed(IMetric<?> m, String name) {
+    if (m.getMetadata() != null) {
+      String x = m.getMetadata().getInternalName();
+      return x.equals(name);
+    }
+    return false;
+  }
+
+  private IMetric<?> find(final String measureName, final boolean createIfMissing) {
+    IMetric<?> m = null;
+    for (final IMetric<?> cur : metrics) {
+      if (isNamed(cur, measureName)) {
         m = cur;
         break;
       }
@@ -76,18 +84,18 @@ public class MetricGroup {
   }
 
   public void setValue(final String metricName, final double metricValue) {
-    final Measure m = find(metricName, true);
+    final IMetric<?> m = find(metricName, true);
     m.setValue(metricValue);
   }
 
   public void setValue(final String metricName, final String splitName, final String split, final double metricValue) {
-    final Measure m = find(metricName, true);
-    final Measure ms = m.getSplitting(splitName);
-    ms.setValue(split, metricValue);
+    final IMetric<?> m = find(metricName, true);
+    final IMetric<?> ms = m.getSplitting(splitName, split);
+    ms.setValue(metricValue);
   }
 
   public void reset() {
-    for (final Measure m : metrics) {
+    for (final IMetric<?> m : metrics) {
       m.reset();
     }
   }
@@ -97,7 +105,7 @@ public class MetricGroup {
     final StringBuilder sb = new StringBuilder();
     sb.append('"').append(name).append("\":{");
     boolean first = true;
-    for (final Measure m : metrics) {
+    for (final IMetric<?> m : metrics) {
       if (!first) {
         sb.append(',');
       }
@@ -111,7 +119,7 @@ public class MetricGroup {
   }
 
   public void refresh() {
-    for (final Measure m : metrics) {
+    for (final IMetric<?> m : metrics) {
       if (m instanceof IDerivedMeasure) {
         ((IDerivedMeasure)m).refresh();
       }

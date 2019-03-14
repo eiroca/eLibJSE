@@ -31,7 +31,7 @@ import net.eiroca.library.diagnostics.monitors.TCPServerMonitor;
 import net.eiroca.library.diagnostics.monitors.WebServerMonitor;
 import net.eiroca.library.diagnostics.monitors.eSysAdmServerMonitor;
 
-public class ServerMonitors extends Registry {
+public class ServerMonitors {
 
   public static final Registry registry = new Registry();
 

@@ -292,7 +292,7 @@ final public class LibFile {
     return key;
   }
 
-  public static InputStream findResource(String... paths) {
+  public static InputStream findResource(final String... paths) {
     InputStream inputStream = null;
     String foundPath = null;
     for (final String path : paths) {
@@ -306,7 +306,7 @@ final public class LibFile {
         inputStream = new FileInputStream(foundPath);
         return inputStream;
       }
-      catch (FileNotFoundException e) {
+      catch (final FileNotFoundException e) {
         // should never happen
       }
     }

@@ -18,7 +18,7 @@ package net.eiroca.library.metrics.derived;
 
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricMetadata;
-import net.eiroca.library.metrics.datum.Datum;
+import net.eiroca.library.metrics.datum.IDatum;
 
 public class DeltaMeasure extends SnappedMeasure {
 
@@ -33,8 +33,8 @@ public class DeltaMeasure extends SnappedMeasure {
   }
 
   @Override
-  protected void update(final Datum dest, final Datum newDatum, final Datum oldDatum) {
-    dest.setValue(newDatum.value - oldDatum.value);
+  protected void update(final IDatum dest, final IDatum newDatum, final IDatum oldDatum) {
+    dest.setValue(newDatum.getValue() - oldDatum.getValue());
   }
 
 }

@@ -16,6 +16,7 @@
  **/
 package net.eiroca.library.metrics;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import net.eiroca.library.metrics.datum.StatisticDatum;
 
@@ -45,7 +46,12 @@ public class Statistic extends Metric<Statistic, StatisticDatum> {
   }
 
   public Collection<Statistic> getSplitMeasures() {
-    return splittings == null ? null : splittings.values();
+    if (splittings == null) { return null; }
+    final ArrayList<Statistic> result = new ArrayList<>();
+    for (final IMetric<StatisticDatum> x : splittings.values()) {
+      result.add((Statistic)x);
+    }
+    return result;
   }
 
 }

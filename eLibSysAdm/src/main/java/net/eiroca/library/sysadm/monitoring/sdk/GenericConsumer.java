@@ -30,7 +30,7 @@ import net.eiroca.ext.library.elastic.ElasticBulk;
 import net.eiroca.ext.library.gson.SimpleJson;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
-import net.eiroca.library.metrics.datum.Datum;
+import net.eiroca.library.metrics.datum.IDatum;
 import net.eiroca.library.sysadm.monitoring.api.IMeasureConsumer;
 import net.eiroca.library.system.IContext;
 import net.eiroca.library.system.Logs;
@@ -62,9 +62,9 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   @Override
   public void setup(final IContext context) throws Exception {
     this.context = context;
-    configElasticServerURL = context.getConfigString(CFG_EXPORTER_ELASTIC, null);
-    configElasticIndex = context.getConfigString(CFG_EXPORTER_ELASTICINDEX, "metrics-");
-    configLoggerName = context.getConfigString(CFG_EXPORTER_LOGGER, "Metrics");
+    configElasticServerURL = context.getConfigString(GenericConsumer.CFG_EXPORTER_ELASTIC, null);
+    configElasticIndex = context.getConfigString(GenericConsumer.CFG_EXPORTER_ELASTICINDEX, "metrics-");
+    configLoggerName = context.getConfigString(GenericConsumer.CFG_EXPORTER_LOGGER, "Metrics");
     metricLog = LibStr.isNotEmptyOrNull(configLoggerName) ? Logs.getLogger(configLoggerName) : null;
     elasticServer = LibStr.isNotEmptyOrNull(configElasticServerURL) ? new ElasticBulk(configElasticServerURL) : null;
     if (elasticServer != null) {
@@ -123,7 +123,9 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     for (final SimpleJson json : events) {
       final String _doc = json.toString();
       try {
-        if (metricLog != null) metricLog.info(_doc);
+        if (metricLog != null) {
+          metricLog.info(_doc);
+        }
         if (elasticServer != null) {
           final JsonElement dateJson = json.getRoot().get("datetime");
           if (dateJson != null) {
@@ -145,7 +147,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   }
 
   @Override
-  public boolean exportData(final String group, final String metric, final String splitGroup, final String splitName, final Datum datum, final Map<String, Object> meta) {
+  public boolean exportData(final String group, final String metric, final String splitGroup, final String splitName, final IDatum datum, final Map<String, Object> meta) {
     context.debug("exportData ", metric);
     final SimpleJson json = new SimpleJson(true);
     final Calendar cal = Calendar.getInstance();
@@ -154,7 +156,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     json.addProperty("datetime", cal.getTime(), GenericConsumer.ISO8601_FULL);
     json.addProperty("group", group);
     json.addProperty("metric", metric);
-    json.addProperty("value", datum.value);
+    json.addProperty("value", datum.getValue());
     if (splitGroup != null) {
       json.addProperty("master", false);
       json.addProperty("splitGroup", splitGroup);

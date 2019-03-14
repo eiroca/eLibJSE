@@ -20,6 +20,8 @@ public interface IDatum {
 
   public void init(final double defVal);
 
+  public long getTimeStamp();
+
   public boolean hasValue();
 
   public double getValue();

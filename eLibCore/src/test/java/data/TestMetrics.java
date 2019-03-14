@@ -58,10 +58,10 @@ public class TestMetrics {
     final Measure m = new Measure();
     m.setValue(1);
     m.addValue(3);
-    Measure s = m.getSplitting("Split1");
+    Measure s = (Measure)m.getSplitting("Split1");
     s.setValue("A", 2);
     s.setValue("B", 2);
-    s = m.getSplitting("Split2");
+    s = (Measure)m.getSplitting("Split2");
     s.setValue(4);
     final String expected = "{\"value\":4.0,\"splittings\":{\"Split1\":{\"splittings\":{\"A\":{\"value\":2.0},\"B\":{\"value\":2.0}}},\"Split2\":{\"value\":4.0}}}";
     final String json = m.toString();
@@ -73,10 +73,10 @@ public class TestMetrics {
     final Statistic m = new Statistic();
     m.addValue(1);
     m.addValue(3);
-    Statistic s = m.getSplitting("Split1");
+    Statistic s = (Statistic)m.getSplitting("Split1");
     s.setValue("A", 2);
     s.setValue("B", 2);
-    s = m.getSplitting("Split2");
+    s = (Statistic)m.getSplitting("Split2");
     s.setValue(4);
     final String expected = "{\"value\":{\"count\":2,\"first\":1.0,\"last\":3.0,\"min\":1.0,\"max\":3.0,\"sumX\":4.0,\"sumX2\":10.0,\"sumX3\":28.0},\"splittings\":{\"Split1\":{\"splittings\":{\"A\":{\"value\":{\"count\":1,\"first\":2.0,\"last\":2.0,\"min\":2.0,\"max\":2.0,\"sumX\":2.0,\"sumX2\":4.0,\"sumX3\":8.0}},\"B\":{\"value\":{\"count\":1,\"first\":2.0,\"last\":2.0,\"min\":2.0,\"max\":2.0,\"sumX\":2.0,\"sumX2\":4.0,\"sumX3\":8.0}}}},\"Split2\":{\"value\":{\"count\":1,\"first\":4.0,\"last\":4.0,\"min\":4.0,\"max\":4.0,\"sumX\":4.0,\"sumX2\":16.0,\"sumX3\":64.0}}}}";
     final String json = m.toString();

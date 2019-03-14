@@ -145,13 +145,13 @@ public class ElasticSearchMonitor extends GenericHTTPMonitor {
 
   private static void addValue(final Measure measure, final String split, final String splitName, final JSONObject node, final String key) {
     if ((node != null) && (node.has(key))) {
-      measure.getSplitting(split).addValue(splitName, node.getDouble(key));
+      measure.getSplitting(split, splitName).addValue(node.getDouble(key));
     }
   }
 
   private static void addValue(final Measure measure, final String split, final JSONObject node, final String key) {
     if ((node != null) && (node.has(key))) {
-      measure.getSplitting(split).addValue(key, node.getDouble(key));
+      measure.getSplitting(split, key).addValue(node.getDouble(key));
     }
   }
 

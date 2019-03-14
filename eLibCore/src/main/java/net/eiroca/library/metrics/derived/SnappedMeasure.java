@@ -17,9 +17,10 @@
 package net.eiroca.library.metrics.derived;
 
 import java.util.Map.Entry;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricMetadata;
-import net.eiroca.library.metrics.datum.Datum;
+import net.eiroca.library.metrics.datum.IDatum;
 import net.eiroca.library.metrics.util.MeasureSnapshot;
 import net.eiroca.library.metrics.util.SnapshotStorage;
 
@@ -46,7 +47,7 @@ public abstract class SnappedMeasure extends Measure implements IDerivedMeasure 
     }
   }
 
-  protected void iterate(final Measure dest, final MeasureSnapshot newSnap, final MeasureSnapshot oldSnap) {
+  protected void iterate(final IMetric<?> dest, final MeasureSnapshot newSnap, final MeasureSnapshot oldSnap) {
     update(dest.getDatum(), newSnap.datum, oldSnap.datum);
     if (newSnap.hasSplittings()) {
       for (final Entry<String, MeasureSnapshot> ms : newSnap.splittings.entrySet()) {
@@ -54,13 +55,13 @@ public abstract class SnappedMeasure extends Measure implements IDerivedMeasure 
         final MeasureSnapshot newSplit = ms.getValue();
         final MeasureSnapshot oldSplit = oldSnap.splittings.get(splitName);
         if (oldSplit != null) {
-          final Measure dms = dest.getSplitting(splitName);
+          final IMetric<?> dms = dest.getSplitting(splitName);
           iterate(dms, newSplit, oldSplit);
         }
       }
     }
   }
 
-  abstract protected void update(Datum dest, Datum newDatum, Datum oldDatum);
+  abstract protected void update(IDatum dest, IDatum newDatum, IDatum oldDatum);
 
 }

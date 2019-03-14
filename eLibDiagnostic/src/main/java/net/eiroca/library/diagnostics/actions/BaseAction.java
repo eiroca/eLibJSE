@@ -34,6 +34,7 @@ import net.eiroca.library.diagnostics.converters.UnixScriptConverter;
 import net.eiroca.library.diagnostics.converters.WindowsScriptConverter;
 import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.diagnostics.validators.GenericValidator;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.parameter.ListParameter;
@@ -90,6 +91,10 @@ public abstract class BaseAction implements IAction<ActionData, ReturnObject>, I
     else {
       converter = new BaseConverter();
     }
+  }
+
+  @Override
+  public void resetMetrics() {
   }
 
   @Override
@@ -153,7 +158,7 @@ public abstract class BaseAction implements IAction<ActionData, ReturnObject>, I
     final String[] metricNames = pMetricNames.get();
     if (metricNames == null) { return; }
     final int numVal = returnedValues.length;
-    final Measure m = mResult.getSplitting(BaseAction.SPLIT_GROUP);
+    final IMetric<?> m = mResult.getSplitting(BaseAction.SPLIT_GROUP);
     for (int i = 0; i < metricNames.length; i++) {
       final String name = metricNames[i];
       Double d;
@@ -164,7 +169,7 @@ public abstract class BaseAction implements IAction<ActionData, ReturnObject>, I
         d = Double.NaN;
       }
       if (d != Double.NaN) {
-        m.setValue(name, d);
+        m.getSplitting(name).setValue(d);
       }
     }
   }

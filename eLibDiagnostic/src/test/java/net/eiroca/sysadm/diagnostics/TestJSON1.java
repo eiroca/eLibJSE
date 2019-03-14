@@ -19,6 +19,7 @@ package net.eiroca.sysadm.diagnostics;
 import java.util.HashMap;
 import java.util.Map;
 import org.json.JSONObject;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricGroup;
 
@@ -108,8 +109,8 @@ public class TestJSON1 {
           val = node.getDouble(alias);
           mapping = me.mappigns.get(alias);
           if (mapping != null) {
-            final Measure m = mapping.measure.getSplitting(type);
-            m.setValue(name, val * mapping.scale);
+            final IMetric<?> m = mapping.measure.getSplitting(type, name);
+            m.getDatum().setValue(val * mapping.scale);
           }
         }
         catch (final Exception e) {

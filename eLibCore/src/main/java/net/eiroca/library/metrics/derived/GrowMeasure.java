@@ -18,7 +18,7 @@ package net.eiroca.library.metrics.derived;
 
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricMetadata;
-import net.eiroca.library.metrics.datum.Datum;
+import net.eiroca.library.metrics.datum.IDatum;
 
 public class GrowMeasure extends SnappedMeasure {
 
@@ -33,9 +33,9 @@ public class GrowMeasure extends SnappedMeasure {
   }
 
   @Override
-  protected void update(final Datum dest, final Datum newDatum, final Datum oldDatum) {
-    final double diff = newDatum.value - oldDatum.value;
-    final double base = oldDatum.value;
+  protected void update(final IDatum dest, final IDatum newDatum, final IDatum oldDatum) {
+    final double diff = newDatum.getValue() - oldDatum.getValue();
+    final double base = oldDatum.getValue();
     if (base > GrowMeasure.ZERO) {
       final double rate = (diff / base) - 1;
       dest.setValue(rate);

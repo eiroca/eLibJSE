@@ -18,7 +18,7 @@ package net.eiroca.library.metrics.derived;
 
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricMetadata;
-import net.eiroca.library.metrics.datum.Datum;
+import net.eiroca.library.metrics.datum.IDatum;
 
 public class HitMissRatioMeasure extends RatioMeasure {
 
@@ -31,7 +31,7 @@ public class HitMissRatioMeasure extends RatioMeasure {
   }
 
   @Override
-  protected void update(final Datum dest, final double num, final double den) {
+  protected void update(final IDatum dest, final double num, final double den) {
     final double tot = den + num;
     if (tot > RatioMeasure.ZERO) {
       dest.setValue(num / tot);

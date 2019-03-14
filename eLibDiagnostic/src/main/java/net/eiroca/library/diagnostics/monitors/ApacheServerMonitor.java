@@ -124,6 +124,7 @@ public class ApacheServerMonitor extends WebServerMonitor {
   @Override
   public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
+    groups.remove(mgProbe);
     groups.add(mgApachePerformance);
     groups.add(mgApacheScoreboard);
   }

@@ -31,7 +31,7 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
   transient protected MetricMetadata metadata = null;
   protected UUID id = UUID.randomUUID();
   protected D datum = null;
-  protected Map<String, M> splittings = null;
+  protected Map<String, IMetric<D>> splittings = null;
 
   @Override
   public UUID getId() {
@@ -50,18 +50,29 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
     return datum;
   }
 
+  @Override
   public boolean hasSplittings() {
     return (splittings != null) && (splittings.size() > 0);
   }
 
-  public Map<String, M> getSplittings() {
+  @Override
+  public Map<String, IMetric<D>> getSplittings() {
     return splittings;
   }
 
   @Override
-  public M getSplitting(final String splitName) {
+  public IMetric<D> getSplitting(final String... splitNames) {
+    IMetric<D> result = this;
+    for (String splitName : splitNames) {
+      result = result.getSplitting(splitName);
+    }
+    return result;
+  }
+
+  @Override
+  public IMetric<D> getSplitting(final String splitName) {
     if (splitName == null) { throw new IllegalArgumentException(); }
-    M splitMeasure = null;
+    IMetric<D> splitMeasure = null;
     if (splittings == null) {
       splittings = new TreeMap<>();
     }
@@ -83,45 +94,23 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
 
   public double getValue(final String split) {
     if (split == null) { throw new IllegalArgumentException(); }
-    final M splitMeasure = getSplitting(split);
-    return splitMeasure.getDatum().getValue();
+    final IMetric<D> splitMeasure = getSplitting(split);
+    return splitMeasure.getValue();
   }
 
   public void addValue(final String split, final double value) {
     if (split == null) { throw new IllegalArgumentException(); }
-    final M splitMeasure = getSplitting(split);
-    splitMeasure.getDatum().addValue(value);
+    final IMetric<D> splitMeasure = getSplitting(split);
+    splitMeasure.addValue(value);
   }
 
   public void setValue(final String split, final double value) {
     if (split == null) { throw new IllegalArgumentException(); }
-    final M splitMeasure = getSplitting(split);
-    splitMeasure.getDatum().setValue(value);
+    final IMetric<D> splitMeasure = getSplitting(split);
+    splitMeasure.setValue(value);
   }
 
-  public void setValue(final double value) {
-    datum.setValue(value);
-  }
 
-  public void addValue(final double value) {
-    datum.addValue(value);
-  }
-
-  public boolean hasValue() {
-    return datum.hasValue();
-  }
-
-  public double getValue() {
-    return datum.getValue();
-  }
-
-  public String getName() {
-    String name = null;
-    if (metadata != null) {
-      name = metadata.getDisplayName();
-    }
-    return name;
-  }
 
   @Override
   public void toJson(final StringBuilder sb) {
@@ -142,7 +131,7 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
       }
       sb.append(Metric.HEADER_SPLITTINGS).append(":{");
       boolean first = true;
-      for (final Entry<String, M> splitting : splittings.entrySet()) {
+      for (final Entry<String, IMetric<D>> splitting : splittings.entrySet()) {
         if (first) {
           first = false;
         }
@@ -165,6 +154,35 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
     final StringBuilder sb = new StringBuilder(128);
     toJson(sb);
     return sb.toString();
+  }
+
+  // IDatum Interface
+  public void init(final double defVal) {
+    datum.init(defVal);
+  }
+
+  public long getTimeStamp() {
+    return datum.getTimeStamp();
+  }
+
+  public boolean hasValue() {
+    return datum.hasValue();
+  }
+
+  public double getValue() {
+    return datum.getValue();
+  }
+
+  public void setValue(final double value) {
+    datum.setValue(value);
+  }
+
+  public void addValue(final double value) {
+    datum.addValue(value);
+  }
+
+  public void toJson(StringBuilder sb, boolean simple) {
+    datum.toJson(sb, simple);
   }
 
 }

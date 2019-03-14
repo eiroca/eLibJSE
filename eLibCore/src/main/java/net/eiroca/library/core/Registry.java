@@ -16,7 +16,9 @@
  **/
 package net.eiroca.library.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Registry {
 
@@ -29,6 +31,14 @@ public class Registry {
 
   public void addEntry(final String name, final String classname) {
     names.put(name.toLowerCase(), classname);
+  }
+
+  public List<String> getNames() {
+    final List<String> result = new ArrayList<>();
+    for (final String x : names.keySet()) {
+      result.add(x);
+    }
+    return result;
   }
 
   public String defaultName() {

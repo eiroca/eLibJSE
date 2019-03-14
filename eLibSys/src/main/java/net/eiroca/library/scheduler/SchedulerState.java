@@ -17,8 +17,8 @@
 package net.eiroca.library.scheduler;
 
 public enum SchedulerState {
-  IDLE, // 
-  SLEEPING, // 
+  IDLE, //
+  SLEEPING, //
   CHECKING, //
   EXECURTING//
 }

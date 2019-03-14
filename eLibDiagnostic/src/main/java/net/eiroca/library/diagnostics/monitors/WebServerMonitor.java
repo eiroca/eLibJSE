@@ -25,6 +25,7 @@ import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.diagnostics.util.ReturnObject;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricGroup;
 
@@ -41,7 +42,7 @@ public class WebServerMonitor extends GenericHTTPMonitor {
   Measure smHTTPStatusCode = mgHTTPMonitor.createMeasure("HttpStatusCode");
   Measure smConnCloseDelay = mgHTTPMonitor.createMeasure("ConnectionCloseDelay");
 
-  MetricGroup mgProbe = new MetricGroup("Query");
+  MetricGroup mgProbe = new MetricGroup("Probe Monitor", "Probe - {0}");
   Measure smProbeResult = mgProbe.createMeasure("Result");
   Measure smProbeStatus = mgProbe.createMeasure("Status");
   Measure smProbeRows = mgProbe.createMeasure("Rows");
@@ -98,12 +99,12 @@ public class WebServerMonitor extends GenericHTTPMonitor {
       smProbeStatus.setValue(0.0);
     }
     else {
-      smProbeStatus.getSplitting("message").setValue(message, 1.0);
+      smProbeStatus.getSplitting("message", message).setValue(1.0);
     }
     int max = 0;
     if (obj != null) {
       final JSONArray arr = obj.getJSONArray("infos");
-      final Measure checkInfo = smProbeResult.getSplitting("check");
+      final IMetric<?> checkInfo = smProbeResult.getSplitting("check");
       smProbeRows.setValue(arr.length());
       for (int i = 0; i < arr.length(); i++) {
         final JSONObject o = arr.getJSONObject(i);
@@ -112,7 +113,7 @@ public class WebServerMonitor extends GenericHTTPMonitor {
         if (retCode > max) {
           max = retCode;
         }
-        checkInfo.setValue(splitName, retCode);
+        checkInfo.getSplitting(splitName).setValue(retCode);
         context.info(splitName, "=", retCode);
       }
     }

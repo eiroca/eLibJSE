@@ -16,10 +16,11 @@
  **/
 package net.eiroca.library.metrics;
 
+import java.util.Map;
 import java.util.UUID;
 import net.eiroca.library.metrics.datum.IDatum;
 
-public interface IMetric<D extends IDatum> {
+public interface IMetric<D extends IDatum> extends IDatum {
 
   public void reset();
 
@@ -31,7 +32,13 @@ public interface IMetric<D extends IDatum> {
 
   public MetricMetadata getMetadata();
 
+  public boolean hasSplittings();
+
+  public Map<String, IMetric<D>> getSplittings();
+
   public IMetric<D> getSplitting(final String splitName);
+
+  public IMetric<D> getSplitting(final String... splitNames);
 
   public void toJson(StringBuilder sb);
 

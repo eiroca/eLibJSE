@@ -35,6 +35,10 @@ public class MetricMetadata {
     this.defValue = defValue;
   }
 
+  public String getInternalName() {
+    return name;
+  }
+
   public String getDisplayName() {
     return MessageFormat.format(displayFormat, name);
   }

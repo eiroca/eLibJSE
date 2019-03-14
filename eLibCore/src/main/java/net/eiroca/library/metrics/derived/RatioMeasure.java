@@ -17,9 +17,11 @@
 package net.eiroca.library.metrics.derived;
 
 import java.util.Map.Entry;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricMetadata;
 import net.eiroca.library.metrics.datum.Datum;
+import net.eiroca.library.metrics.datum.IDatum;
 
 public class RatioMeasure extends Measure implements IDerivedMeasure {
 
@@ -43,16 +45,16 @@ public class RatioMeasure extends Measure implements IDerivedMeasure {
     iterate(this, numMeasure, denMeasure);
   }
 
-  private void iterate(final Measure ratioMeasure, final Measure num, final Measure den) {
+  private void iterate(final IMetric<?> ratioMeasure, final IMetric<?> num, final IMetric<?> den) {
     if (denMeasure.hasValue()) {
       update(getDatum(), numMeasure.getValue(), denMeasure.getValue());
     }
     if (denMeasure.hasSplittings()) {
-      for (final Entry<String, Measure> ms : denMeasure.getSplittings().entrySet()) {
+      for (final Entry<String, IMetric<Datum>> ms : denMeasure.getSplittings().entrySet()) {
         final String splitGroup = ms.getKey();
-        final Measure dens = ms.getValue();
-        final Measure nums = numMeasure.getSplitting(splitGroup);
-        final Measure result = getSplitting(splitGroup);
+        final IMetric<?> dens = ms.getValue();
+        final IMetric<?> nums = numMeasure.getSplitting(splitGroup);
+        final IMetric<?> result = getSplitting(splitGroup);
         update(result.getDatum(), nums.getValue(), dens.getValue());
         if (denMeasure.hasSplittings()) {
           iterate(result, nums, dens);
@@ -61,7 +63,7 @@ public class RatioMeasure extends Measure implements IDerivedMeasure {
     }
   }
 
-  protected void update(final Datum dest, final double num, final double den) {
+  protected void update(final IDatum dest, final double num, final double den) {
     if (den > RatioMeasure.ZERO) {
       dest.setValue(num / den);
     }

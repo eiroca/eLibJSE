@@ -172,4 +172,9 @@ public class StatisticDatum implements IDatum {
     sb.append("}");
   }
 
+  @Override
+  public long getTimeStamp() {
+    return firstDate;
+  }
+
 }

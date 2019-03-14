@@ -26,11 +26,11 @@ public class Datum implements IDatum {
     timeStamp = 0;
   }
 
-  public Datum(double value) {
+  public Datum(final double value) {
     setValue(value);
   }
 
-  public Datum(final Datum m) {
+  public Datum(final IDatum m) {
     if (m.hasValue()) {
       timeStamp = m.getTimeStamp();
       value = m.getValue();
@@ -54,6 +54,7 @@ public class Datum implements IDatum {
     return sb.toString();
   }
 
+  @Override
   public long getTimeStamp() {
     return timeStamp;
   }

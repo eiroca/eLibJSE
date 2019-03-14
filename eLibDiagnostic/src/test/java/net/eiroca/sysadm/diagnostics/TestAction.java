@@ -22,7 +22,7 @@ import net.eiroca.library.diagnostics.actiondata.ActionData;
 import net.eiroca.library.diagnostics.actions.BaseAction;
 import net.eiroca.library.diagnostics.actions.SSHCommandAction;
 import net.eiroca.library.diagnostics.util.ReturnObject;
-import net.eiroca.library.metrics.Measure;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.Context;
 
@@ -60,7 +60,7 @@ public class TestAction {
       for (final MetricGroup g : groups) {
         context.debug("processing group: ", g.getName());
         g.refresh();
-        for (final Measure m : g.getMetrics()) {
+        for (final IMetric<?> m : g.getMetrics()) {
           context.info(m.toString());
         }
       }

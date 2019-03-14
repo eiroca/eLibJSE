@@ -18,6 +18,8 @@ package net.eiroca.library.diagnostics;
 
 public interface IServerMonitor extends IMonitor, ICommand {
 
+  public void resetMetrics();
+
   public boolean check(final String target) throws CommandException;
 
 }

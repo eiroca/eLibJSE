@@ -23,9 +23,10 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import net.eiroca.library.data.Status;
 import net.eiroca.library.diagnostics.IServerMonitor;
-import net.eiroca.library.metrics.Measure;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.metrics.datum.Datum;
+import net.eiroca.library.metrics.datum.IDatum;
 import net.eiroca.library.sysadm.monitoring.api.IMeasureConsumer;
 import net.eiroca.library.sysadm.monitoring.api.IMeasureProducer;
 import net.eiroca.library.system.IContext;
@@ -85,49 +86,48 @@ public class GenericProducer implements IMeasureProducer {
       for (final MetricGroup g : groups) {
         context.trace("processing group: ", g.getName());
         g.refresh();
-        for (final Measure m : g.getMetrics()) {
-          result += exportMeasure(meta, g, m);
+        for (final IMetric<?> m : g.getMetrics()) {
+          result += exportMeasure(meta, g.getName(), m);
         }
       }
     }
     return result;
   }
 
-  public int exportMeasure(final Map<String, Object> meta, final MetricGroup g, final Measure m) {
+  public int exportMeasure(final Map<String, Object> meta, final String group, final IMetric<?> m) {
     int result = 0;
-    final String group = g.getName();
-    final String metric = m.getName();
-    final Datum value = m.getDatum();
+    final String metric = m.getMetadata().getInternalName();
+    final IDatum value = m.getDatum();
     context.trace("processing metric: ", metric);
-    if (m.hasValue()) {
+    if (value.hasValue()) {
       if (consumer.exportData(group, metric, null, null, value, meta)) {
         result++;
       }
     }
     if (m.hasSplittings()) {
-      for (final Entry<String, Measure> s : m.getSplittings().entrySet()) {
+      for (final Entry<String, ?> s : m.getSplittings().entrySet()) {
         final String splitGroup = s.getKey();
-        final Measure split = s.getValue();
+        final IMetric<?> split = (IMetric<?>)s.getValue();
         result += exportMesureSplittig(meta, group, metric, splitGroup, split);
       }
     }
     return result;
   }
 
-  private int exportMesureSplittig(final Map<String, Object> meta, final String group, final String metric, final String splitGroup, final Measure split) {
+  private int exportMesureSplittig(final Map<String, Object> meta, final String group, final String metric, final String splitGroup, final IMetric<?> split) {
     int result = 0;
     context.trace("processing metric splitting: ", splitGroup);
     final Datum sum = new Datum();
-    for (final Entry<String, Measure> sm : split.getSplittings().entrySet()) {
+    for (final Entry<String, ?> sm : split.getSplittings().entrySet()) {
       final String splitName = sm.getKey();
-      final Measure splitValue = sm.getValue();
-      final Datum val = splitValue.getDatum();
+      final IMetric<?> splitValue = (IMetric<?>)sm.getValue();
+      final IDatum val = splitValue.getDatum();
       sum.addValue(val.getValue());
       if (consumer.exportData(group, metric, splitGroup, splitName, val, meta)) {
         result++;
       }
     }
-    if (!split.hasValue()) {
+    if (!split.getDatum().hasValue()) {
       if (consumer.exportData(group, metric, null, null, sum, meta)) {
         result++;
       }
@@ -157,13 +157,13 @@ public class GenericProducer implements IMeasureProducer {
     monitor.setup(context);
     int exported_measure = 0;
     final List<MetricGroup> groups = new ArrayList<>();
+    monitor.loadMetricGroup(groups);
     for (final String host : hosts) {
       meta.put("host", host);
+      monitor.resetMetrics();
       final boolean ok = monitor.check(host);
       context.info(name, " ", host, " -> ", ok);
       if (ok) {
-        groups.clear();
-        monitor.loadMetricGroup(groups);
         exported_measure += exportMeasures(meta, groups);
       }
     }

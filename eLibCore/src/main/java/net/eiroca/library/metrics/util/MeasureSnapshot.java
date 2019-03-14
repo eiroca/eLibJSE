@@ -19,7 +19,7 @@ package net.eiroca.library.metrics.util;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import net.eiroca.library.metrics.Measure;
+import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.datum.Datum;
 
 public class MeasureSnapshot {
@@ -27,13 +27,13 @@ public class MeasureSnapshot {
   public Datum datum;
   public Map<String, MeasureSnapshot> splittings = null;
 
-  public MeasureSnapshot(final Measure m) {
+  public MeasureSnapshot(final IMetric<?> m) {
     datum = new Datum(m.getDatum());
     if (m.hasSplittings()) {
       splittings = new HashMap<>();
-      for (final Entry<String, Measure> ms : m.getSplittings().entrySet()) {
+      for (final Entry<String, ?> ms : m.getSplittings().entrySet()) {
         final String splitName = ms.getKey();
-        final Measure split = ms.getValue();
+        final IMetric<?> split = (IMetric<?>)ms.getValue();
         splittings.put(splitName, new MeasureSnapshot(split));
       }
     }

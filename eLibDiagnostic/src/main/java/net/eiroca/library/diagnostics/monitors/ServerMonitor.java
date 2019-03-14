@@ -119,12 +119,17 @@ public abstract class ServerMonitor implements IServerMonitor {
   @Override
   public void setup(final IContext context) throws CommandException {
     this.context = context;
+    readConf();
+    resetMetrics();
+  }
+
+  @Override
+  public void resetMetrics() {
     final List<MetricGroup> groups = new ArrayList<>();
     loadMetricGroup(groups);
     for (final MetricGroup mg : groups) {
       mg.reset();
     }
-    readConf();
   }
 
   @Override
