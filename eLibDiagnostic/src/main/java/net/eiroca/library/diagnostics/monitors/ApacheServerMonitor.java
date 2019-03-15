@@ -32,30 +32,30 @@ public class ApacheServerMonitor extends WebServerMonitor {
   private static final String CONFIG_MODSTATUSURL = "modStatusURL";
 
   // measurement variables
-  public MetricGroup mgApachePerformance = new MetricGroup("Apache Performance", "Apache - {0}");
-  public Measure totalAccesses = mgApachePerformance.createMeasure("TotalAccesses");
-  public Measure totalkBytes = mgApachePerformance.createMeasure("TotalBytes");
-  public Measure cpuLoad = mgApachePerformance.createMeasure("CPULoad");
-  public Measure uptime = mgApachePerformance.createMeasure("Uptime");
-  public Measure reqPerSec = mgApachePerformance.createMeasure("ReqPerSec");
-  public Measure bytesPerSec = mgApachePerformance.createMeasure("BytesPerSec");
-  public Measure bytesPerReq = mgApachePerformance.createMeasure("BytesPerReq");
-  public Measure busyWorkers = mgApachePerformance.createMeasure("BusyWorkers");
-  public Measure idleWorkers = mgApachePerformance.createMeasure("IdleWorkers");
-  public Measure workersUtilization = mgApachePerformance.createMeasure("WorkersUtilization");
+  protected final MetricGroup mgApachePerformance = new MetricGroup("Apache Performance", "Apache - {0}");
+  protected final Measure totalAccesses = mgApachePerformance.createMeasure("TotalAccesses", "Total count of requests to the Apache server", "counter");
+  protected final Measure totalkBytes = mgApachePerformance.createMeasure("TotalBytes", "Total amount of megabytes served by the Apache server", "megabytes");
+  protected final Measure cpuLoad = mgApachePerformance.createMeasure("CPULoad", "Current CPU load of the Apache server", "percent");
+  protected final Measure uptime = mgApachePerformance.createMeasure("Uptime", "The time the servers has been running in seconds", "s");
+  protected final Measure reqPerSec = mgApachePerformance.createMeasure("ReqPerSec", "Requests received per second", "rate", "s");
+  protected final Measure bytesPerSec = mgApachePerformance.createMeasure("BytesPerSec", "Bytes sent per second", "bytes", "s");
+  protected final Measure bytesPerReq = mgApachePerformance.createMeasure("BytesPerReq", "Bytes sent per request", "bytes", "request");
+  protected final Measure busyWorkers = mgApachePerformance.createMeasure("BusyWorkers", "The number of worker serving requests", "number");
+  protected final Measure idleWorkers = mgApachePerformance.createMeasure("IdleWorkers", "The number of idle worker", "number");
+  protected final Measure workersUtilization = mgApachePerformance.createMeasure("WorkersUtilization", "Shows how utilized the server is, consider increasing the workers thread pool. If this reaches 100% no more connections are accepted by Apache", "number");
 
-  public MetricGroup mgApacheScoreboard = new MetricGroup("Apache Scoreboard", "Apache - Scoreboard - {0}");
-  public Measure sbWaitingForConnection = mgApacheScoreboard.createMeasure("Waiting");
-  public Measure sbStartingUp = mgApacheScoreboard.createMeasure("Starting up");
-  public Measure sbReadingRequest = mgApacheScoreboard.createMeasure("Reading Request");
-  public Measure sbSendingReply = mgApacheScoreboard.createMeasure("Sending Reply");
-  public Measure sbKeepAlive = mgApacheScoreboard.createMeasure("Keepalive (read)");
-  public Measure sbDnsLookup = mgApacheScoreboard.createMeasure("DNS Lookup");
-  public Measure sbClosingConnection = mgApacheScoreboard.createMeasure("Closing connection");
-  public Measure sbLogging = mgApacheScoreboard.createMeasure("Logging");
-  public Measure sbGracefullyFinishing = mgApacheScoreboard.createMeasure("Gracefully finishing");
-  public Measure sbIdleCleanupOfWorker = mgApacheScoreboard.createMeasure("Idle cleanup of worker");
-  public Measure sbOpenSlot = mgApacheScoreboard.createMeasure("Open Slot");
+  protected final MetricGroup mgApacheScoreboard = new MetricGroup("Apache Scoreboard", "Apache - Scoreboard - {0}");
+  protected final Measure sbClosingConnection = mgApacheScoreboard.createMeasure("Closing connection", "Closing connection", "number");
+  protected final Measure sbDnsLookup = mgApacheScoreboard.createMeasure("DNS Lookup", "DNS lookup", "number");
+  protected final Measure sbGracefullyFinishing = mgApacheScoreboard.createMeasure("Gracefully finishing", "Gracefully finishing", "number");
+  protected final Measure sbIdleCleanupOfWorker = mgApacheScoreboard.createMeasure("Idle cleanup of worker", "Idle cleanup of worker", "number");
+  protected final Measure sbKeepAlive = mgApacheScoreboard.createMeasure("Keepalive (read)", "Keepalive (read)", "number");
+  protected final Measure sbLogging = mgApacheScoreboard.createMeasure("Logging", "Logging", "number");
+  protected final Measure sbOpenSlot = mgApacheScoreboard.createMeasure("Open Slot", "Open slot with no current process", "number");
+  protected final Measure sbReadingRequest = mgApacheScoreboard.createMeasure("Reading Request", "Reading request", "number");
+  protected final Measure sbSendingReply = mgApacheScoreboard.createMeasure("Sending Reply", "Sending reply", "number");
+  protected final Measure sbStartingUp = mgApacheScoreboard.createMeasure("Starting up", "Starting up", "number");
+  protected final Measure sbWaitingForConnection = mgApacheScoreboard.createMeasure("Waiting", "Waiting for connection", "number");
 
   @Override
   public boolean preCheck(final InetAddress host) throws CommandException {

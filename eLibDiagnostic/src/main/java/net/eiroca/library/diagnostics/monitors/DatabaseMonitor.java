@@ -64,9 +64,9 @@ public class DatabaseMonitor extends TCPServerMonitor {
 
   private static final String CONFIG_RUNSQL = "runSQL";
 
-  MetricGroup mgDBMonitor = new MetricGroup("Database Monitor", "Database - {0}");
-  Measure mDBQueryTime = mgDBMonitor.createMeasure("Query Time");
-  Measure mDBQueryRows = mgDBMonitor.createMeasure("Query Rows");
+  protected final MetricGroup mgDBMonitor = new MetricGroup("Database Monitor", "Database - {0}");
+  protected final Measure mDBQueryTime = mgDBMonitor.createMeasure("Query Time", "Tikem taken by the query ", "ms");
+  protected final Measure mDBQueryRows = mgDBMonitor.createMeasure("Query Rows", "Rows returned by the query", "number");
 
   protected GenericValidator validator;
   protected DBConfig config;
@@ -132,11 +132,6 @@ public class DatabaseMonitor extends TCPServerMonitor {
   public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
     groups.add(mgDBMonitor);
-    if (checks != null) {
-      for (final SQLchecks check : checks) {
-        groups.add(check.mg);
-      }
-    }
   }
 
   @Override
@@ -336,13 +331,13 @@ public class DatabaseMonitor extends TCPServerMonitor {
         }
         switch (check.type) {
           case 1:
-            populateSimpleMetrics(check.mg, con, SQL, sqlParams);
+            populateSimpleMetrics(check.metricGroup, con, SQL, sqlParams);
             break;
           case 2:
-            populateSplittedMetrics(check.mg, check.param, con, SQL, sqlParams);
+            populateSplittedMetrics(check.metricGroup, check.param, con, SQL, sqlParams);
             break;
           default:
-            CommandException.ConfigurationError("Invalid check type for " + check.mg.getName());
+            CommandException.ConfigurationError("Invalid check type for " + check.metricGroup.getName());
         }
       }
     }

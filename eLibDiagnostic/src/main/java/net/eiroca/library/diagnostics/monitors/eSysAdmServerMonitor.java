@@ -39,11 +39,11 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
   private static final String CONFIG_AGGREGATION_SPLIT = "splitting_aggregation";
 
   // measurement variables
-  public MetricGroup mgeSysAdm = new MetricGroup("eSysAdm Monitor", "eSysAdm - {0}");
-  public Measure mMetrics = mgeSysAdm.createMeasure("Metrics");
-  public Measure mAlerts = mgeSysAdm.createMeasure("Alerts");
-  public Measure mKPIs = mgeSysAdm.createMeasure("KPIs");
-  public Measure mTimings = mgeSysAdm.createMeasure("Timings");
+  protected final MetricGroup mgeSysAdm = new MetricGroup("eSysAdm Monitor", "eSysAdm - {0}");
+  protected final Measure mMetrics = mgeSysAdm.createMeasure("Metrics", "Metrics collected by eSysAdm server", "number");
+  protected final Measure mAlerts = mgeSysAdm.createMeasure("Alerts", "Alerts collected by eSysAdm server", "number");
+  protected final Measure mKPIs = mgeSysAdm.createMeasure("KPIs", "KPIs (%) collected by eSysAdm server", "percent");
+  protected final Measure mTimings = mgeSysAdm.createMeasure("Timings", "Timings (ms) collected by eSysAdm server", "ms");
 
   @Override
   public void loadMetricGroup(final List<MetricGroup> groups) {

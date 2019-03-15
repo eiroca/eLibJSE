@@ -23,16 +23,16 @@ import net.eiroca.library.system.LibFile;
 public class SQLchecks {
 
   public String SQLscript;
-  public MetricGroup mg;
+  public MetricGroup metricGroup;
   public int type;
   public String param;
 
-  public SQLchecks(final String measureGroupName, final String format, final String SQLscript) {
-    this(measureGroupName, format, SQLscript, 1, null);
+  public SQLchecks(final MetricGroup metricGroup, final String SQLscript) {
+    this(metricGroup, SQLscript, 1, null);
   }
 
-  public SQLchecks(final String measureGroupName, final String format, final String SQLscript, final int type, final String param) {
-    mg = new MetricGroup(measureGroupName, format);
+  public SQLchecks(final MetricGroup metricGroup, final String SQLscript, final int type, final String param) {
+    this.metricGroup = metricGroup;
     this.type = type;
     this.param = param;
     this.SQLscript = SQLscript;

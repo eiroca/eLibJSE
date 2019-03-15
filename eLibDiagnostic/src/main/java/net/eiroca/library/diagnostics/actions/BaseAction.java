@@ -55,9 +55,9 @@ public abstract class BaseAction implements IAction<ActionData, ReturnObject>, I
 
   // measurement variables
   public MetricGroup mgResult = new MetricGroup("Generic Execution Monitor");
-  protected Measure mStatus = mgResult.createMeasure("Status");
-  protected Measure mResult = mgResult.createMeasure("Result");
-  protected Measure mVerified = mgResult.createMeasure("ContentVerified");
+  protected Measure mStatus = mgResult.createMeasure("Status", "Exection status (0 OK)", "boolean");
+  protected Measure mResult = mgResult.createMeasure("Result", "Output result", "number");
+  protected Measure mVerified = mgResult.createMeasure("ContentVerified", "1 if result is validated and valid", "boolean");
 
   public static final String SPLIT_GROUP = "Values";
 
