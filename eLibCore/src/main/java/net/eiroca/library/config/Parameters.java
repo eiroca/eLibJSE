@@ -94,7 +94,6 @@ public class Parameters {
         if (f != null) {
           try {
             f.set(config, val);
-            System.out.println("X=" + f.get(config));
           }
           catch (IllegalArgumentException | IllegalAccessException e) {
           }
