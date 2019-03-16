@@ -18,14 +18,14 @@ package net.eiroca.library.system;
 
 import java.util.HashMap;
 import java.util.Map;
+import net.eiroca.library.config.Parameter;
+import net.eiroca.library.config.Parameters;
+import net.eiroca.library.config.parameter.BooleanParameter;
+import net.eiroca.library.config.parameter.IntegerParameter;
+import net.eiroca.library.config.parameter.LongParameter;
+import net.eiroca.library.config.parameter.PasswordParameter;
+import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.LibStr;
-import net.eiroca.library.parameter.BooleanParameter;
-import net.eiroca.library.parameter.IntegerParameter;
-import net.eiroca.library.parameter.LongParameter;
-import net.eiroca.library.parameter.Parameter;
-import net.eiroca.library.parameter.Parameters;
-import net.eiroca.library.parameter.PasswordParameter;
-import net.eiroca.library.parameter.StringParameter;
 
 public class ContextParameters extends Parameters {
 
@@ -71,7 +71,8 @@ public class ContextParameters extends Parameters {
       }
       final boolean isNull = LibStr.isEmptyOrNull(value);
       if (present && !p.isNullable() && isNull) { throw new IllegalArgumentException("Parameter '" + key + "' may not be null"); }
-      p.formString(value);
+      Object val = p.convertString(value);
+      values.put(p, val);
     }
   }
 

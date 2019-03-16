@@ -14,8 +14,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config.parameter;
 
+import net.eiroca.library.config.Parameter;
+import net.eiroca.library.config.Parameters;
 import net.eiroca.library.core.LibStr;
 
 public class DoubleParameter extends Parameter<Double> {
@@ -29,18 +31,25 @@ public class DoubleParameter extends Parameter<Double> {
   }
 
   @Override
-  public void formString(final String value) {
-    if (LibStr.isEmptyOrNull(value)) {
-      this.value = defValue;
+  public Double convertString(final String strValue) {
+    Double value;
+    if (LibStr.isEmptyOrNull(strValue)) {
+      value = defValue;
     }
     else {
       try {
-        this.value = new Double(value.trim());
+        value = new Double(strValue.trim());
       }
       catch (final NumberFormatException e) {
-        this.value = defValue;
+        value = defValue;
       }
     }
+    return value;
+  }
+
+  @Override
+  public boolean isValid(final Object value) {
+    return value instanceof Double;
   }
 
 }

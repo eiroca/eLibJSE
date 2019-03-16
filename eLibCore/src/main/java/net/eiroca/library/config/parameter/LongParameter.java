@@ -14,37 +14,47 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config.parameter;
 
-import java.nio.file.Path;
-import net.eiroca.library.core.Helper;
+import net.eiroca.library.config.Parameter;
+import net.eiroca.library.config.Parameters;
 import net.eiroca.library.core.LibStr;
 
-public class PathParameter extends Parameter<Path> {
+public class LongParameter extends Parameter<Long> {
 
-  public PathParameter(final Parameters owner, final String paramName, final String defPathStr, final boolean required, final boolean nullable) {
-    super(owner, paramName, Helper.getDirPath(defPathStr), required, nullable);
+  public LongParameter(final Parameters owner, final String paramName, final long paramDef, final boolean required, final boolean nullable) {
+    super(owner, paramName, paramDef, required, nullable);
+
   }
 
-  public PathParameter(final Parameters owner, final String paramName, final String defPathStr) {
-    this(owner, paramName, defPathStr, false, false);
+  public LongParameter(final Parameters owner, final String paramName, final long paramDef) {
+    super(owner, paramName, paramDef);
   }
 
-  public PathParameter(final Parameters owner, final String paramName) {
+  public LongParameter(final Parameters owner, final String paramName) {
     super(owner, paramName);
   }
 
   @Override
-  public void formString(final String strValue) {
+  public Long convertString(final String strValue) {
+    Long value;
     if (LibStr.isEmptyOrNull(strValue)) {
       value = defValue;
     }
     else {
-      value = Helper.getDirPath(strValue);
-      if (value == null) {
+      try {
+        value = new Long(strValue.trim());
+      }
+      catch (final NumberFormatException e) {
         value = defValue;
       }
     }
+    return value;
+  }
+
+  @Override
+  public boolean isValid(final Object value) {
+    return value instanceof Long;
   }
 
 }

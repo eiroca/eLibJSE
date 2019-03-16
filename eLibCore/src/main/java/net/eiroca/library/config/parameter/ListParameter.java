@@ -14,8 +14,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config.parameter;
 
+import net.eiroca.library.config.Parameter;
+import net.eiroca.library.config.Parameters;
 import net.eiroca.library.core.LibStr;
 
 public class ListParameter extends Parameter<String[]> {
@@ -26,7 +28,6 @@ public class ListParameter extends Parameter<String[]> {
     super(owner, paramName, null, required, nullable);
     this.separator = separator;
     defValue = (paramDef != null) ? paramDef.split(separator) : null;
-    value = defValue;
   }
 
   public ListParameter(final Parameters owner, final String paramName, final String separator, final String paramDef) {
@@ -43,22 +44,34 @@ public class ListParameter extends Parameter<String[]> {
     super(owner, paramName);
   }
 
-  @Override
-  public void formString(final String strValue) {
-    if (LibStr.isEmptyOrNull(strValue)) {
-      value = defValue;
-    }
-    else {
-      value = strValue.split(separator);
-    }
-  }
-
   public String getSeparator() {
     return separator;
   }
 
   public void setSeparator(final String separator) {
     this.separator = separator;
+  }
+
+  @Override
+  public String[] convertString(final String strValue) {
+    String[] value;
+    if (LibStr.isEmptyOrNull(strValue)) {
+      value = defValue;
+    }
+    else {
+      value = strValue.split(separator);
+    }
+    return value;
+  }
+
+  @Override
+  public String encodeString(final Object val) {
+    return LibStr.merge((String[])val, separator, "");
+  }
+
+  @Override
+  public boolean isValid(final Object value) {
+    return value instanceof String[];
   }
 
 }

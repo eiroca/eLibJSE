@@ -14,42 +14,46 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config.parameter;
 
+import java.nio.file.Path;
+import net.eiroca.library.config.Parameter;
+import net.eiroca.library.config.Parameters;
+import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 
-public class CharParameter extends Parameter<Character> {
+public class PathParameter extends Parameter<Path> {
 
-  public CharParameter(final Parameters owner, final String paramName, final Character paramDef, final boolean required, final boolean nullable) {
-    super(owner, paramName, paramDef, required, nullable);
+  public PathParameter(final Parameters owner, final String paramName, final String defPathStr, final boolean required, final boolean nullable) {
+    super(owner, paramName, Helper.getDirPath(defPathStr), required, nullable);
   }
 
-  public CharParameter(final Parameters owner, final String paramName, final Character paramDef) {
-    super(owner, paramName, paramDef);
+  public PathParameter(final Parameters owner, final String paramName, final String defPathStr) {
+    this(owner, paramName, defPathStr, false, false);
   }
 
-  public CharParameter(final Parameters owner, final String paramName) {
+  public PathParameter(final Parameters owner, final String paramName) {
     super(owner, paramName);
   }
 
   @Override
-  public void formString(String strValue) {
+  public Path convertString(final String strValue) {
+    Path value;
     if (LibStr.isEmptyOrNull(strValue)) {
       value = defValue;
     }
     else {
-      if (strValue.length() > 2) {
-        if ((strValue.startsWith("\"")) && (strValue.endsWith("\""))) {
-          strValue = strValue.substring(1, strValue.length() - 1);
-        }
-      }
-      if (strValue.length() == 1) {
-        value = strValue.charAt(0);
-      }
-      else {
+      value = Helper.getDirPath(strValue);
+      if (value == null) {
         value = defValue;
       }
     }
+    return value;
+  }
+
+  @Override
+  public boolean isValid(final Object value) {
+    return value instanceof Path;
   }
 
 }

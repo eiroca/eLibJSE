@@ -14,10 +14,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config.parameter;
 
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import net.eiroca.library.config.Parameter;
+import net.eiroca.library.config.Parameters;
 import net.eiroca.library.core.LibStr;
 
 public class RegExParameter extends Parameter<Pattern> {
@@ -57,13 +59,25 @@ public class RegExParameter extends Parameter<Pattern> {
   }
 
   @Override
-  public void formString(final String strValue) {
+  public Pattern convertString(final String strValue) {
+    Pattern value;
     if (LibStr.isEmptyOrNull(strValue)) {
       value = defValue;
     }
     else {
       value = decodePattern(strValue);
     }
+    return value;
+  }
+
+  @Override
+  public String encodeString(final Object val) {
+    return ((Pattern)val).pattern();
+  }
+
+  @Override
+  public boolean isValid(final Object value) {
+    return value instanceof Pattern;
   }
 
 }

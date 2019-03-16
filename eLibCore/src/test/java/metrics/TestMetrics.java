@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package data;
+package metrics;
 
 import org.junit.Assert;
 import org.junit.Test;

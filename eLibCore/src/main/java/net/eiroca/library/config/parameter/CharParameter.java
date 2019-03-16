@@ -14,32 +14,51 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config.parameter;
 
+import net.eiroca.library.config.Parameter;
+import net.eiroca.library.config.Parameters;
 import net.eiroca.library.core.LibStr;
 
-public class BooleanParameter extends Parameter<Boolean> {
+public class CharParameter extends Parameter<Character> {
 
-  public BooleanParameter(final Parameters owner, final String paramName, final boolean paramDef, final boolean required, final boolean nullable) {
+  public CharParameter(final Parameters owner, final String paramName, final Character paramDef, final boolean required, final boolean nullable) {
     super(owner, paramName, paramDef, required, nullable);
   }
 
-  public BooleanParameter(final Parameters owner, final String paramName, final boolean paramDef) {
+  public CharParameter(final Parameters owner, final String paramName, final Character paramDef) {
     super(owner, paramName, paramDef);
   }
 
-  public BooleanParameter(final Parameters owner, final String paramName) {
+  public CharParameter(final Parameters owner, final String paramName) {
     super(owner, paramName);
   }
 
   @Override
-  public void formString(final String strValue) {
+  public Character convertString(String strValue) {
+    Character value;
     if (LibStr.isEmptyOrNull(strValue)) {
       value = defValue;
     }
     else {
-      value = Boolean.parseBoolean(strValue.trim());
+      if (strValue.length() > 2) {
+        if ((strValue.startsWith("\"")) && (strValue.endsWith("\""))) {
+          strValue = strValue.substring(1, strValue.length() - 1);
+        }
+      }
+      if (strValue.length() == 1) {
+        value = strValue.charAt(0);
+      }
+      else {
+        value = defValue;
+      }
     }
+    return value;
+  }
+
+  @Override
+  public boolean isValid(final Object value) {
+    return value instanceof Character;
   }
 
 }

@@ -14,38 +14,27 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config.parameter;
 
-import net.eiroca.library.core.LibStr;
+import net.eiroca.library.config.Parameters;
 
-public class LongParameter extends Parameter<Long> {
+public class PasswordParameter extends StringParameter {
 
-  public LongParameter(final Parameters owner, final String paramName, final long paramDef, final boolean required, final boolean nullable) {
+  public PasswordParameter(final Parameters owner, final String paramName, final String paramDef, final boolean required, final boolean nullable) {
     super(owner, paramName, paramDef, required, nullable);
-
   }
 
-  public LongParameter(final Parameters owner, final String paramName, final long paramDef) {
+  public PasswordParameter(final Parameters owner, final String paramName, final String paramDef) {
     super(owner, paramName, paramDef);
   }
 
-  public LongParameter(final Parameters owner, final String paramName) {
-    super(owner, paramName);
+  public PasswordParameter(final Parameters owner, final String paramName, final String paramDef, final boolean trimQuote) {
+    this(owner, paramName, paramDef);
+    this.trimQuote = trimQuote;
   }
 
-  @Override
-  public void formString(final String value) {
-    if (LibStr.isEmptyOrNull(value)) {
-      this.value = defValue;
-    }
-    else {
-      try {
-        this.value = new Long(value.trim());
-      }
-      catch (final NumberFormatException e) {
-        this.value = defValue;
-      }
-    }
+  public PasswordParameter(final Parameters owner, final String paramName) {
+    super(owner, paramName);
   }
 
 }

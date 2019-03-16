@@ -132,7 +132,7 @@ public class MetricGroup {
     return add(m);
   }
 
-  public Measure define(String name, Measure m, String description, String unit, String rate) {
+  public Measure define(final String name, final Measure m, final String description, final String unit, final String rate) {
     final MetricMetadata definition = new MetricMetadata(name, measureNameFormat, 0);
     definition.setDescription(description);
     definition.setUnit(unit);
@@ -151,14 +151,14 @@ public class MetricGroup {
     return add(new Measure(definition));
   }
 
-  public Measure createMeasure(String name, String description, String unit) {
+  public Measure createMeasure(final String name, final String description, final String unit) {
     final MetricMetadata definition = new MetricMetadata(name, measureNameFormat, 0);
     definition.setDescription(description);
     definition.setUnit(unit);
     return add(new Measure(definition));
   }
 
-  public Measure createMeasure(String name, String description, String unit, String rate) {
+  public Measure createMeasure(final String name, final String description, final String unit, final String rate) {
     final MetricMetadata definition = new MetricMetadata(name, measureNameFormat, 0);
     definition.setDescription(description);
     definition.setUnit(unit);
@@ -166,7 +166,7 @@ public class MetricGroup {
     return add(new Measure(definition));
   }
 
-  public Measure createMeasure(String name, String description, String unit, boolean calcDelta) {
+  public Measure createMeasure(final String name, final String description, final String unit, final boolean calcDelta) {
     final MetricMetadata definition = new MetricMetadata(name, measureNameFormat, 0);
     definition.setDescription(description);
     definition.setUnit(unit);

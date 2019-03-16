@@ -31,7 +31,6 @@ public class MetricMetadata {
   //
   private boolean calcDelta;
 
-  
   public MetricMetadata(final String name) {
     this.name = name;
   }
@@ -67,7 +66,7 @@ public class MetricMetadata {
     return displayFormat;
   }
 
-  public void setDisplayFormat(String displayFormat) {
+  public void setDisplayFormat(final String displayFormat) {
     this.displayFormat = displayFormat;
   }
 
@@ -75,7 +74,7 @@ public class MetricMetadata {
     return description;
   }
 
-  public void setDescription(String description) {
+  public void setDescription(final String description) {
     this.description = description;
   }
 
@@ -83,7 +82,7 @@ public class MetricMetadata {
     return unit;
   }
 
-  public void setUnit(String unit) {
+  public void setUnit(final String unit) {
     this.unit = unit;
   }
 
@@ -91,7 +90,7 @@ public class MetricMetadata {
     return rate;
   }
 
-  public void setRate(String rate) {
+  public void setRate(final String rate) {
     this.rate = rate;
   }
 
@@ -99,7 +98,7 @@ public class MetricMetadata {
     return noagg;
   }
 
-  public void setNoagg(String noagg) {
+  public void setNoagg(final String noagg) {
     this.noagg = noagg;
   }
 
@@ -107,8 +106,7 @@ public class MetricMetadata {
     return calcDelta;
   }
 
-  
-  public void setCalcDelta(boolean calcDelta) {
+  public void setCalcDelta(final boolean calcDelta) {
     this.calcDelta = calcDelta;
   }
 

@@ -14,8 +14,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config.parameter;
 
+import net.eiroca.library.config.Parameter;
+import net.eiroca.library.config.Parameters;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 
@@ -44,7 +46,8 @@ public class ByteParameter extends Parameter<Byte> {
   }
 
   @Override
-  public void formString(final String strValue) {
+  public Byte convertString(final String strValue) {
+    Byte value;
     if (LibStr.isEmptyOrNull(strValue)) {
       value = defValue;
     }
@@ -63,6 +66,12 @@ public class ByteParameter extends Parameter<Byte> {
         }
       }
     }
+    return value;
+  }
+
+  @Override
+  public boolean isValid(final Object value) {
+    return value instanceof Byte;
   }
 
 }

@@ -14,8 +14,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config.parameter;
 
+import net.eiroca.library.config.Parameter;
+import net.eiroca.library.config.Parameters;
 import net.eiroca.library.core.LibStr;
 
 public class IntegerParameter extends Parameter<Integer> {
@@ -37,18 +39,25 @@ public class IntegerParameter extends Parameter<Integer> {
   }
 
   @Override
-  public void formString(final String value) {
-    if (LibStr.isEmptyOrNull(value)) {
-      this.value = defValue;
+  public Integer convertString(final String strValue) {
+    Integer value;
+    if (LibStr.isEmptyOrNull(strValue)) {
+      value = defValue;
     }
     else {
       try {
-        this.value = new Integer(value.trim());
+        value = new Integer(strValue.trim());
       }
       catch (final NumberFormatException e) {
-        this.value = defValue;
+        value = defValue;
       }
     }
+    return value;
+  }
+
+  @Override
+  public boolean isValid(final Object value) {
+    return value instanceof Integer;
   }
 
 }

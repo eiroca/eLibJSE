@@ -14,16 +14,20 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.eiroca.library.core.LibReflection;
 import net.eiroca.library.core.LibStr;
 
 public class Parameters {
 
   protected List<Parameter<?>> params = new ArrayList<>();
+  protected Map<Parameter<?>, Object> values = new HashMap<>();
 
   public Parameters() {
   }
@@ -37,6 +41,7 @@ public class Parameters {
   }
 
   public void laodConfig(final Map<String, String> config, final String prefix) throws IllegalArgumentException {
+    values.clear();
     for (final Parameter<?> p : params) {
       final String key = LibStr.concatenate(prefix, p.getName());
       final boolean present = config.containsKey(key);
@@ -44,7 +49,69 @@ public class Parameters {
       final boolean isNull = LibStr.isEmptyOrNull(value);
       if (p.isRequired() && !present) { throw new IllegalArgumentException(String.format("Parameter '%s' must exist", key)); }
       if (present && !p.isNullable() && isNull) { throw new IllegalArgumentException(String.format("Parameter '%s' cannot be null", key)); }
-      p.formString(value);
+      final Object val = p.convertString(value);
+      values.put(p, val);
+    }
+  }
+
+  public void saveConfig(final Map<String, String> config, final String prefix) {
+    for (final Parameter<?> p : params) {
+      final String key = LibStr.concatenate(prefix, p.getName());
+      Object val = values.get(p);
+      if (val == null) {
+        val = p.defValue;
+      }
+      if (val != null) {
+        final String value = p.encodeString(val);
+        config.put(key, value);
+      }
+    }
+  }
+
+  public void saveConfig(final IConfigurationUpdate config) {
+    for (final Parameter<?> p : params) {
+      final String key = p.getName();
+      Object val = values.get(p);
+      if (val == null) {
+        val = p.defValue;
+      }
+      if (val != null) {
+        config.setProperty(key, val);
+      }
+    }
+  }
+
+  public void saveConfig(final Object config) {
+    final Map<String, Field> fields = LibReflection.getFieldMap(config, true);
+    for (final Parameter<?> p : params) {
+      final String key = p.getName();
+      Object val = values.get(p);
+      if (val == null) {
+        val = p.defValue;
+      }
+      if (val != null) {
+        final Field f = fields.get(key);
+        if (f != null) {
+          try {
+            f.set(config, val);
+            System.out.println("X=" + f.get(config));
+          }
+          catch (IllegalArgumentException | IllegalAccessException e) {
+          }
+        }
+      }
+    }
+  }
+
+  public Object getValue(final Parameter<?> param) {
+    Object v = values.get(param);
+    if (v == null) v = param.defValue;
+    return v;
+  }
+
+  public void setValue(final Parameter<?> param, final Object value) {
+    if (param.isValid(value)) {
+      values.put(param, value);
     }
   }
 

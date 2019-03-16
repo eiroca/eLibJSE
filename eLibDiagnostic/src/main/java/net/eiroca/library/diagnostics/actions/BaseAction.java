@@ -19,6 +19,8 @@ package net.eiroca.library.diagnostics.actions;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import net.eiroca.library.config.parameter.ListParameter;
+import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.diagnostics.CommandException;
@@ -37,8 +39,6 @@ import net.eiroca.library.diagnostics.validators.GenericValidator;
 import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricGroup;
-import net.eiroca.library.parameter.ListParameter;
-import net.eiroca.library.parameter.StringParameter;
 import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 

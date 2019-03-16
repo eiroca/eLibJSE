@@ -19,14 +19,14 @@ package net.eiroca.library.diagnostics.actions;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 import org.apache.commons.text.StringSubstitutor;
+import net.eiroca.library.config.parameter.BooleanParameter;
+import net.eiroca.library.config.parameter.LongParameter;
+import net.eiroca.library.config.parameter.PathParameter;
+import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.csv.CSVMap;
 import net.eiroca.library.diagnostics.CommandException;
-import net.eiroca.library.parameter.BooleanParameter;
-import net.eiroca.library.parameter.LongParameter;
-import net.eiroca.library.parameter.PathParameter;
-import net.eiroca.library.parameter.StringParameter;
 import net.eiroca.library.system.IContext;
 
 public abstract class CommandAction extends BaseAction {

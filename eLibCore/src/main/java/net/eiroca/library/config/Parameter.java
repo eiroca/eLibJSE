@@ -14,41 +14,51 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config;
 
-public abstract class Parameter<T> {
+public abstract class Parameter<T extends Object> {
 
-  private String name;
-  private boolean required;
-  private boolean nullable;
-  protected T value;
+  protected Parameters owner;
+  protected String name;
+  protected boolean required;
+  protected boolean nullable;
   protected T defValue;
 
-  public Parameter(final Parameters owner, final String paramName, final T defValue, final boolean required, final boolean nullable) {
-    this.name = paramName;
-    this.required = required;
-    this.nullable = nullable;
-    this.value = defValue;
-    this.defValue = defValue;
-    owner.add(this);
+  public Parameter(final Parameters owner, final String paramName) {
+    this(owner, paramName, null, true, false);
   }
 
   public Parameter(final Parameters owner, final String paramName, final T defValue) {
     this(owner, paramName, defValue, false, defValue == null ? true : false);
   }
 
-  public Parameter(final Parameters owner, final String paramName) {
-    this(owner, paramName, null, true, false);
+  public Parameter(final Parameters owner, final String paramName, final T defValue, final boolean required, final boolean nullable) {
+    this.name = paramName;
+    this.required = required;
+    this.nullable = nullable;
+    this.defValue = defValue;
+    this.owner = owner;
+    owner.add(this);
   }
 
-  abstract public void formString(String strValue);
+  abstract public boolean isValid(Object value);
 
+  public T convertString(final String strValue) {
+    return null;
+  }
+
+  public String encodeString(final Object val) {
+    return String.valueOf(val);
+  }
+
+  @SuppressWarnings("unchecked")
   public T get() {
+    final T value = (T)owner.getValue(this);
     return value;
   }
 
   public void set(final T val) {
-    value = val;
+    owner.setValue(this, val);
   }
 
   public String getName() {
@@ -80,7 +90,8 @@ public abstract class Parameter<T> {
     final StringBuilder sb = new StringBuilder();
     sb.append(name);
     sb.append("=");
-    sb.append(value == null ? defValue : value);
+    sb.append(get());
     return sb.toString();
   }
+
 }

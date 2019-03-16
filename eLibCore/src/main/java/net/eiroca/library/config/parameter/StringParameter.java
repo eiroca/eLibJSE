@@ -14,8 +14,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.parameter;
+package net.eiroca.library.config.parameter;
 
+import net.eiroca.library.config.Parameter;
+import net.eiroca.library.config.Parameters;
 import net.eiroca.library.core.LibStr;
 
 public class StringParameter extends Parameter<String> {
@@ -52,7 +54,8 @@ public class StringParameter extends Parameter<String> {
   }
 
   @Override
-  public void formString(final String strValue) {
+  public String convertString(final String strValue) {
+    String value;
     if (LibStr.isEmptyOrNull(strValue)) {
       value = defValue;
     }
@@ -64,6 +67,7 @@ public class StringParameter extends Parameter<String> {
         value = strValue;
       }
     }
+    return value;
   }
 
   public boolean isTrimQuote() {
@@ -72,6 +76,11 @@ public class StringParameter extends Parameter<String> {
 
   public void setTrimQuote(final boolean trimQuote) {
     this.trimQuote = trimQuote;
+  }
+
+  @Override
+  public boolean isValid(final Object value) {
+    return value instanceof String;
   }
 
 }

@@ -16,9 +16,9 @@
  **/
 package net.eiroca.library.diagnostics.actions;
 
-import net.eiroca.library.parameter.BooleanParameter;
-import net.eiroca.library.parameter.IntegerParameter;
-import net.eiroca.library.parameter.StringParameter;
+import net.eiroca.library.config.parameter.BooleanParameter;
+import net.eiroca.library.config.parameter.IntegerParameter;
+import net.eiroca.library.config.parameter.StringParameter;
 
 public abstract class HTTPAction extends BaseAction {
 

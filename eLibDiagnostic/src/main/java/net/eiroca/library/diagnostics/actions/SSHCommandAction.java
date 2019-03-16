@@ -25,15 +25,15 @@ import org.apache.commons.text.StringSubstitutor;
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.Session;
 import com.trilead.ssh2.StreamGobbler;
+import net.eiroca.library.config.parameter.IntegerParameter;
+import net.eiroca.library.config.parameter.PasswordParameter;
+import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.diagnostics.actiondata.ActionData;
 import net.eiroca.library.diagnostics.actiondata.Messages;
 import net.eiroca.library.diagnostics.util.ReturnObject;
-import net.eiroca.library.parameter.IntegerParameter;
-import net.eiroca.library.parameter.PasswordParameter;
-import net.eiroca.library.parameter.StringParameter;
 import net.eiroca.library.system.IContext;
 import net.eiroca.library.system.Pipe;
 
