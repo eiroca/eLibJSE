@@ -32,8 +32,9 @@ import net.eiroca.library.rule.context.RuleGroup;
 public class RuleManager {
 
   private static final String CSV_ENCODING = "UTF-8";
-  private static final String CSV_COMMENT = "#";
-  private static final String CSV_SEPARATOR = ";";
+  private static final char CSV_COMMENT = '#';
+  private static final char CSV_SEPARATOR = ';';
+  private static final char CSV_QUOTE = '"';
 
   private static final String SEP = "\t";
   private static final String EOL = "\n";
@@ -97,20 +98,20 @@ public class RuleManager {
 
   public GenericRuleGroup addGenericRules(final String context, final String path, final int filterCount, final int resultCount) {
     final GenericRuleGroup ruleContext = new GenericRuleGroup(context);
-    ruleContext.loadFromCSV(path, RuleManager.CSV_SEPARATOR, RuleManager.CSV_COMMENT, RuleManager.CSV_ENCODING, filterCount, resultCount);
+    ruleContext.loadFromCSV(path, RuleManager.CSV_SEPARATOR, RuleManager.CSV_QUOTE, RuleManager.CSV_COMMENT, RuleManager.CSV_ENCODING, filterCount, resultCount);
     registry.put(context, ruleContext);
     return ruleContext;
   }
 
   public RegExRuleGroup addRegExRules(final String context, final String path) {
     final RegExRuleGroup ruleContext = new RegExRuleGroup(context);
-    ruleContext.loadFromCSV(path, RuleManager.CSV_SEPARATOR, RuleManager.CSV_COMMENT, RuleManager.CSV_ENCODING);
+    ruleContext.loadFromCSV(path, RuleManager.CSV_SEPARATOR, RuleManager.CSV_QUOTE, RuleManager.CSV_COMMENT, RuleManager.CSV_ENCODING);
     registry.put(context, ruleContext);
     return ruleContext;
   }
 
   public LookupRuleGroup addLookupRule(final String context, final String path) {
-    final LookupRuleGroup ruleContext = new LookupRuleGroup(context, new MappingCSVData(path, RuleManager.CSV_SEPARATOR, RuleManager.CSV_COMMENT, RuleManager.CSV_ENCODING));
+    final LookupRuleGroup ruleContext = new LookupRuleGroup(context, new MappingCSVData(path, RuleManager.CSV_SEPARATOR, RuleManager.CSV_QUOTE, RuleManager.CSV_COMMENT, RuleManager.CSV_ENCODING));
     registry.put(context, ruleContext);
     return ruleContext;
   }

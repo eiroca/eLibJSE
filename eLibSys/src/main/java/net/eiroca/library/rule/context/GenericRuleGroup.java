@@ -37,8 +37,8 @@ public class GenericRuleGroup extends RuleGroup {
     return rules;
   }
 
-  public void loadFromCSV(final String path, final String sep, final String com, final String enc, final int filterCount, final int resultCount) {
-    final CSVData data = new CSVData(path, sep, com, enc);
+  public void loadFromCSV(final String path, final char sep, final char quote, final char com, final String enc, final int filterCount, final int resultCount) {
+    final CSVData data = new CSVData(path, sep, quote, com, enc);
     final int totCount = filterCount + resultCount;
     for (final String[] fixDef : data.getData()) {
       if (fixDef.length != totCount) {

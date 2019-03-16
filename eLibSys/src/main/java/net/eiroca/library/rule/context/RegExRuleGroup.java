@@ -67,7 +67,7 @@ public class RegExRuleGroup extends RuleGroup {
     if (LibStr.isEmptyOrNull(text)) { return; }
     boolean found = false;
     final CSVData tagPatterns = definitions;
-    if (tagPatterns.getFieldNames().length != 3) {
+    if (tagPatterns.getFieldNames().size() != 3) {
       System.err.println("DEFINIZIONE ERRATA: " + LibStr.merge(tagPatterns.getFieldNames(), ",", ""));
       return;
     }
@@ -110,8 +110,8 @@ public class RegExRuleGroup extends RuleGroup {
     return regexes.values();
   }
 
-  public void loadFromCSV(final String path, final String sep, final String com, final String enc) {
-    setDefinitions(new CSVData(path, sep, com, enc));
+  public void loadFromCSV(final String path, final char sep, final char quote, final char com, final String enc) {
+    setDefinitions(new CSVData(path, sep, quote, com, enc));
   }
 
   public CSVData getDefinitions() {
@@ -119,7 +119,7 @@ public class RegExRuleGroup extends RuleGroup {
   }
 
   public void setDefinitions(final CSVData newData) {
-    if ((newData.getFieldNames().length < 2)) {
+    if ((newData.getFieldNames().size() < 2)) {
       System.err.println("INVALID REPLACE DEFINITION (at least 2 colomns)");
       return;
     }

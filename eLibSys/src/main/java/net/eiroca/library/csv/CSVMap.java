@@ -19,39 +19,45 @@ package net.eiroca.library.csv;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
 import net.eiroca.library.core.Helper;
+import net.eiroca.library.system.Logs;
 
 public class CSVMap implements ICSVReader {
 
+  private static final Logger logger = Logs.getLogger();
+
   private final Map<String, String> data = new HashMap<>();
-  private String[] fieldNames;
+  private List<String> fieldNames;
 
   public CSVMap() {
-    fieldNames = new String[] {
-        "key", "value"
-    };
+    fieldNames = new ArrayList<>();
+    fieldNames.add("key");
+    fieldNames.add("value");
   }
 
-  public CSVMap(final String csvFile, final String csvSeparatorChar, final String comment, final String encoding) {
-    readCSV(csvFile, csvSeparatorChar, comment, encoding);
+  public CSVMap(final String csvFile, final char sepChar, final char quoteChar, final char comment, final String encoding) {
+    readCSV(csvFile, sepChar, quoteChar, comment, encoding);
   }
 
-  public void readCSV(final String csvFile, final String csvSeparatorChar, final String comment, final String encoding) {
+  public void readCSV(final String csvFile, final char sepChar, final char quoteChar, final char comment, final String encoding) {
     data.clear();
-    CSV.read(this, csvFile, csvSeparatorChar, comment, encoding);
+    CSV.read(this, csvFile, sepChar, quoteChar, comment, encoding);
   }
 
   public void saveCSV(final String csvFile, final String csvSeparatorChar) {
     BufferedWriter bw = null;
     try {
       bw = new BufferedWriter(new FileWriter(csvFile));
-      for (int i = 0; i < fieldNames.length; i++) {
+      for (int i = 0; i < fieldNames.size(); i++) {
         if (i > 0) {
           bw.write(csvSeparatorChar);
         }
-        bw.write(fieldNames[i]);
+        bw.write(fieldNames.get(i));
       }
       bw.write(CSV.LF);
       for (final Map.Entry<String, String> e : data.entrySet()) {
@@ -68,8 +74,8 @@ public class CSVMap implements ICSVReader {
 
   public String getFieldName(final int i) {
     String result = null;
-    if ((fieldNames != null) && (i >= 0) && (i < fieldNames.length)) {
-      result = fieldNames[i];
+    if ((fieldNames != null) && (i >= 0) && (i < fieldNames.size())) {
+      result = fieldNames.get(i);
     }
     return result;
   }
@@ -108,18 +114,18 @@ public class CSVMap implements ICSVReader {
   }
 
   @Override
-  public void notifyHeaders(final String[] headers) {
+  public void notifyHeaders(final List<String> headers) {
     fieldNames = headers;
   }
 
   @Override
-  public void notifyRow(final String[] row) {
-    data.put(row[0], row[1]);
+  public void notifyRow(final List<String> row) {
+    data.put(row.get(0), row.get(1));
   }
 
   @Override
   public void notifyError(final String message) {
-    System.err.println(message);
+    CSVMap.logger.error(message);
   }
 
 }

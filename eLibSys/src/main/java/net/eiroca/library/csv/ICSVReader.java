@@ -16,11 +16,13 @@
  **/
 package net.eiroca.library.csv;
 
+import java.util.List;
+
 public interface ICSVReader {
 
-  public void notifyHeaders(String[] headers);
+  public void notifyHeaders(List<String> headers);
 
-  public void notifyRow(String[] row);
+  public void notifyRow(List<String> row);
 
   public void notifyError(String message);
 

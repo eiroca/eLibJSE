@@ -21,21 +21,23 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 
 public class CSV {
 
   public static final String ENCODING = "UTF-8";
-  public static final String COMMENT = "#";
-  public static final String SEPARATOR = ";";
+  public static final char COMMENT = '#';
+  public static final char SEPARATOR = ';';
+  public static final char QUOTE = '"';
   public static final String LF = "\n";
 
   public static void read(final ICSVReader reader, final String csvFile) {
-    CSV.read(reader, csvFile, CSV.SEPARATOR, CSV.COMMENT, CSV.ENCODING);
+    CSV.read(reader, csvFile, CSV.SEPARATOR, CSV.QUOTE, CSV.COMMENT, CSV.ENCODING);
   }
 
-  public static void read(final ICSVReader reader, final String csvFile, final String csvSeparatorChar, final String comment, final String encoding) {
+  public static void read(final ICSVReader reader, final String csvFile, final char sepChar, final char quoteChar, final char comment, final String encoding) {
     BufferedReader br = null;
     InputStreamReader is = null;
     String line = "";
@@ -45,15 +47,15 @@ public class CSV {
       String headerLine;
       // Get header line from CSV file
       if ((headerLine = br.readLine()) != null) {
-        final String[] fieldNames = headerLine.split(csvSeparatorChar, -1);
+        final List<String> fieldNames = LibStr.split(headerLine, sepChar, quoteChar);
         reader.notifyHeaders(fieldNames);
         // Iterate over the lines of CSV file
         while ((line = br.readLine()) != null) {
-          if (LibStr.isEmptyOrNull(line) || ((comment != null) && line.startsWith(comment))) {
+          if (LibStr.isEmptyOrNull(line) || (line.charAt(0) == comment)) {
             continue;
           }
-          final String[] csvLine = line.split(csvSeparatorChar, -1);
-          if (csvLine.length != fieldNames.length) {
+          final List<String> csvLine = LibStr.split(line, sepChar, quoteChar);
+          if (csvLine.size() != fieldNames.size()) {
             reader.notifyError("Invalid row " + line);
           }
           else {

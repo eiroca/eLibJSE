@@ -37,7 +37,7 @@ import net.eiroca.library.csv.CSVMap;
 
 public class Sentence {
 
-  private static final String COMMENT = "#";
+  private static final char COMMENT = '#';
   private static final String ENCODING = "UTF-8";
 
   private static CSVMap validWords = new CSVMap();
@@ -86,11 +86,11 @@ public class Sentence {
     }
   };
 
-  public static void loadConf(final String validWordFile, final String wordReplaceFile, final String aliasFile, final String preferredFile, final String sep) {
-    Sentence.validWords = new CSVMap(validWordFile, sep, Sentence.COMMENT, Sentence.ENCODING);
-    Sentence.replaces = new CSVMap(wordReplaceFile, sep, Sentence.COMMENT, Sentence.ENCODING);
-    Sentence.alias = new CSVMap(aliasFile, sep, Sentence.COMMENT, Sentence.ENCODING);
-    Sentence.preferred = new CSVData(preferredFile, sep, Sentence.COMMENT, Sentence.ENCODING).getData();
+  public static void loadConf(final String validWordFile, final String wordReplaceFile, final String aliasFile, final String preferredFile, final char sep) {
+    Sentence.validWords = new CSVMap(validWordFile, sep, (char)0, Sentence.COMMENT, Sentence.ENCODING);
+    Sentence.replaces = new CSVMap(wordReplaceFile, sep, (char)0, Sentence.COMMENT, Sentence.ENCODING);
+    Sentence.alias = new CSVMap(aliasFile, sep, (char)0, Sentence.COMMENT, Sentence.ENCODING);
+    Sentence.preferred = new CSVData(preferredFile, sep, (char)0, Sentence.COMMENT, Sentence.ENCODING).getData();
   }
 
   public static void saveStats(final String path) {

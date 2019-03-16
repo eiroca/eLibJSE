@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 final public class LibStr {
@@ -246,6 +247,55 @@ final public class LibStr {
       }
     }
     sb.append('"');
+  }
+
+  final public static List<String> split(final String row, final char separator, final char quote) {
+    final List<String> result = new ArrayList<>();
+    final StringBuffer sb = new StringBuffer();
+    boolean inQuote = false;
+    for (int i = 0; i < row.length(); i++) {
+      final char ch = row.charAt(i);
+      if (inQuote) {
+        if (ch == quote) {
+          char nextCh = 0;
+          if (i < (row.length() - 1)) {
+            nextCh = row.charAt(i + 1);
+          }
+          if (nextCh == quote) {
+            sb.append(ch);
+            i++;
+          }
+          else {
+            inQuote = false;
+          }
+        }
+        else {
+          sb.append(ch);
+        }
+      }
+      else {
+        if (ch == separator) {
+          result.add(sb.toString());
+          sb.setLength(0);
+        }
+        else if (ch == quote) {
+          inQuote = true;
+        }
+        else {
+          sb.append(ch);
+        }
+      }
+    }
+    result.add(sb.toString());
+    return result;
+  }
+
+  public static String[] toArray(final List<String> row) {
+    final String[] res = new String[row.size()];
+    for (int i = 0; i < row.size(); i++) {
+      res[i] = row.get(i);
+    }
+    return res;
   }
 
 }

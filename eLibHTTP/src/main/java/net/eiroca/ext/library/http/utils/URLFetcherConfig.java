@@ -141,7 +141,7 @@ public class URLFetcherConfig {
       if (DEFS[i].equals(val)) { return i; }
     }
     return 0;
-  };
+  }
 
   public void setup(final IConfig context) {
     setProtocol(context.getConfigString(URLFetcherConfig.CONFIG_PROTOCOL, null));

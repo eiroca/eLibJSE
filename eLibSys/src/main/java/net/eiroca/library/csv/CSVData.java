@@ -18,34 +18,39 @@ package net.eiroca.library.csv;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import net.eiroca.library.core.LibStr;
+import net.eiroca.library.system.Logs;
 
 public class CSVData implements ICSVReader {
 
+  private static final Logger logger = Logs.getLogger();
+
   private final List<String[]> data = new ArrayList<>();
-  private String[] fieldNames;
+  private List<String> fieldNames;
 
   public CSVData(final String csvFile) {
-    readCSV(csvFile, CSV.SEPARATOR, CSV.COMMENT, CSV.ENCODING);
+    readCSV(csvFile, CSV.SEPARATOR, CSV.QUOTE, CSV.COMMENT, CSV.ENCODING);
   }
 
-  public CSVData(final String csvFile, final String csvSeparatorChar, final String comment, final String encoding) {
-    readCSV(csvFile, csvSeparatorChar, comment, encoding);
+  public CSVData(final String csvFile, final char sepChar, final char quoteChar, final char comment, final String encoding) {
+    readCSV(csvFile, sepChar, quoteChar, comment, encoding);
   }
 
-  public void readCSV(final String csvFile, final String csvSeparatorChar, final String comment, final String encoding) {
+  public void readCSV(final String csvFile, final char sepChar, final char quoteChar, final char comment, final String encoding) {
     data.clear();
-    CSV.read(this, csvFile, csvSeparatorChar, comment, encoding);
+    CSV.read(this, csvFile, sepChar, quoteChar, comment, encoding);
   }
 
   public String getFieldName(final int i) {
     String result = null;
-    if ((fieldNames != null) && (i >= 0) && (i < fieldNames.length)) {
-      result = fieldNames[i];
+    if ((fieldNames != null) && (i >= 0) && (i < fieldNames.size())) {
+      result = fieldNames.get(i);
     }
     return result;
   }
 
-  public String[] getFieldNames() {
+  public List<String> getFieldNames() {
     return fieldNames;
   }
 
@@ -62,18 +67,18 @@ public class CSVData implements ICSVReader {
   }
 
   @Override
-  public void notifyHeaders(final String[] headers) {
+  public void notifyHeaders(final List<String> headers) {
     fieldNames = headers;
   }
 
   @Override
-  public void notifyRow(final String[] row) {
-    data.add(row);
+  public void notifyRow(final List<String> row) {
+    data.add(LibStr.toArray(row));
   }
 
   @Override
   public void notifyError(final String message) {
-    System.err.println(message);
+    CSVData.logger.error(message);
   }
 
 }

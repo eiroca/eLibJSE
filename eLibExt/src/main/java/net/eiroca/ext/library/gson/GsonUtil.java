@@ -153,6 +153,7 @@ public class GsonUtil {
     }
     return defVal;
   }
+
   public static Date getDate(final JsonObject o, final String name, final SimpleDateFormat... formats) {
     final JsonElement dataFld = o.get(name);
     final String data = (dataFld != null) ? dataFld.getAsString() : null;

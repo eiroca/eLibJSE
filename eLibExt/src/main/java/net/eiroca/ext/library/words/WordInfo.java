@@ -20,7 +20,7 @@ public class WordInfo {
 
   enum WordType {
     WHITELIST, BLACKLIST, ITALIAN, ENGLISH, CHANGED, CORRECTED, UNKNOWN
-  };
+  }
 
   public String word;
   public String newWord;

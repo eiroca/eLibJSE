@@ -32,8 +32,9 @@ import net.eiroca.library.system.IContext;
 public abstract class CommandAction extends BaseAction {
 
   private static final String CSV_ENCODING = "UTF-8";
-  private static final String CSV_COMMENT = "#";
-  private static final String CSV_SEPARATOR = "\t";
+  private static final char CSV_COMMENT = '#';
+  private static final char CSV_SEPARATOR = '\t';
+  private static final char CSV_QUOTE = '"';
 
   private static final String COMMAND_IS_NULL = "The 'command' parameter is null or empty.";
   private static final String COMMANDKEY_IS_NULL = "The 'commandKey' parameter is null or empty.";
@@ -64,7 +65,7 @@ public abstract class CommandAction extends BaseAction {
       if (pCommandTable.get() == null) {
         CommandException.ConfigurationError(CommandAction.COMMANDTABLE_IS_NULL);
       }
-      commandMap = new CSVMap(pCommandTable.get().toString(), CommandAction.CSV_SEPARATOR, CommandAction.CSV_COMMENT, CommandAction.CSV_ENCODING);
+      commandMap = new CSVMap(pCommandTable.get().toString(), CommandAction.CSV_SEPARATOR, CommandAction.CSV_QUOTE, CommandAction.CSV_COMMENT, CommandAction.CSV_ENCODING);
     }
     else {
       commandMap = null;

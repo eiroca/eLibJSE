@@ -71,7 +71,7 @@ public class ContextParameters extends Parameters {
       }
       final boolean isNull = LibStr.isEmptyOrNull(value);
       if (present && !p.isNullable() && isNull) { throw new IllegalArgumentException("Parameter '" + key + "' may not be null"); }
-      Object val = p.convertString(value);
+      final Object val = p.convertString(value);
       values.put(p, val);
     }
   }

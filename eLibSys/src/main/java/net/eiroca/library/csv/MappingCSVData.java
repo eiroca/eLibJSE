@@ -17,13 +17,17 @@
 package net.eiroca.library.csv;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import net.eiroca.library.system.Logs;
 
 public class MappingCSVData implements ICSVReader {
 
-  private final Map<String, Map<String, String>> valuesMap = new HashMap<>();
+  private static final Logger logger = Logs.getLogger();
 
-  private String[] fieldNames;
+  private final Map<String, Map<String, String>> valuesMap = new HashMap<>();
+  private List<String> fieldNames;
 
   public String name;
 
@@ -31,23 +35,23 @@ public class MappingCSVData implements ICSVReader {
   }
 
   public MappingCSVData(final String csvFile) {
-    readCSV(csvFile, CSV.SEPARATOR, CSV.COMMENT, CSV.ENCODING);
+    readCSV(csvFile, CSV.SEPARATOR, CSV.QUOTE, CSV.COMMENT, CSV.ENCODING);
   }
 
-  public MappingCSVData(final String csvFile, final String csvSeparatorChar, final String comment, final String encoding) {
-    readCSV(csvFile, csvSeparatorChar, comment, encoding);
+  public MappingCSVData(final String csvFile, final char csvSeparatorChar, final char quoteChar, final char comment, final String encoding) {
+    readCSV(csvFile, csvSeparatorChar, quoteChar, comment, encoding);
   }
 
-  public void readCSV(final String csvFile, final String csvSeparatorChar, final String comment, final String encoding) {
+  public void readCSV(final String csvFile, final char csvSeparatorChar, final char quoteChar, final char comment, final String encoding) {
     name = csvFile;
     valuesMap.clear();
-    CSV.read(this, csvFile, csvSeparatorChar, comment, encoding);
+    CSV.read(this, csvFile, csvSeparatorChar, quoteChar, comment, encoding);
   }
 
   public String getFieldName(final int i) {
     String result = null;
-    if ((fieldNames != null) && (i >= 0) && (i < fieldNames.length)) {
-      result = fieldNames[i];
+    if ((fieldNames != null) && (i >= 0) && (i < fieldNames.size())) {
+      result = fieldNames.get(i);
     }
     return result;
   }
@@ -61,23 +65,23 @@ public class MappingCSVData implements ICSVReader {
   }
 
   @Override
-  public void notifyHeaders(final String[] headers) {
+  public void notifyHeaders(final List<String> headers) {
     fieldNames = headers;
   }
 
   @Override
-  public void notifyRow(final String[] row) {
-    final String matchValue = row[0];
+  public void notifyRow(final List<String> row) {
+    final String matchValue = row.get(0);
     final Map<String, String> auxMap = new HashMap<>();
-    for (int i = 1; i < fieldNames.length; i++) {
-      auxMap.put(fieldNames[i], row[i]);
+    for (int i = 1; i < fieldNames.size(); i++) {
+      auxMap.put(fieldNames.get(i), row.get(i));
     }
     valuesMap.put(matchValue, auxMap);
   }
 
   @Override
   public void notifyError(final String message) {
-    System.err.println(message);
+    MappingCSVData.logger.error(message);
   }
 
 }

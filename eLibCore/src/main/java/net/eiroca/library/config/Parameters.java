@@ -104,7 +104,9 @@ public class Parameters {
 
   public Object getValue(final Parameter<?> param) {
     Object v = values.get(param);
-    if (v == null) v = param.defValue;
+    if (v == null) {
+      v = param.defValue;
+    }
     return v;
   }
 
