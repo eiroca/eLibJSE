@@ -16,7 +16,7 @@
  **/
 package net.eiroca.ext.library.elastic;
 
-import net.eiroca.ext.library.gson.JSonUtil;
+import net.eiroca.ext.library.gson.GsonUtil;
 
 public class ElasticBulkStats {
 
@@ -97,7 +97,7 @@ public class ElasticBulkStats {
 
   @Override
   public String toString() {
-    return JSonUtil.toJSON(this);
+    return GsonUtil.toJSON(this);
   }
 
 }

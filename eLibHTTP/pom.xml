@@ -29,5 +29,10 @@
 			<artifactId>googleauth</artifactId>
 			<version>${googleauth.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>eu.agno3.jcifs</groupId>
+			<artifactId>jcifs-ng</artifactId>
+			<version>${jcifs-ng.version}</version>
+		</dependency>
 	</dependencies>
 </project>

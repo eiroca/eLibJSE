@@ -25,9 +25,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 
-public class JSonUtil {
+public class GsonUtil {
 
   final public static String toJSON(final Object obj) {
     return new Gson().toJson(obj);
@@ -144,6 +145,14 @@ public class JSonUtil {
     return result;
   }
 
+  public static int getInt(final JsonObject json, final String name, final int defVal) {
+    final JsonElement e = json.get(name);
+    if (e != null) {
+      final String data = e.getAsString();
+      return Helper.getInt(data, defVal);
+    }
+    return defVal;
+  }
   public static Date getDate(final JsonObject o, final String name, final SimpleDateFormat... formats) {
     final JsonElement dataFld = o.get(name);
     final String data = (dataFld != null) ? dataFld.getAsString() : null;
@@ -168,7 +177,7 @@ public class JSonUtil {
   }
 
   public static void move(final JsonObject dest, final String destName, final JsonObject source, final String srcName) {
-    final String val = JSonUtil.getString(source, srcName);
+    final String val = GsonUtil.getString(source, srcName);
     if (val == null) { return; }
     dest.addProperty(destName, val);
     source.remove(srcName);

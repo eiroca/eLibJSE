@@ -18,12 +18,8 @@ package net.eiroca.ext.library.json;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import net.eiroca.library.core.Helper;
-import net.eiroca.library.core.LibStr;
 
-public class JSONHelper {
+public class JsonHelper {
 
   public static void mergeArray(final JSONObject parent, final String nodeName, final String sep) {
     final JSONArray node = (parent != null) ? parent.optJSONArray(nodeName) : null;
@@ -67,23 +63,6 @@ public class JSONHelper {
     }
   }
 
-  public static String getString(final JsonObject json, final String name) {
-    String result = null;
-    final JsonElement e = json.get(name);
-    if (e != null) {
-      final String data = e.getAsString();
-      result = LibStr.isEmptyOrNull(data) ? null : data;
-    }
-    return result;
-  }
 
-  public static int getInt(final JsonObject json, final String name, final int defVal) {
-    final JsonElement e = json.get(name);
-    if (e != null) {
-      final String data = e.getAsString();
-      return Helper.getInt(data, defVal);
-    }
-    return defVal;
-  }
 
 }
