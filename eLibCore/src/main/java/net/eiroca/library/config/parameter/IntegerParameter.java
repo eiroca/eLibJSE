@@ -22,6 +22,15 @@ import net.eiroca.library.core.LibStr;
 
 public class IntegerParameter extends Parameter<Integer> {
 
+  public int minVal = Integer.MIN_VALUE;
+  public int maxVal = Integer.MAX_VALUE;
+
+  public IntegerParameter(final Parameters owner, final String paramName, final int defValue, final int minVal, final int maxVal) {
+    super(owner, paramName, defValue, true, false);
+    this.minVal = minVal;
+    this.maxVal = maxVal;
+  }
+
   public IntegerParameter(final Parameters owner, final String paramName, final int defValue, final boolean required, final boolean nullable) {
     super(owner, paramName, defValue, required, nullable);
   }
@@ -47,6 +56,9 @@ public class IntegerParameter extends Parameter<Integer> {
     else {
       try {
         value = new Integer(strValue.trim());
+        if ((value < minVal) || (value > maxVal)) {
+          value = defValue;
+        }
       }
       catch (final NumberFormatException e) {
         value = defValue;

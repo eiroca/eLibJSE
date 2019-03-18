@@ -41,8 +41,9 @@ public class ContextParameters extends Parameters {
   public ContextParameters() {
   }
 
-  public void laodConfig(final IContext context, final String prefix) throws IllegalArgumentException {
+  public void loadConfig(final IContext context, final String prefix) throws IllegalArgumentException {
     context.debug("Loading params");
+    values.clear();
     for (final Parameter<?> p : params) {
       final String key = LibStr.concatenate(prefix, p.getName());
       final boolean present = true;
@@ -74,6 +75,11 @@ public class ContextParameters extends Parameters {
       final Object val = p.convertString(value);
       values.put(p, val);
     }
+  }
+
+  public void convert(final IContext context, final String prefix, final Object target, final String namePrefix) throws IllegalArgumentException {
+    loadConfig(context, prefix);
+    saveConfig(target, namePrefix, true);
   }
 
 }

@@ -75,7 +75,7 @@ public abstract class BaseAction implements IAction<ActionData, ReturnObject>, I
   @Override
   public void setup(final IContext context) throws CommandException {
     this.context = context;
-    params.laodConfig(context, null);
+    params.loadConfig(context, null);
     context.info(params);
     validator = new GenericValidator();
     validator.setup(context);

@@ -39,11 +39,43 @@ public class TestParameters {
 
   }
 
+  public class Cofing3 extends Config1 {
+
+    public int a = 1;
+    int _a = 2;
+    private final int _b = 3;
+    protected int _c = 4;
+    public int _d = 5;
+
+    public int getA() {
+      return _a;
+    }
+
+    public int getB() {
+      return _b;
+    }
+
+    public int getC() {
+      return _c;
+    }
+
+    public int getD() {
+      return _d;
+    }
+
+  }
+
   Parameters params = new Parameters();
   StringParameter p1 = new StringParameter(params, "f1", "1");
   IntegerParameter p2 = new IntegerParameter(params, "f2", 2);
   IntegerParameter p3 = new IntegerParameter(params, "x", 3);
   IntegerParameter p4 = new IntegerParameter(params, "p", 4);
+
+  Parameters params2 = new Parameters();
+  IntegerParameter pa1 = new IntegerParameter(params2, "a", 0);
+  IntegerParameter pa2 = new IntegerParameter(params2, "b", 0);
+  IntegerParameter pa3 = new IntegerParameter(params2, "c", 0);
+  IntegerParameter pa4 = new IntegerParameter(params2, "d", 0);
 
   @Test
   public void configTest1() {
@@ -61,6 +93,17 @@ public class TestParameters {
     Assert.assertEquals(config.f2, 2);
     Assert.assertEquals(config.x, 3);
     Assert.assertEquals(config.p, -1);
+  }
+
+  @Test
+  public void configTest3() {
+    final Cofing3 config = new Cofing3();
+    params2.saveConfig(config, "_", true);
+    Assert.assertEquals(config.a, 1);
+    Assert.assertEquals(config.getA(), 0);
+    Assert.assertEquals(config.getB(), 0);
+    Assert.assertEquals(config.getC(), 0);
+    Assert.assertEquals(config.getD(), 0);
   }
 
 }

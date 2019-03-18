@@ -22,6 +22,15 @@ import net.eiroca.library.core.LibStr;
 
 public class LongParameter extends Parameter<Long> {
 
+  public long minVal = Long.MIN_VALUE;
+  public long maxVal = Long.MAX_VALUE;
+
+  public LongParameter(final Parameters owner, final String paramName, final long defValue, final long minVal, final long maxVal) {
+    super(owner, paramName, defValue, true, false);
+    this.minVal = minVal;
+    this.maxVal = maxVal;
+  }
+
   public LongParameter(final Parameters owner, final String paramName, final long paramDef, final boolean required, final boolean nullable) {
     super(owner, paramName, paramDef, required, nullable);
 

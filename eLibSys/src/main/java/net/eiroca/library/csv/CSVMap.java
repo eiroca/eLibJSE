@@ -49,7 +49,7 @@ public class CSVMap implements ICSVReader {
     CSV.read(this, csvFile, sepChar, quoteChar, comment, encoding);
   }
 
-  public void saveCSV(final String csvFile, final String csvSeparatorChar) {
+  public void saveCSV(final String csvFile, final char csvSeparatorChar) {
     BufferedWriter bw = null;
     try {
       bw = new BufferedWriter(new FileWriter(csvFile));

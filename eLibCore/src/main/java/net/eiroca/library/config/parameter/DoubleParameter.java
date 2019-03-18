@@ -22,6 +22,15 @@ import net.eiroca.library.core.LibStr;
 
 public class DoubleParameter extends Parameter<Double> {
 
+  public double minVal = Double.MIN_VALUE;
+  public double maxVal = Double.MAX_VALUE;
+
+  public DoubleParameter(final Parameters owner, final String paramName, final double defValue, final double minVal, final double maxVal) {
+    super(owner, paramName, defValue, true, false);
+    this.minVal = minVal;
+    this.maxVal = maxVal;
+  }
+
   public DoubleParameter(final Parameters owner, final String paramName, final double paramDef) {
     super(owner, paramName, paramDef);
   }

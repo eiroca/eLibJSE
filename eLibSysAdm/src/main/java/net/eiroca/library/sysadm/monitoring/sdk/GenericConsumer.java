@@ -25,35 +25,59 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 import org.slf4j.Logger;
-import com.google.gson.JsonElement;
 import net.eiroca.ext.library.elastic.ElasticBulk;
 import net.eiroca.ext.library.gson.SimpleJson;
+import net.eiroca.library.config.parameter.IntegerParameter;
+import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.metrics.datum.IDatum;
 import net.eiroca.library.sysadm.monitoring.api.IMeasureConsumer;
+import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 import net.eiroca.library.system.Logs;
 
 public class GenericConsumer implements IMeasureConsumer, Runnable {
 
-  private static final String CFG_EXPORTER_ELASTIC = "elasticURL";
-  private static final String CFG_EXPORTER_ELASTICINDEX = "elasticIndex";
-  private static final String CFG_EXPORTER_LOGGER = "logger";
-
   private static final String ARRAY_SUFFIX = "[]";
   private static final SimpleDateFormat ISO8601_FULL = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-  private String configElasticServerURL;
-  private String configElasticIndex;
-  private String configLoggerName;
+  private static final String FLD_DATETIME = "datetime";
+  private static final String FLD_GROUP = "group";
+  private static final String FLD_METRIC = "metric";
+  private static final String FLD_MASTER = "master";
+  private static final String FLD_SPLIT_GROUP = "splitGroup";
+  private static final String FLD_SPLIT_NAME = "splitName";
+  private static final String FLD_VALUE = "value";
 
+  public static ContextParameters config = new ContextParameters();
+  public static StringParameter _timezone = new StringParameter(GenericConsumer.config, "timezone", null);
+  //
+  public static StringParameter _elasticURL = new StringParameter(GenericConsumer.config, "elasticURL", "http://localhost:9200/_bulk");
+  public static StringParameter _elasticIndex = new StringParameter(GenericConsumer.config, "elasticIndex", "metrics-");
+  public static IntegerParameter _elasticIndexMode = new IntegerParameter(GenericConsumer.config, "elasticIndexMode", 1, 0, 2);
+  public static StringParameter _indexDateFormat = new StringParameter(GenericConsumer.config, "indexDateFormat", "yyyy/MM/dd");
+  public static StringParameter _elasticType = new StringParameter(GenericConsumer.config, "elasticType", FLD_METRIC);
+  public static StringParameter _elasticPipeline = new StringParameter(GenericConsumer.config, "elasticPipeline", null);
+  //
+  public static StringParameter _logger = new StringParameter(GenericConsumer.config, "logger", "Metrics");
+  // Dynamic mapped to parameters
+  protected String config_elasticURL;
+  protected String config_elasticIndex;
+  protected int config_elasticIndexMode;// 0 fixed, 1 fixed+now 2 fixed+event.date
+  protected String config_indexDateFormat;
+  protected String config_elasticType;
+  protected String config_elasticPipeline;
+  protected String config_logger;
+  protected String config_timezone;
+  //
+  private final Object dataLock = new Object();
+  private List<Event> buffer = new ArrayList<>();
+  //
   protected IContext context = null;
   protected Logger metricLog = null;
   protected ElasticBulk elasticServer = null;
-
-  private final Object dataLock = new Object();
-  private List<SimpleJson> buffer = new ArrayList<>();
+  protected SimpleDateFormat indexDateFormat;
 
   public GenericConsumer() {
     super();
@@ -62,11 +86,10 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   @Override
   public void setup(final IContext context) throws Exception {
     this.context = context;
-    configElasticServerURL = context.getConfigString(GenericConsumer.CFG_EXPORTER_ELASTIC, null);
-    configElasticIndex = context.getConfigString(GenericConsumer.CFG_EXPORTER_ELASTICINDEX, "metrics-");
-    configLoggerName = context.getConfigString(GenericConsumer.CFG_EXPORTER_LOGGER, "Metrics");
-    metricLog = LibStr.isNotEmptyOrNull(configLoggerName) ? Logs.getLogger(configLoggerName) : null;
-    elasticServer = LibStr.isNotEmptyOrNull(configElasticServerURL) ? new ElasticBulk(configElasticServerURL) : null;
+    GenericConsumer.config.convert(context, null, this, "config_");
+    metricLog = LibStr.isNotEmptyOrNull(config_logger) ? Logs.getLogger(config_logger) : null;
+    indexDateFormat = new SimpleDateFormat(config_indexDateFormat);
+    elasticServer = LibStr.isNotEmptyOrNull(config_elasticURL) ? new ElasticBulk(config_elasticURL) : null;
     if (elasticServer != null) {
       elasticServer.open();
     }
@@ -82,14 +105,16 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     }
   }
 
-  public void addMeasure(final SimpleJson data) {
+  public void addMeasure(final long timeStamp, final SimpleJson data) {
+    if (data == null) return;
+    final Event e = new Event(timeStamp, data);
     synchronized (dataLock) {
-      buffer.add(data);
+      buffer.add(e);
     }
   }
 
-  public List<SimpleJson> swap() {
-    List<SimpleJson> result = null;
+  public List<Event> swap() {
+    List<Event> result = null;
     synchronized (dataLock) {
       if (buffer.size() > 0) {
         result = buffer;
@@ -104,7 +129,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     if (context != null) {
       context.debug("run export");
     }
-    final List<SimpleJson> events = swap();
+    final List<Event> events = swap();
     if ((events != null) && (events.size() > 0)) {
       try {
         flush(events);
@@ -116,24 +141,19 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     }
   }
 
-  private void flush(final List<SimpleJson> events) throws Exception {
+  private void flush(final List<Event> events) throws Exception {
     context.debug("flush events");
-    final String _type = "log";
-    final String _pipeline = null;
-    for (final SimpleJson json : events) {
+    for (final Event event : events) {
+      final SimpleJson json = event.getData();
       final String _doc = json.toString();
       try {
         if (metricLog != null) {
           metricLog.info(_doc);
         }
         if (elasticServer != null) {
-          final JsonElement dateJson = json.getRoot().get("datetime");
-          if (dateJson != null) {
-            final String eventDate = dateJson.getAsString().substring(0, 10);
-            final String _indexName = configElasticIndex + eventDate;
-            final String _id = UUID.randomUUID().toString();
-            elasticServer.add(_indexName, _type, _id, _pipeline, _doc);
-          }
+          final String _id = getEventID(event);
+          final String _indexName = getEventIndex(event);
+          elasticServer.add(_indexName, config_elasticType, _id, config_elasticPipeline, _doc);
         }
       }
       catch (final Exception e) {
@@ -146,24 +166,48 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     context.info("Exported measure(s): " + events.size());
   }
 
+  private String getEventIndex(final Event event) {
+    final long timestamp = event.getTimestamp();
+    String index;
+    switch (config_elasticIndexMode) {
+      case 1:
+        index = config_elasticIndex + indexDateFormat.format(new Date());
+        break;
+      case 2:
+        index = config_elasticIndex + indexDateFormat.format(new Date(timestamp));
+        break;
+      default:
+        index = config_elasticIndex;
+        break;
+    }
+    return index;
+  }
+
+  private String getEventID(final Event event) {
+    return UUID.randomUUID().toString();
+  }
+
   @Override
   public boolean exportData(final String group, final String metric, final String splitGroup, final String splitName, final IDatum datum, final Map<String, Object> meta) {
     context.debug("exportData ", metric);
     final SimpleJson json = new SimpleJson(true);
     final Calendar cal = Calendar.getInstance();
-    cal.setTimeZone(TimeZone.getTimeZone("CET"));
+    if (config_timezone != null) {
+      cal.setTimeZone(TimeZone.getTimeZone(config_timezone));
+    }
     cal.setTime(new Date(datum.getTimeStamp()));
-    json.addProperty("datetime", cal.getTime(), GenericConsumer.ISO8601_FULL);
-    json.addProperty("group", group);
-    json.addProperty("metric", metric);
-    json.addProperty("value", datum.getValue());
+    final long timeStamp = cal.getTimeInMillis();
+    json.addProperty(FLD_DATETIME, cal.getTime(), GenericConsumer.ISO8601_FULL);
+    json.addProperty(FLD_GROUP, group);
+    json.addProperty(FLD_METRIC, metric);
+    json.addProperty(FLD_VALUE, datum.getValue());
     if (splitGroup != null) {
-      json.addProperty("master", false);
-      json.addProperty("splitGroup", splitGroup);
-      json.addProperty("splitName", splitName);
+      json.addProperty(FLD_MASTER, false);
+      json.addProperty(FLD_SPLIT_GROUP, splitGroup);
+      json.addProperty(FLD_SPLIT_NAME, splitName);
     }
     else {
-      json.addProperty("master", true);
+      json.addProperty(FLD_MASTER, true);
     }
     if (meta != null) {
       for (final Map.Entry<String, Object> metadata : meta.entrySet()) {
@@ -181,7 +225,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
         }
       }
     }
-    addMeasure(json);
+    addMeasure(timeStamp, json);
     return true;
   }
 
