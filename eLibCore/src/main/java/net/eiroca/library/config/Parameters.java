@@ -115,17 +115,15 @@ public class Parameters {
       if (val == null) {
         val = p.defValue;
       }
-      if (val != null) {
-        final Field f = fields.get(key);
-        if (f != null) {
-          try {
-            if (forceAccess) {
-              f.setAccessible(true);
-            }
-            f.set(config, val);
+      final Field f = fields.get(key);
+      if (f != null) {
+        try {
+          if (forceAccess) {
+            f.setAccessible(true);
           }
-          catch (IllegalArgumentException | IllegalAccessException e) {
-          }
+          f.set(config, val);
+        }
+        catch (IllegalArgumentException | IllegalAccessException e) {
         }
       }
     }

@@ -41,10 +41,10 @@ public class SQLchecks {
   public String getSQL(final String variant) {
     String SQL = null;
     if (variant != null) {
-      SQL = LibFile.readFile(MessageFormat.format(SQLscript, variant));
+      SQL = LibFile.readFile(MessageFormat.format(SQLscript, variant), SQLchecks.class);
     }
     if (SQL == null) {
-      SQL = LibFile.readFile(SQLscript);
+      SQL = LibFile.readFile(SQLscript, SQLchecks.class);
     }
     if (SQL != null) {
       SQL = SQL.replaceAll("([\r\n\t]+)", " ").trim();

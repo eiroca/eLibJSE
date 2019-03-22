@@ -57,7 +57,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   public static StringParameter _elasticIndex = new StringParameter(GenericConsumer.config, "elasticIndex", "metrics-");
   public static IntegerParameter _elasticIndexMode = new IntegerParameter(GenericConsumer.config, "elasticIndexMode", 1, 0, 2);
   public static StringParameter _indexDateFormat = new StringParameter(GenericConsumer.config, "indexDateFormat", "yyyy/MM/dd");
-  public static StringParameter _elasticType = new StringParameter(GenericConsumer.config, "elasticType", FLD_METRIC);
+  public static StringParameter _elasticType = new StringParameter(GenericConsumer.config, "elasticType", GenericConsumer.FLD_METRIC);
   public static StringParameter _elasticPipeline = new StringParameter(GenericConsumer.config, "elasticPipeline", null);
   //
   public static StringParameter _logger = new StringParameter(GenericConsumer.config, "logger", "Metrics");
@@ -106,7 +106,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   }
 
   public void addMeasure(final long timeStamp, final SimpleJson data) {
-    if (data == null) return;
+    if (data == null) { return; }
     final Event e = new Event(timeStamp, data);
     synchronized (dataLock) {
       buffer.add(e);
@@ -197,17 +197,16 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     }
     cal.setTime(new Date(datum.getTimeStamp()));
     final long timeStamp = cal.getTimeInMillis();
-    json.addProperty(FLD_DATETIME, cal.getTime(), GenericConsumer.ISO8601_FULL);
-    json.addProperty(FLD_GROUP, group);
-    json.addProperty(FLD_METRIC, metric);
-    json.addProperty(FLD_VALUE, datum.getValue());
+    json.addProperty(GenericConsumer.FLD_DATETIME, cal.getTime(), GenericConsumer.ISO8601_FULL);
+    json.addProperty(GenericConsumer.FLD_GROUP, group);
+    json.addProperty(GenericConsumer.FLD_METRIC, metric);
     if (splitGroup != null) {
-      json.addProperty(FLD_MASTER, false);
-      json.addProperty(FLD_SPLIT_GROUP, splitGroup);
-      json.addProperty(FLD_SPLIT_NAME, splitName);
+      json.addProperty(GenericConsumer.FLD_MASTER, false);
+      json.addProperty(GenericConsumer.FLD_SPLIT_GROUP, splitGroup);
+      json.addProperty(GenericConsumer.FLD_SPLIT_NAME, splitName);
     }
     else {
-      json.addProperty(FLD_MASTER, true);
+      json.addProperty(GenericConsumer.FLD_MASTER, true);
     }
     if (meta != null) {
       for (final Map.Entry<String, Object> metadata : meta.entrySet()) {
@@ -218,12 +217,18 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
         }
         if (key.endsWith(GenericConsumer.ARRAY_SUFFIX)) {
           key = key.substring(0, key.length() - GenericConsumer.ARRAY_SUFFIX.length());
-          json.addProperty(key, (String[])val);
+          if (val instanceof String[]) {
+            json.addProperty(key, (String[])val);
+          }
+          else {
+            json.addProperty(key, (List<?>)val);
+          }
         }
         else {
           json.addProperty(key, val.toString());
         }
       }
+      json.addProperty(GenericConsumer.FLD_VALUE, datum.getValue());
     }
     addMeasure(timeStamp, json);
     return true;

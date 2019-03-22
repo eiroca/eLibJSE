@@ -18,7 +18,10 @@ package net.eiroca.library.diagnostics.monitors;
 
 import java.net.InetAddress;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import net.eiroca.ext.library.http.utils.URLFetcherConfig;
 import net.eiroca.library.core.Helper;
@@ -31,9 +34,22 @@ import net.eiroca.library.metrics.MetricGroup;
 
 public class WebServerMonitor extends GenericHTTPMonitor {
 
+  private static final String REGEX_VALUE_FIELD = "value";
+  private static final String REGEX_KEY_FIELD = "key";
+  private static final String PROBETYPE_JSON = "json";
+  private static final String PROBETYPE_REGEX = "regex";
+
   protected static final String CONFIG_PROBECHECK = "checkProbe";
   protected static final String CONFIG_PROBEURL = "probeURL";
   protected static final String CONFIG_PROBEPARSING = "parseProbe";
+  protected static final String CONFIG_PROBETYPE = "probeType";
+  protected static final String CONFIG_PROBEREGEX = "probeRegEx";
+  private static final String DEF_PROBEREGEX = "\\s*(?<key>\\w+)\\s*\\=\\s*(?<value>[\\.\\deE+-]+)\\s*";
+  private static final String DEF_PROBETYPE = WebServerMonitor.PROBETYPE_JSON;
+
+  private boolean config_parseProbe;
+  private String config_probeType;
+  private Pattern config_probeRegEx;
 
   MetricGroup mgHTTPMonitor = new MetricGroup("HTTP Monitor", "WebServer - {0}");
   Measure smHeaderSize = mgHTTPMonitor.createMeasure("HeaderSize", "Size of HTTP headers", "bytes");
@@ -47,6 +63,7 @@ public class WebServerMonitor extends GenericHTTPMonitor {
   Measure smProbeStatus = mgProbe.createMeasure("Status", "Probe status", "number");
   Measure smProbeRows = mgProbe.createMeasure("Rows", "Probe number of rows returned ", "number");
 
+  protected boolean defaultHasProbe = true;
   protected boolean urlCheck;
 
   @Override
@@ -86,13 +103,46 @@ public class WebServerMonitor extends GenericHTTPMonitor {
   }
 
   public void parseProbeData(final String content) {
+    boolean success = (content != null);
+    if (success) {
+      if (config_probeType.equals(WebServerMonitor.PROBETYPE_JSON)) {
+        success = parseJson(content);
+      }
+      else if (config_probeType.equals(WebServerMonitor.PROBETYPE_REGEX)) {
+        success = parseRegEx(content);
+      }
+    }
+  }
+
+  private boolean parseRegEx(final String content) {
+    final Matcher m = config_probeRegEx.matcher(content);
+    final int max = 0;
+    int cnt = 0;
+    final IMetric<?> checkInfo = smProbeResult.getSplitting("check");
+    while (m.find()) {
+      cnt++;
+      final String key = m.group(WebServerMonitor.REGEX_KEY_FIELD);
+      final double value = Helper.getDouble(m.group(WebServerMonitor.REGEX_VALUE_FIELD), 0);
+      checkInfo.getSplitting(key).setValue(value);
+      context.debug(key, "=", value);
+    }
+    smProbeRows.setValue(cnt);
+    smProbeResult.setValue(max);
+    return cnt > 0;
+  }
+
+  private boolean parseJson(final String content) {
     boolean success = false;
     String message = null;
     JSONObject obj = null;
-    if (content != null) {
+    try {
       obj = new JSONObject(content);
       success = obj.getBoolean("success");
       message = obj.getString("message");
+    }
+    catch (final JSONException e) {
+      context.warn("JSON error: " + e.getMessage());
+      context.info(e.getMessage() + ": " + content);
     }
     smProbeResult.setValue(success ? 1.0 : 0.0);
     if (LibStr.isEmptyOrNull(message)) {
@@ -101,8 +151,8 @@ public class WebServerMonitor extends GenericHTTPMonitor {
     else {
       smProbeStatus.getSplitting("message", message).setValue(1.0);
     }
-    int max = 0;
     if (obj != null) {
+      int max = 0;
       final JSONArray arr = obj.getJSONArray("infos");
       final IMetric<?> checkInfo = smProbeResult.getSplitting("check");
       smProbeRows.setValue(arr.length());
@@ -114,22 +164,29 @@ public class WebServerMonitor extends GenericHTTPMonitor {
           max = retCode;
         }
         checkInfo.getSplitting(splitName).setValue(retCode);
-        context.info(splitName, "=", retCode);
+        context.debug(splitName, "=", retCode);
       }
+      smProbeResult.setValue(max);
     }
-    smProbeResult.setValue(max);
+    return success;
   }
 
   @Override
   public boolean preCheck(final InetAddress host) throws CommandException {
-    boolean ok = super.preCheck(host);
+    final boolean ok = super.preCheck(host);
     if (ok) {
-      final String method = context.getConfigString(URLFetcherConfig.CONFIG_METHOD, URLFetcherConfig.DEF_METHOD).toUpperCase();
-      final String postData = context.getConfigString(URLFetcherConfig.CONFIG_POST_DATA, null);
-      fetcher.setURL(getURL(WebServerMonitor.CONFIG_PROBEURL, host.getHostName()));
-      fetcher.setMethod(method, postData);
-      urlCheck = context.getConfigBoolean(WebServerMonitor.CONFIG_PROBECHECK, true);
-      ok = urlCheck;
+      urlCheck = context.getConfigBoolean(WebServerMonitor.CONFIG_PROBECHECK, defaultHasProbe);
+      if (urlCheck) {
+        final String method = context.getConfigString(URLFetcherConfig.CONFIG_METHOD, URLFetcherConfig.DEF_METHOD).toUpperCase();
+        final String postData = context.getConfigString(URLFetcherConfig.CONFIG_POST_DATA, null);
+        fetcher.setURL(getURL(WebServerMonitor.CONFIG_PROBEURL, host.getHostName()));
+        fetcher.setMethod(method, postData);
+        config_parseProbe = context.getConfigBoolean(WebServerMonitor.CONFIG_PROBEPARSING, false);
+        if (config_parseProbe) {
+          config_probeType = context.getConfigString(WebServerMonitor.CONFIG_PROBETYPE, WebServerMonitor.DEF_PROBETYPE).toLowerCase();
+          config_probeRegEx = Pattern.compile(context.getConfigString(WebServerMonitor.CONFIG_PROBEREGEX, WebServerMonitor.DEF_PROBEREGEX));
+        }
+      }
     }
     return ok;
   }

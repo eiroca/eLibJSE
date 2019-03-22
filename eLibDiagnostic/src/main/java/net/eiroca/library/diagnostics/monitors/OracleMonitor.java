@@ -120,11 +120,11 @@ public class OracleMonitor extends DatabaseMonitor {
   public void setup(final IContext context) throws CommandException {
     super.setup(context);
     checks = new SQLchecks[] {
-        new SQLchecks(mgOracle, "/res/oracle_metrics.sql"), //
-        new SQLchecks(mgOracleTablespace, "/res/oracle_tablespaces.sql", 2, "Tablespace"), //
-        new SQLchecks(mgOracleWaiter, "/res/oracle_waiters.sql", 2, "Waiter"), //
-        new SQLchecks(mgOracleLock, "/res/oracle_locks.sql", 2, "Lock"), //
-        new SQLchecks(mgOracleTopSQL, "/res/oracle{0}_topsql.sql", 2, "Query")//
+        new SQLchecks(mgOracle, "/sql/oracle_metrics.sql"), //
+        new SQLchecks(mgOracleTablespace, "/sql/oracle_tablespaces.sql", 2, "Tablespace"), //
+        new SQLchecks(mgOracleWaiter, "/sql/oracle_waiters.sql", 2, "Waiter"), //
+        new SQLchecks(mgOracleLock, "/sql/oracle_locks.sql", 2, "Lock"), //
+        new SQLchecks(mgOracleTopSQL, "/sql/oracle{0}_topsql.sql", 2, "Query")//
     };
   }
 

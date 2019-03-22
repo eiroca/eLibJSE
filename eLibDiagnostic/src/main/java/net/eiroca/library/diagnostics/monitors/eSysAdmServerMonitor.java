@@ -25,6 +25,7 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 import net.eiroca.library.core.LibMath;
+import net.eiroca.library.core.LibStr;
 import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricAggregation;
@@ -35,6 +36,7 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
 
   private static final String CONFIG_PORT = "port";
   private static final String CONFIG_NAMESPACE = "namespace";
+  private static final String DEF_NAMESPACE = "unknown";
   private static final String CONFIG_AGGREGATION_MEASURE = "aggregation";
   private static final String CONFIG_AGGREGATION_SPLIT = "splitting_aggregation";
 
@@ -45,6 +47,8 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
   protected final Measure mKPIs = mgeSysAdm.createMeasure("KPIs", "KPIs (%) collected by eSysAdm server", "percent");
   protected final Measure mTimings = mgeSysAdm.createMeasure("Timings", "Timings (ms) collected by eSysAdm server", "ms");
 
+  private String namespace;
+
   @Override
   public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
@@ -54,8 +58,10 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
   @Override
   public URL getURL(final InetAddress host) throws MalformedURLException {
     final String port = "" + context.getConfigInt(eSysAdmServerMonitor.CONFIG_PORT, 2000);
-    final String namespace = context.getConfigString(eSysAdmServerMonitor.CONFIG_NAMESPACE, "ubknowmn");
-    final String urlStr = MessageFormat.format("http://{0}:{1}/rest/export/{2}", host.getHostName(), port, namespace);
+    namespace = context.getConfigString(eSysAdmServerMonitor.CONFIG_NAMESPACE, eSysAdmServerMonitor.DEF_NAMESPACE);
+    if (namespace != null) namespace = namespace.trim();
+    final String fmtURL = LibStr.isEmptyOrNull(namespace) ? "http://{0}:{1}/rest/export" : "http://{0}:{1}/rest/export/{2}";
+    final String urlStr = MessageFormat.format(fmtURL, host.getHostName(), port, namespace);
     context.info("URL: ", urlStr);
     return new URL(urlStr);
   }
@@ -101,7 +107,7 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
   @Override
   public void parseJSON(final JSONObject obj) {
     final String measureAggregationStr = context.getConfigString(eSysAdmServerMonitor.CONFIG_AGGREGATION_MEASURE, MetricAggregation.average.toString());
-    final String aplitAggregationStr = context.getConfigString(eSysAdmServerMonitor.CONFIG_AGGREGATION_SPLIT, MetricAggregation.average.toString());
+    final String splitAggregationStr = context.getConfigString(eSysAdmServerMonitor.CONFIG_AGGREGATION_SPLIT, MetricAggregation.last.toString());
     MetricAggregation measureAggregation = MetricAggregation.average;
     MetricAggregation splitAggregation = MetricAggregation.last;
     try {
@@ -110,7 +116,7 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
     catch (final IllegalArgumentException e) {
     }
     try {
-      splitAggregation = MetricAggregation.valueOf(aplitAggregationStr);
+      splitAggregation = MetricAggregation.valueOf(splitAggregationStr);
     }
     catch (final IllegalArgumentException e) {
     }
@@ -128,7 +134,21 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
     mServerStatus.setValue(status);
     if (status != 0) { return; }
     final JSONObject result = obj.getJSONObject("result");
-    context.info("result:", result);
+    context.debug("result:", result);
+    if (LibStr.isEmptyOrNull(namespace)) {
+      final Iterator<String> namespaces = result.keys();
+      while (namespaces.hasNext()) {
+        final String namespace = namespaces.next();
+        parseNameSpace(namespace + ".", measureAggregation, splitAggregation, result.getJSONObject(namespace));
+      }
+    }
+    else {
+      parseNameSpace(null, measureAggregation, splitAggregation, result);
+    }
+
+  }
+
+  private void parseNameSpace(final String splitPrefix, final MetricAggregation measureAggregation, final MetricAggregation splitAggregation, final JSONObject result) {
     final Iterator<String> metrics = result.keys();
     Measure m = null;
     while (metrics.hasNext()) {
@@ -167,7 +187,8 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
         while (splittingsGroups.hasNext()) {
           final String splitGroup = splittingsGroups.next();
           data = splittings.getJSONObject(splitGroup);
-          final IMetric<?> ms = m.getSplitting(splitGroup);
+          final String splitGrupName = LibStr.concatenate(splitPrefix, splitGroup);
+          final IMetric<?> ms = m.getSplitting(splitGrupName);
           final JSONObject splittingSubKeysObj = data.optJSONObject("splittings");
           final Iterator<String> splittingsSubKeys = splittingSubKeysObj.keys();
           while (splittingsSubKeys.hasNext()) {
@@ -176,9 +197,8 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
             value = data.optJSONObject("value");
             final Double splitVal = getValue(value, splitAggregation);
             if (splitVal != null) {
-              context.logF(LogLevel.info, "{0}.{1}={2}", splitGroup, splitName, splitVal);
-              final IMetric<?> mm = ms.getSplitting(splitName);
-              mm.setValue(splitVal);
+              context.logF(LogLevel.info, "{0}.{1}={2}", splitGrupName, splitName, splitVal);
+              ms.getSplitting(splitName).setValue(splitVal);
             }
           }
         }

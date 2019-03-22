@@ -46,34 +46,36 @@ public class ContextParameters extends Parameters {
     values.clear();
     for (final Parameter<?> p : params) {
       final String key = LibStr.concatenate(prefix, p.getName());
-      final boolean present = true;
-      String value = null;
-      final Integer type = ContextParameters.typeMapping.get(p.getClass());
-      final int typeVal = (type != null) ? type.intValue() : -1;
-      switch (typeVal) {
-        case 0:
-          value = String.valueOf(context.getConfigString(key, ((StringParameter)p).getDefault()));
-          break;
-        case 1:
-          value = String.valueOf(context.getConfigInt(key, ((IntegerParameter)p).getDefault()));
-          break;
-        case 2:
-          value = String.valueOf(context.getConfigLong(key, ((LongParameter)p).getDefault()));
-          break;
-        case 3:
-          value = String.valueOf(context.getConfigBoolean(key, ((BooleanParameter)p).getDefault()));
-          break;
-        case 4:
-          value = String.valueOf(context.getConfigPassword(key));
-          break;
-        default:
-          value = context.getConfigString(key, null);
-          break;
+      final boolean present = context.hasConfig(key);
+      if (present) {
+        String value = null;
+        final Integer type = ContextParameters.typeMapping.get(p.getClass());
+        final int typeVal = (type != null) ? type.intValue() : -1;
+        switch (typeVal) {
+          case 0:
+            value = context.getConfigString(key, null);
+            break;
+          case 1:
+            value = String.valueOf(context.getConfigInt(key, ((IntegerParameter)p).getDefault()));
+            break;
+          case 2:
+            value = String.valueOf(context.getConfigLong(key, ((LongParameter)p).getDefault()));
+            break;
+          case 3:
+            value = String.valueOf(context.getConfigBoolean(key, ((BooleanParameter)p).getDefault()));
+            break;
+          case 4:
+            value = context.getConfigPassword(key);
+            break;
+          default:
+            value = context.getConfigString(key, null);
+            break;
+        }
+        final boolean isNull = LibStr.isEmptyOrNull(value);
+        if (present && !p.isNullable() && isNull) { throw new IllegalArgumentException("Parameter '" + key + "' may not be null"); }
+        final Object val = p.convertString(value);
+        values.put(p, val);
       }
-      final boolean isNull = LibStr.isEmptyOrNull(value);
-      if (present && !p.isNullable() && isNull) { throw new IllegalArgumentException("Parameter '" + key + "' may not be null"); }
-      final Object val = p.convertString(value);
-      values.put(p, val);
     }
   }
 

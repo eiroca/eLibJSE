@@ -16,6 +16,8 @@
  **/
 package config;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import net.eiroca.library.config.Parameters;
@@ -27,7 +29,13 @@ public class TestParameters {
   public class Config1 {
 
     public String f1;
-    public String x = "0";
+    public String x;
+
+    public Config1() {
+      super();
+      f1 = "1";
+      x = "0";
+    }
 
   }
 
@@ -35,17 +43,59 @@ public class TestParameters {
 
     public int f2;
     public int x;
-    private final int p = -1;
+    private int p;
+    public String z;
+
+    public Cofing2() {
+      super();
+      f2 = 2;
+      x = 2;
+      p = -1;
+      z = "z";
+    }
+
+    public int getF2() {
+      return f2;
+    }
+
+    public void setF2(final int f2) {
+      this.f2 = f2;
+    }
+
+    public int getX() {
+      return x;
+    }
+
+    public void setX(final int x) {
+      this.x = x;
+    }
+
+    public int getP() {
+      return p;
+    }
+
+    public void setP(final int p) {
+      this.p = p;
+    }
 
   }
 
   public class Cofing3 extends Config1 {
 
-    public int a = 1;
-    int _a = 2;
-    private final int _b = 3;
-    protected int _c = 4;
-    public int _d = 5;
+    public int a;
+    int _a;
+    private int _b;
+    protected int _c;
+    public int _d;
+
+    public Cofing3() {
+      super();
+      a = 1;
+      _a = 2;
+      _b = 3;
+      _c = 4;
+      _d = 5;
+    }
 
     public int getA() {
       return _a;
@@ -63,6 +113,9 @@ public class TestParameters {
       return _d;
     }
 
+    public void setB(final int b) {
+      _b = b;
+    }
   }
 
   Parameters params = new Parameters();
@@ -70,6 +123,7 @@ public class TestParameters {
   IntegerParameter p2 = new IntegerParameter(params, "f2", 2);
   IntegerParameter p3 = new IntegerParameter(params, "x", 3);
   IntegerParameter p4 = new IntegerParameter(params, "p", 4);
+  StringParameter pNull = new StringParameter(params, "z", null);
 
   Parameters params2 = new Parameters();
   IntegerParameter pa1 = new IntegerParameter(params2, "a", 0);
@@ -104,6 +158,23 @@ public class TestParameters {
     Assert.assertEquals(config.getB(), 0);
     Assert.assertEquals(config.getC(), 0);
     Assert.assertEquals(config.getD(), 0);
+  }
+
+  @Test
+  public void configTest4() {
+    final Map<String, String> data = new HashMap<>();
+    final Cofing2 config = new Cofing2();
+    params.loadConfig(data, null);
+    params.saveConfig(config, null, true);
+    Assert.assertEquals(config.z, null);
+    data.put("z", "");
+    params.loadConfig(data, null);
+    params.saveConfig(config, null, true);
+    Assert.assertEquals(config.z, null);
+    data.put("z", "x");
+    params.loadConfig(data, null);
+    params.saveConfig(config, null, true);
+    Assert.assertEquals(config.z, "x");
   }
 
 }

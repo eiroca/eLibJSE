@@ -14,27 +14,26 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.system;
+package net.eiroca.library.sysadm.monitoring.sdk;
 
-import java.io.File;
-import java.net.URL;
+import java.util.Properties;
+import org.apache.commons.codec.binary.Base64;
+import net.eiroca.library.system.Context;
 
-public interface IConfig {
+public class ServerContext extends Context {
 
-  public String getConfigString(String propName, String defValue);
+  public ServerContext(String name, Properties properties) {
+    super(name, properties);
+  }
 
-  public int getConfigInt(String propName, int defVal);
-
-  public long getConfigLong(String propName, long defVal);
-
-  public boolean getConfigBoolean(String propName, boolean defVal);
-
-  public String getConfigPassword(String propName);
-
-  public File getConfigFile(String propName);
-
-  public URL getConfigUrl(String propName);
-
-  public boolean hasConfig(String key);
+  @Override
+  public String getConfigPassword(final String propName) {
+     String result = config.get(propName);
+    if (result != null) {
+      Base64 base64 = new Base64();
+      result = new String(base64.decode(result.getBytes()));
+    }
+    return result;
+  }
 
 }

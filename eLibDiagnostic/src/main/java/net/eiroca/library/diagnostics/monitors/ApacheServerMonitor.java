@@ -57,12 +57,17 @@ public class ApacheServerMonitor extends WebServerMonitor {
   protected final Measure sbStartingUp = mgApacheScoreboard.createMeasure("Starting up", "Starting up", "number");
   protected final Measure sbWaitingForConnection = mgApacheScoreboard.createMeasure("Waiting", "Waiting for connection", "number");
 
+  public ApacheServerMonitor() {
+    super();
+    defaultHasProbe = false;
+  }
+
   @Override
   public boolean preCheck(final InetAddress host) throws CommandException {
     final boolean ok = super.preCheck(host);
     if (ok) {
       final URL baseURL = getURL(ApacheServerMonitor.CONFIG_MODSTATUSURL, host.getHostName());
-      context.info("ElasticSearch URL: " + baseURL);
+      context.info("ModStatus URL: " + baseURL);
       fetcher.setURL(baseURL);
       fetcher.setMethod(URLFetcherConfig.METHOD_GET, null);
     }

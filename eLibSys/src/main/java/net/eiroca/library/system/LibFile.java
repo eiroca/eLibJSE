@@ -31,14 +31,18 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Scanner;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 import net.eiroca.library.core.Helper;
 
 final public class LibFile {
@@ -245,8 +249,12 @@ final public class LibFile {
   }
 
   public static String readFile(final String resourceName) {
+    return LibFile.readFile(resourceName, null);
+  }
+
+  public static String readFile(final String resourceName, final Class<?> callingClass) {
     String result = null;
-    final URL url = Helper.getResourceURL(resourceName, null);
+    final URL url = Helper.getResourceURL(resourceName, callingClass);
     if (url != null) {
       InputStream is = null;
       Scanner scanner = null;
@@ -318,6 +326,41 @@ final public class LibFile {
       }
     }
     return inputStream;
+  }
+
+  public static void getFiles(final String paths, final List<URI> filesList) {
+    for (final String path : paths.split(File.pathSeparator)) {
+      LibFile.getFiles(new File(path), filesList);
+    }
+  }
+
+  public static void getFiles(final File file, final List<URI> filesList) {
+    if (file.isDirectory()) {
+      final File list[] = file.listFiles();
+      for (final File f : list) {
+        getFiles(f, filesList);
+      }
+    }
+    else {
+      filesList.add(file.toURI());
+    }
+  }
+
+  public static void getClassPathFiles(final List<URI> filesList) {
+    LibFile.getFiles(System.getProperty("java.class.path"), filesList);
+  }
+
+  public static void getJarContent(final String jarPath, final List<String> content) {
+    try (JarFile jarFile = new JarFile(jarPath);) {
+      final Enumeration<JarEntry> e = jarFile.entries();
+      while (e.hasMoreElements()) {
+        final JarEntry entry = e.nextElement();
+        final String name = entry.getName();
+        content.add(name);
+      }
+    }
+    catch (IOException e1) {
+    }
   }
 
 }

@@ -19,7 +19,7 @@ package net.eiroca.library.system;
 public interface ILog {
 
   enum LogLevel {
-    trace, debug, info, warn, error
+    trace, debug, info, warn, error, fatal
   }
 
   public void log(final LogLevel priority, final String msg);
@@ -37,5 +37,7 @@ public interface ILog {
   public void warn(final Object... msg);
 
   public void error(final Object... msg);
+
+  public void fatal(final Object... msg);
 
 }

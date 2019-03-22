@@ -14,27 +14,12 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.system;
+package net.eiroca.library.sysadm.monitoring.sdk;
 
-import java.io.File;
-import java.net.URL;
+import java.util.Set;
 
-public interface IConfig {
+public interface ITagsProvider {
 
-  public String getConfigString(String propName, String defValue);
-
-  public int getConfigInt(String propName, int defVal);
-
-  public long getConfigLong(String propName, long defVal);
-
-  public boolean getConfigBoolean(String propName, boolean defVal);
-
-  public String getConfigPassword(String propName);
-
-  public File getConfigFile(String propName);
-
-  public URL getConfigUrl(String propName);
-
-  public boolean hasConfig(String key);
+  public Set<String> getTags(String key);
 
 }

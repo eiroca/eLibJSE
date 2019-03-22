@@ -28,6 +28,10 @@ import net.eiroca.library.metrics.MetricGroup;
 
 public class RESTServerMonitor extends WebServerMonitor {
 
+  public RESTServerMonitor() {
+    defaultHasProbe = false;
+  }
+
   @Override
   public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);

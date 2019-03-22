@@ -19,6 +19,7 @@ package net.eiroca.ext.library.gson;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -93,10 +94,10 @@ public class SimpleJson {
     node.add(propertyName, SimpleJson.parser.parse(value));
   }
 
-  public void addProperty(final String name, final String value) {
+  public void addProperty(final String name, final String val) {
     final String propertyName = getPropertyName(name);
     final JsonObject node = getNode(name);
-    node.addProperty(propertyName, value);
+    node.addProperty(propertyName, val);
   }
 
   public void addProperty(final String name, final double value) {
@@ -117,6 +118,16 @@ public class SimpleJson {
     final JsonArray e = new JsonArray();
     for (final String s : value) {
       e.add(s);
+    }
+    node.add(propertyName, e);
+  }
+
+  public void addProperty(final String name, final List<?> value) {
+    final String propertyName = getPropertyName(name);
+    final JsonObject node = getNode(name);
+    final JsonArray e = new JsonArray();
+    for (final Object s : value) {
+      e.add(s != null ? String.valueOf(s) : null);
     }
     node.add(propertyName, e);
   }

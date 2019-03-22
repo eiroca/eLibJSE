@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import net.eiroca.library.data.Status;
 import net.eiroca.library.diagnostics.IServerMonitor;
@@ -39,11 +40,16 @@ public class GenericProducer implements IMeasureProducer {
   protected IContext context;
   protected IServerMonitor monitor;
   protected IMeasureConsumer consumer;
+  protected List<String> hosts;
+  protected ITagsProvider tagProvider;
+  protected List<String> tags = new ArrayList<>();
 
-  public GenericProducer(final String name, final IServerMonitor monitor, final IMeasureConsumer consumer) {
+  public GenericProducer(final String name, final IServerMonitor monitor, final List<String> hosts, final ITagsProvider tagProvider, final IMeasureConsumer consumer) {
     super();
     this.name = name;
     this.monitor = monitor;
+    this.hosts = hosts;
+    this.tagProvider = tagProvider;
     this.consumer = consumer;
   }
 
@@ -63,6 +69,13 @@ public class GenericProducer implements IMeasureProducer {
   public void setup(final IContext context) throws Exception {
     this.context = context;
     context.info(name, " setup done");
+    tags.clear();
+    final String tagsStr = context.getConfigString("tags", null);
+    if (tagsStr != null) {
+      for (final String t : tagsStr.split(" ")) {
+        tags.add(t);
+      }
+    }
   }
 
   @Override
@@ -128,7 +141,7 @@ public class GenericProducer implements IMeasureProducer {
       }
     }
     if (!split.getDatum().hasValue()) {
-      if (consumer.exportData(group, metric, null, null, sum, meta)) {
+      if (consumer.exportData(group, metric, splitGroup, null, sum, meta)) {
         result++;
       }
     }
@@ -136,34 +149,32 @@ public class GenericProducer implements IMeasureProducer {
   }
 
   public Status execute() throws Exception {
-    final Map<String, Object> meta = new TreeMap<>();
-    final List<String> hosts = new ArrayList<>();
-    String aHost = context.getConfigString("host", null);
-    if (aHost != null) {
-      hosts.add(aHost.trim());
-    }
-    aHost = context.getConfigString("hosts", null);
-    if (aHost != null) {
-      for (final String s : aHost.split(" ")) {
-        hosts.add(s.trim());
-      }
-    }
-    if (hosts.size() == 0) { return new Status(-1, "Host is missing"); }
-    final String tags = context.getConfigString("tags", null);
-    meta.put("source", name);
-    if (tags != null) {
-      meta.put("tags[]", tags.split(" "));
-    }
     monitor.setup(context);
     int exported_measure = 0;
     final List<MetricGroup> groups = new ArrayList<>();
     monitor.loadMetricGroup(groups);
     for (final String host : hosts) {
-      meta.put("host", host);
       monitor.resetMetrics();
       final boolean ok = monitor.check(host);
       context.info(name, " ", host, " -> ", ok);
       if (ok) {
+        final Map<String, Object> meta = new TreeMap<>();
+        meta.put("source", name);
+        meta.put("host", host);
+        final Set<String> hostTags = (tagProvider != null) ? tagProvider.getTags(host) : null;
+        if ((hostTags != null) && (hostTags.size() > 0)) {
+          final List<String> _tags = new ArrayList<>();
+          _tags.addAll(hostTags);
+          if (tags != null) {
+            _tags.addAll(tags);
+          }
+          meta.put("tags[]", _tags);
+        }
+        else {
+          if (tags != null) {
+            meta.put("tags[]", tags);
+          }
+        }
         exported_measure += exportMeasures(meta, groups);
       }
     }

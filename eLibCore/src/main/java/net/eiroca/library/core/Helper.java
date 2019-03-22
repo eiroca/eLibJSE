@@ -338,28 +338,33 @@ final public class Helper {
 
   public static URL getResourceURL(final String resourceName, final Class<?> callingClass) {
     if (LibStr.isEmptyOrNull(resourceName)) { return null; }
-    ClassLoader cl = null;
+    ClassLoader cl1 = null;
+    ClassLoader cl2 = null;
+    ClassLoader cl3 = null;
     URL url = null;
     if ((url == null) && (callingClass != null)) {
-      cl = callingClass.getClassLoader();
-      if (cl != null) {
-        url = cl.getResource(resourceName);
+      cl1 = callingClass.getClassLoader();
+      if (cl1 != null) {
+        url = cl1.getResource(resourceName);
       }
     }
     if (url == null) {
-      cl = Thread.currentThread().getContextClassLoader();
-      if (cl != null) {
-        url = cl.getResource(resourceName);
+      cl2 = Thread.currentThread().getContextClassLoader();
+      if ((cl2 != null) && (cl2 != cl1)) {
+        url = cl2.getResource(resourceName);
       }
     }
     if (url == null) {
-      cl = Class.class.getClassLoader();
-      if (cl != null) {
-        url = cl.getResource(resourceName);
+      cl3 = Class.class.getClassLoader();
+      if ((cl3 != null) && (cl3 != cl1) && (cl3 != cl2)) {
+        url = cl3.getResource(resourceName);
       }
     }
     if ((url == null) && (resourceName.charAt(0) != '/')) {
       url = Helper.getResourceURL('/' + resourceName, callingClass);
+    }
+    else if ((url == null) && (resourceName.charAt(0) == '/')) {
+      url = Helper.getResourceURL(resourceName.substring(1), callingClass);
     }
     return url;
   }

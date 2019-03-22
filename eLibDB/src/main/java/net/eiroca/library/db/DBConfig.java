@@ -120,7 +120,7 @@ public class DBConfig {
 
   public void setSQLType(final String sqlType) {
     if (context != null) {
-      context.info("Set SQLType = ", sqlType);
+      context.debug("Set SQLType = ", sqlType);
     }
     SQLType = sqlType;
   }
@@ -264,8 +264,8 @@ public class DBConfig {
 
   @Override
   public String toString() {
-    return "DBConfig [SQLType=" + SQLType + ", server=" + server + ", port=" + port + ", database=" + database + ", username=" + username + ", password=" + password + ", sid=" + sid + ", URL=" + URL + ", windows=" + windows + ", DB2schema=" + DB2schema + ", connectionUrl=" + connectionUrl
-        + ", sqlclass=" + sqlclass + ", prepared=" + prepared + ", lastError=" + lastError + ", context=" + context + "]";
+    return "DBConfig [SQLType=" + SQLType + ", server=" + server + ", port=" + port + ", database=" + database + ", username=" + username + ", password=" + (password != null ? "YES" : "NO") + ", sid=" + sid + ", URL=" + URL + ", windows=" + windows + ", DB2schema=" + DB2schema + ", connectionUrl="
+        + connectionUrl + ", sqlclass=" + sqlclass + ", prepared=" + prepared + "]";
   }
 
 }

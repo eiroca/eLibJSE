@@ -18,7 +18,6 @@ package net.eiroca.ext.library.http.utils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.logging.Logger;
 import javax.net.ssl.SSLProtocolException;
 import org.apache.http.HttpHost;
 import org.apache.http.config.Lookup;
@@ -27,10 +26,12 @@ import org.apache.http.conn.ManagedHttpClientConnection;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.impl.conn.DefaultHttpClientConnectionOperator;
 import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SniHttpClientConnectionOperator extends DefaultHttpClientConnectionOperator {
 
-  private static final Logger log = Logger.getLogger(URLFetcher.class.getName());
+  private static final Logger log = LoggerFactory.getLogger(URLFetcher.class.getName());
 
   public SniHttpClientConnectionOperator(final Lookup<ConnectionSocketFactory> socketFactoryRegistry) {
     super(socketFactoryRegistry, null, null);
@@ -45,7 +46,7 @@ public class SniHttpClientConnectionOperator extends DefaultHttpClientConnection
       final Boolean enableSniValue = (Boolean)context.getAttribute(SniSSLSocketFactory.ENABLE_SNI);
       final boolean enableSni = (enableSniValue == null) || enableSniValue;
       if (enableSni && (e.getMessage() != null) && e.getMessage().equals("handshake alert:  unrecognized_name")) {
-        SniHttpClientConnectionOperator.log.info("Server received saw wrong SNI host, retrying without SNI");
+        SniHttpClientConnectionOperator.log.debug("Server received saw wrong SNI host, retrying without SNI");
         context.setAttribute(SniSSLSocketFactory.ENABLE_SNI, false);
         super.connect(conn, host, localAddress, connectTimeout, socketConfig, context);
       }

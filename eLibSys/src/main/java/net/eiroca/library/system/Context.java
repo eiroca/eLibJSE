@@ -23,6 +23,7 @@ import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import net.eiroca.library.core.Helper;
@@ -35,13 +36,7 @@ public class Context implements IContext {
     @Override
     protected Context initialValue() {
       final Context c = new Context(Thread.currentThread().getName());
-      for (final Entry<Object, Object> e : System.getProperties().entrySet()) {
-        final Object key = e.getKey();
-        final Object val = e.getValue();
-        if ((val != null) && (key != null)) {
-          c.config.put(key.toString(), val.toString());
-        }
-      }
+      Context.importProperties(c, System.getProperties());
       return c;
     }
   };
@@ -57,26 +52,38 @@ public class Context implements IContext {
     return Context.currentContext.get();
   }
 
+  public static void importProperties(final Context c, final Properties properties) {
+    for (final Entry<Object, Object> e : properties.entrySet()) {
+      final Object key = e.getKey();
+      final Object val = e.getValue();
+      if ((val != null) && (key != null)) {
+        c.config.put(key.toString(), val.toString());
+      }
+    }
+  }
+
   public Context(final String name) {
     this.name = name;
     logger = LoggerFactory.getLogger(name);
   }
 
-  // ILog
+  public Context(final String name, final Properties properties) {
+    this(name);
+    Context.importProperties(this, properties);
+  }
 
-  private LogLevel getLogLevel(final LogLevel level) {
+  final private LogLevel getLogLevel(final LogLevel level) {
     int importance = level.ordinal() + bonusLevel;
     if (importance < 0) {
       importance = 0;
     }
-    if (importance > 4) {
-      importance = 4;
+    if (importance >= LogLevel.values().length) {
+      importance = LogLevel.values().length - 1;
     }
     return LogLevel.values()[importance];
   }
 
-  @Override
-  public boolean isLoggable(final LogLevel level) {
+  final private boolean internalIsLoggable(final LogLevel level) {
     switch (level) {
       case trace:
         return logger.isTraceEnabled();
@@ -87,53 +94,13 @@ public class Context implements IContext {
       case warn:
         return logger.isWarnEnabled();
       case error:
+      case fatal:
         return logger.isErrorEnabled();
     }
     return false;
   }
 
-  @Override
-  public void trace(final Object... msg) {
-    final LogLevel l = getLogLevel(LogLevel.trace);
-    if (isLoggable(l)) {
-      log(l, LibStr.concatenate(msg));
-    }
-  }
-
-  @Override
-  public void debug(final Object... msg) {
-    final LogLevel l = getLogLevel(LogLevel.debug);
-    if (isLoggable(l)) {
-      log(l, LibStr.concatenate(msg));
-    }
-  }
-
-  @Override
-  public void info(final Object... msg) {
-    final LogLevel l = getLogLevel(LogLevel.info);
-    if (isLoggable(l)) {
-      log(l, LibStr.concatenate(msg));
-    }
-  }
-
-  @Override
-  public void warn(final Object... msg) {
-    final LogLevel l = getLogLevel(LogLevel.warn);
-    if (isLoggable(l)) {
-      log(l, LibStr.concatenate(msg));
-    }
-  }
-
-  @Override
-  public void error(final Object... msg) {
-    final LogLevel l = getLogLevel(LogLevel.error);
-    if (isLoggable(l)) {
-      log(l, LibStr.concatenate(msg));
-    }
-  }
-
-  @Override
-  public void log(final LogLevel priority, final String msg) {
+  final private void internalLog(final LogLevel priority, final String msg) {
     switch (priority) {
       case trace:
         logger.trace(msg);
@@ -148,16 +115,81 @@ public class Context implements IContext {
         logger.warn(msg);
         break;
       case error:
+      case fatal:
         logger.error(msg);
         break;
+    }
+  }
+
+  // ILog
+
+  @Override
+  public boolean isLoggable(final LogLevel priority) {
+    final LogLevel l = getLogLevel(priority);
+    return internalIsLoggable(l);
+  }
+
+  @Override
+  public void trace(final Object... msg) {
+    final LogLevel l = getLogLevel(LogLevel.trace);
+    if (internalIsLoggable(l)) {
+      internalLog(l, LibStr.concatenate(msg));
+    }
+  }
+
+  @Override
+  public void debug(final Object... msg) {
+    final LogLevel l = getLogLevel(LogLevel.debug);
+    if (internalIsLoggable(l)) {
+      internalLog(l, LibStr.concatenate(msg));
+    }
+  }
+
+  @Override
+  public void info(final Object... msg) {
+    final LogLevel l = getLogLevel(LogLevel.info);
+    if (internalIsLoggable(l)) {
+      internalLog(l, LibStr.concatenate(msg));
+    }
+  }
+
+  @Override
+  public void warn(final Object... msg) {
+    final LogLevel l = getLogLevel(LogLevel.warn);
+    if (internalIsLoggable(l)) {
+      internalLog(l, LibStr.concatenate(msg));
+    }
+  }
+
+  @Override
+  public void error(final Object... msg) {
+    final LogLevel l = getLogLevel(LogLevel.error);
+    if (internalIsLoggable(l)) {
+      internalLog(l, LibStr.concatenate(msg));
+    }
+  }
+
+  @Override
+  public void fatal(final Object... msg) {
+    final LogLevel l = getLogLevel(LogLevel.fatal);
+    if (internalIsLoggable(l)) {
+      log(l, LibStr.concatenate(msg));
+    }
+  }
+
+  @Override
+  public void log(final LogLevel priority, final String msg) {
+    final LogLevel l = getLogLevel(priority);
+    if (internalIsLoggable(l)) {
+      internalLog(l, msg);
     }
   }
 
   @Override
   public void logF(final LogLevel priority, final String format, final Object... args) {
     final LogLevel l = getLogLevel(priority);
-    if (isLoggable(l)) {
-      log(l, MessageFormat.format(format, args));
+    if (internalIsLoggable(l)) {
+      internalLog(l, MessageFormat.format(format, args));
     }
   }
 
@@ -208,6 +240,11 @@ public class Context implements IContext {
     catch (final MalformedURLException e) {
       return null;
     }
+  }
+
+  @Override
+  public boolean hasConfig(final String key) {
+    return config.containsKey(key);
   }
 
   // ---

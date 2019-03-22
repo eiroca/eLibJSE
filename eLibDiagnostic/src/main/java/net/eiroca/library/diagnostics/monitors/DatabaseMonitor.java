@@ -46,9 +46,11 @@ public class DatabaseMonitor extends TCPServerMonitor {
     SINGLE, COLUMNS, ROW_SINGLEMETRIC, ROW_MULTIMETRIC, MIXED
   }
 
-  private static final String CONFIG_CAPTUREMODE = "CaptureMode";
+  private static final String CFG_CAPTUREMODE = "CaptureMode";
+  private static final String DEF_CAPTUREMODE = "Single value";
   private static final HashMap<String, CaputeMode> CONFIG_CAPTUREMODE_VAL = new HashMap<>();
   static {
+    DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.put(DEF_CAPTUREMODE, CaputeMode.SINGLE);
     DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.put("Single value", CaputeMode.SINGLE);
     DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.put("Metrics on columns", CaputeMode.COLUMNS);
     DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.put("Metrics on rows", CaputeMode.ROW_SINGLEMETRIC);
@@ -108,16 +110,16 @@ public class DatabaseMonitor extends TCPServerMonitor {
     validator.setup(context);
     config.setup(context);
     dbSQL.setup(context);
+    runSQL = context.getConfigBoolean(DatabaseMonitor.CONFIG_RUNSQL, true);
     metricGroup = context.getConfigString(DatabaseMonitor.CONFIG_SPLITTINGNAME, DatabaseMonitor.CONFIG_SPLITTINGNAME_DEFAULT);
     resultColumn = context.getConfigString(DatabaseMonitor.CONFIG_RESULTCOLUMN, null);
-    final String modeStr = context.getConfigString(DatabaseMonitor.CONFIG_CAPTUREMODE, null);
-    captureMode = DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.get(modeStr);
+    final String modeStr = context.getConfigString(DatabaseMonitor.CFG_CAPTUREMODE, DEF_CAPTUREMODE);
+    captureMode = (modeStr != null) ? DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.get(modeStr) : null;
     if (captureMode == null) {
       CommandException.ConfigurationError("Invalid capture mode:" + modeStr);
     }
     validateColumn = context.getConfigString(DatabaseMonitor.CONFIG_VALIDATECOLUMN, null);
-    runSQL = context.getConfigBoolean(DatabaseMonitor.CONFIG_RUNSQL, true);
-    context.info("Config: " + config);
+    context.debug("DB config: " + config);
   }
 
   @Override
@@ -162,7 +164,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
     connectEndTime = System.nanoTime();
     // Update server metrics
     mServerReachable.setValue(1.0);
-    mServerLatency.setValue(net.eiroca.library.core.Helper.elapsed(connectStartTime, connectEndTime));
+    mServerLatency.setValue(Helper.elapsed(connectStartTime, connectEndTime));
     mServerSocketTimeout.setValue(0.0);
     mServerConnectionTimeout.setValue(lastError == null ? 0.0 : (lastError instanceof SQLTimeoutException ? 1.0 : 0.0));
     return true;
@@ -182,7 +184,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
   @Override
   public boolean postCheck() throws CommandException {
     endTime = System.nanoTime();
-    mServerResponseTime.setValue(net.eiroca.library.core.Helper.elapsed(startTime, endTime));
+    mServerResponseTime.setValue(Helper.elapsed(startTime, endTime));
     mServerResult.setValue(queryResult);
     mServerStatus.setValue(!succed);
     mDBQueryRows.setValue(rowcount);
@@ -200,7 +202,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
     queryStartTime = System.nanoTime();
     boolean ok = dbSQL.execute();
     queryEndTime = System.nanoTime();
-    mDBQueryTime.setValue(net.eiroca.library.core.Helper.elapsed(queryStartTime, queryEndTime));
+    mDBQueryTime.setValue(Helper.elapsed(queryStartTime, queryEndTime));
     if (!ok) {
       CommandException.InfrastructureError("Error -> " + dbSQL.getErrorDesc());
     }
@@ -238,7 +240,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
           final IMetric<?> ms = mServerResult.getSplitting(metricGroup);
           for (int i = 0; i < data.length; i++) {
             final String splitName = dbSQL.getColumnsName(i);
-            final Double val = net.eiroca.library.core.Helper.getDouble(data[i], 0.0);
+            final Double val = Helper.getDouble(data[i], 0.0);
             final IMetric<?> mm = ms.getSplitting(splitName);
             mm.setValue(val);
             queryResult += val;
@@ -260,7 +262,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
               if (valStr == null) {
                 continue;
               }
-              final Double val = net.eiroca.library.core.Helper.getDouble(valStr, 0.0);
+              final Double val = Helper.getDouble(valStr, 0.0);
               context.logF(LogLevel.debug, "{0}[{1}]={2}", splitGroup, splitName, val);
               final IMetric<?> ms = mServerResult.getSplitting(splitGroup, splitName);
               ms.setValue(val);
@@ -278,7 +280,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
             if (valStr == null) {
               continue;
             }
-            final Double val = net.eiroca.library.core.Helper.getDouble(valStr, 0.0);
+            final Double val = Helper.getDouble(valStr, 0.0);
             context.logF(LogLevel.debug, "{0}[{1}]={2}", splitGroup, splitName, val);
             final IMetric<?> ms = mServerResult.getSplitting(splitGroup, splitName);
             ms.setValue(val);
@@ -342,10 +344,10 @@ public class DatabaseMonitor extends TCPServerMonitor {
       }
     }
     catch (final Exception e) {
-      CommandException.InfrastructureError(net.eiroca.library.core.Helper.getExceptionAsString(e, false));
+      CommandException.InfrastructureError(Helper.getExceptionAsString(e, false));
     }
     finally {
-      net.eiroca.library.core.Helper.close(con);
+      Helper.close(con);
     }
   }
 
@@ -374,7 +376,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
       LibSystem.trace(context, e, false);
     }
     finally {
-      net.eiroca.library.core.Helper.close(rs, st);
+      Helper.close(rs, st);
     }
   }
 
@@ -408,7 +410,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
       LibSystem.trace(context, e, false);
     }
     finally {
-      net.eiroca.library.core.Helper.close(rs, st);
+      Helper.close(rs, st);
     }
   }
 

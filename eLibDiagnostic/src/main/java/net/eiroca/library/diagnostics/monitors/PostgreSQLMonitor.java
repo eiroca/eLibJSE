@@ -108,10 +108,10 @@ public class PostgreSQLMonitor extends DatabaseMonitor {
   public void setup(final IContext context) throws CommandException {
     super.setup(context);
     checks = new SQLchecks[] {
-        new SQLchecks(mgPostgreSQL, "/res/postgres_metrics.sql"), //
-        new SQLchecks(mgPostgreSQLTables, "/res/postgres_table.sql", 2, "Table"), //
-        new SQLchecks(mgPostgreSQLIndexes, "/res/postgres_index.sql", 2, "Index"), //
-        new SQLchecks(mgPostgreSQLSequences, "/res/postgres_sequence.sql", 2, "Sequence"), //
+        new SQLchecks(mgPostgreSQL, "/sql/postgres_metrics.sql"), //
+        new SQLchecks(mgPostgreSQLTables, "/sql/postgres_table.sql", 2, "Table"), //
+        new SQLchecks(mgPostgreSQLIndexes, "/sql/postgres_index.sql", 2, "Index"), //
+        new SQLchecks(mgPostgreSQLSequences, "/sql/postgres_sequence.sql", 2, "Sequence"), //
     };
   }
 
