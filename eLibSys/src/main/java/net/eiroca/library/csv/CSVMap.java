@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.system.Logs;
@@ -78,6 +79,10 @@ public class CSVMap implements ICSVReader {
       result = fieldNames.get(i);
     }
     return result;
+  }
+
+  public Set<String> getKeys() {
+    return data.keySet();
   }
 
   public String getData(final String key) {

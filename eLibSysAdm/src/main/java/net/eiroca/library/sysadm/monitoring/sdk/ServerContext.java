@@ -22,18 +22,30 @@ import net.eiroca.library.system.Context;
 
 public class ServerContext extends Context {
 
-  public ServerContext(String name, Properties properties) {
+  private ICredentialProvider provider = null;
+
+  public ServerContext(final String name, final Properties properties) {
     super(name, properties);
+  }
+
+  public void setCredentialProvider(final ICredentialProvider provider) {
+    this.provider = provider;
   }
 
   @Override
   public String getConfigPassword(final String propName) {
-     String result = config.get(propName);
+    String pwd = null;
+    final String result = config.get(propName);
     if (result != null) {
-      Base64 base64 = new Base64();
-      result = new String(base64.decode(result.getBytes()));
+      if (provider != null) {
+        pwd = provider.getPlainPassword(result);
+      }
+      if (pwd == null) {
+        final Base64 base64 = new Base64();
+        pwd = new String(base64.decode(result.getBytes()));
+      }
     }
-    return result;
+    return pwd;
   }
 
 }
