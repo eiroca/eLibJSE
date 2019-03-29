@@ -25,26 +25,26 @@ import net.eiroca.library.system.Logs;
 
 public class Scheduler implements AutoCloseable {
 
-  Logger logger = Logs.getLogger();
+  protected Logger logger = Logs.getLogger();
+  protected final SchedulerThread schedulerThread;
+  protected boolean active;
 
-  private final SchedulerThread schedulerThread;
-  private boolean active;
-
-  final ExecutorService tasksExecutor;
+  protected ExecutorService tasksExecutor;
 
   public Scheduler() {
-    this(Executors.newFixedThreadPool(8), 1, TimeUnit.SECONDS, "Scheduler");
+    this(Executors.newFixedThreadPool(8), 1, 60, TimeUnit.SECONDS, "Scheduler");
   }
 
-  public Scheduler(final ExecutorService tasksExecutor, final int minCheckInterval, final TimeUnit timeUnit, final String schedulerName) {
-    schedulerThread = new SchedulerThread(this, minCheckInterval, timeUnit, schedulerName);
+  public Scheduler(final ExecutorService tasksExecutor, final int minCheckInterval, final int maxCheckInterval, final TimeUnit timeUnit, final String schedulerName) {
+    schedulerThread = new SchedulerThread(this, minCheckInterval, maxCheckInterval, timeUnit, schedulerName);
     this.tasksExecutor = tasksExecutor;
   }
 
-  public String addTask(final Runnable task, final SchedulerPolicy policy) {
+  public Task addTask(final Runnable task, final SchedulerPolicy policy) {
     final String id = UUID.randomUUID().toString();
-    schedulerThread.add(new Task(this, id, task, policy));
-    return id;
+    final Task t = new Task(this, id, task, policy);
+    schedulerThread.add(t);
+    return t;
   }
 
   public void removeTask(final String id) {
@@ -89,27 +89,26 @@ public class Scheduler implements AutoCloseable {
   }
 
   public void onBeforeChecking() {
-    logger.trace("onBeforeChecking");
   }
 
   public void onBeforeExecuting() {
-    logger.trace("onBeforeExecuting");
   }
 
   public void onBeforeSleeping() {
-    logger.trace("onBeforeSleeping");
   }
 
   public void onTaskStart(final Task task) {
-    logger.trace("onTaskStart " + task.getId());
   }
 
   public void onTaskEnd(final Task task) {
-    logger.trace("onTaskEnd " + task.getId());
+    long nextRun = task.nextRun();
+    if (nextRun < this.schedulerThread.getNextRun()) {
+      schedulerThread.wakeup();
+    }
   }
 
   public void onTaskSkip(final Task task) {
-    logger.trace("onTaskSkip " + task.getId());
+    logger.debug("onTaskSkip " + task.getId());
   }
 
   public void onTaskError(final Task task, final Exception e) {

@@ -26,19 +26,23 @@ public class SchedulerThread extends Thread {
 
   private final Scheduler scheduler;
   private final int minDelay;
+  private final int maxDelay;
   private final AtomicReference<SchedulerState> state = new AtomicReference<>();
   private final Object lock = new Object();
   private final List<Task> tasks = new ArrayList<>();
+  private long nextRun;
 
   public SchedulerThread(final Scheduler scheduler) {
-    this(scheduler, 0, TimeUnit.SECONDS, "SchedulerThread");
+    this(scheduler, 0, 60, TimeUnit.SECONDS, "SchedulerThread");
   }
 
-  public SchedulerThread(final Scheduler scheduler, final int minDelay, final TimeUnit timeUnit, final String threadName) {
-    if (minDelay < 0) { throw new IllegalArgumentException("initialDelay < 0. Value: " + minDelay); }
+  public SchedulerThread(final Scheduler scheduler, final int minDelay, final int maxDelay, final TimeUnit timeUnit, final String threadName) {
+    if (minDelay < 0) { throw new IllegalArgumentException("minDelay < 0. Value: " + minDelay); }
+    if (maxDelay < minDelay) { throw new IllegalArgumentException("maxDelay < minDelay. Value: " + maxDelay); }
     if (timeUnit == null) { throw new IllegalArgumentException("timeUnit is null"); }
     this.scheduler = scheduler;
     this.minDelay = (int)timeUnit.toMillis(minDelay);
+    this.maxDelay = (int)timeUnit.toMillis(maxDelay);
     setName(threadName);
     setDaemon(true);
     state.set(SchedulerState.IDLE);
@@ -49,8 +53,14 @@ public class SchedulerThread extends Thread {
     while (scheduler.isActive()) {
       try {
         final long now = System.currentTimeMillis();
-        final long nextRun = taskCheck(now);
-        final int delay = (int)(nextRun - now);
+        nextRun = taskCheck(now);
+        int delay = (int)(nextRun - now);
+        if (delay > maxDelay) {
+          delay = maxDelay;
+        }
+        else if (delay < minDelay) {
+          delay = minDelay;
+        }
         if ((delay > 10) && (state.get() == SchedulerState.IDLE)) {
           scheduler.onBeforeSleeping();
           synchronized (lock) {
@@ -137,6 +147,18 @@ public class SchedulerThread extends Thread {
 
   public void close() {
     state.set(SchedulerState.IDLE);
+  }
+
+  public SchedulerState getShedulerState() {
+    return state.get();
+  }
+
+  public long getNextRun() {
+    return nextRun;
+  }
+
+  public List<Task> getTaskList() {
+    return tasks;
   }
 
 }

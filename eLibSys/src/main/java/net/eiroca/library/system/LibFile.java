@@ -338,7 +338,7 @@ final public class LibFile {
     if (file.isDirectory()) {
       final File list[] = file.listFiles();
       for (final File f : list) {
-        getFiles(f, filesList);
+        LibFile.getFiles(f, filesList);
       }
     }
     else {
@@ -359,7 +359,7 @@ final public class LibFile {
         content.add(name);
       }
     }
-    catch (IOException e1) {
+    catch (final IOException e1) {
     }
   }
 

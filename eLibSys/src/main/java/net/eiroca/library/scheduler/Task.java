@@ -34,6 +34,7 @@ public class Task implements Runnable {
   final SchedulerPolicy schedulerPolicy;
 
   String id;
+  String name;
   TaskState executionState;
   Status status = Task.STATUS_IDLE;
   long lastRun;
@@ -64,6 +65,10 @@ public class Task implements Runnable {
 
   public boolean isBusy() {
     return executionState != TaskState.IDLE;
+  }
+
+  public TaskState getState() {
+    return executionState;
   }
 
   public long getLastRun() {
@@ -104,6 +109,14 @@ public class Task implements Runnable {
   public void setErrorState(final Exception e) {
     status = Task.STATUS_KO;
     scheduler.onTaskError(this, e);
+  }
+
+  public String getName() {
+    return (name != null) ? name : id;
+  }
+
+  public void setName(final String name) {
+    this.name = name;
   }
 
 }
