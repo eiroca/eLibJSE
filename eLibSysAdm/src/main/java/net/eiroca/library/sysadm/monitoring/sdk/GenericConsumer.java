@@ -56,7 +56,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   public static StringParameter _elasticURL = new StringParameter(GenericConsumer.config, "elasticURL", "http://localhost:9200/_bulk");
   public static StringParameter _elasticIndex = new StringParameter(GenericConsumer.config, "elasticIndex", "metrics-");
   public static IntegerParameter _elasticIndexMode = new IntegerParameter(GenericConsumer.config, "elasticIndexMode", 1, 0, 2);
-  public static StringParameter _indexDateFormat = new StringParameter(GenericConsumer.config, "indexDateFormat", "yyyy/MM/dd");
+  public static StringParameter _indexDateFormat = new StringParameter(GenericConsumer.config, "indexDateFormat", "yyyy.MM.dd");
   public static StringParameter _elasticType = new StringParameter(GenericConsumer.config, "elasticType", GenericConsumer.FLD_METRIC);
   public static StringParameter _elasticPipeline = new StringParameter(GenericConsumer.config, "elasticPipeline", null);
   //
@@ -228,8 +228,8 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
           json.addProperty(key, val.toString());
         }
       }
-      json.addProperty(GenericConsumer.FLD_VALUE, datum.getValue());
     }
+    json.addProperty(GenericConsumer.FLD_VALUE, datum.getValue());
     addMeasure(timeStamp, json);
     return true;
   }

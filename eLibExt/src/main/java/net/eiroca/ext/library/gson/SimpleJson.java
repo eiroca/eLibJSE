@@ -154,6 +154,12 @@ public class SimpleJson {
     }
   }
 
+  public void set(final String name, final List<String> val) {
+    if ((val != null) && (val.size() > 0)) {
+      addProperty(name, val);
+    }
+  }
+
   public void set(final String name, final Date val, final SimpleDateFormat sdf) {
     if (val != null) {
       addProperty(name, sdf.format(val));

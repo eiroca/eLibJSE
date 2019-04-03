@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
+import net.eiroca.library.core.LibStr;
 import net.eiroca.library.metrics.datum.IDatum;
 
 public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements IMetric<D> {
@@ -136,9 +137,7 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
         else {
           sb.append(',');
         }
-        sb.append('\"');
-        sb.append(splitting.getKey());
-        sb.append('\"');
+        LibStr.encodeJson(sb, splitting.getKey());
         sb.append(":");
         splitting.getValue().toJson(sb);
       }
