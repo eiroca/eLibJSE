@@ -16,6 +16,12 @@
  **/
 package net.eiroca.library.sysadm.monitoring.api;
 
-public interface IMeasureProducer extends Runnable, IContextEnabled {
+import net.eiroca.library.system.IContext;
+
+public interface IContextEnabled {
+
+  public void setup(final IContext context) throws Exception;
+
+  public void teardown() throws Exception;
 
 }

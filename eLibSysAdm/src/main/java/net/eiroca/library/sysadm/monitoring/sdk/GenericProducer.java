@@ -18,9 +18,9 @@ package net.eiroca.library.sysadm.monitoring.sdk;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import net.eiroca.library.data.Status;
 import net.eiroca.library.diagnostics.IServerMonitor;
@@ -33,6 +33,15 @@ import net.eiroca.library.sysadm.monitoring.api.IMeasureProducer;
 import net.eiroca.library.system.IContext;
 
 public class GenericProducer implements IMeasureProducer {
+
+  private static final String FLD_GROUP = "group";
+  private static final String FLD_METRIC = "metric";
+  private static final String FLD_MASTER = "master";
+  private static final String FLD_SPLIT_GROUP = "splitGroup";
+  private static final String FLD_SPLIT_NAME = "splitName";
+  private static final String FLD_HOST = "host";
+  private static final String FLD_SOURCE = "source";
+  private static final String FLD_TAGS = "tags[]";
 
   protected String id;
 
@@ -93,7 +102,16 @@ public class GenericProducer implements IMeasureProducer {
     context.info(name, " teardown");
   }
 
-  public int exportMeasures(final Map<String, Object> meta, final List<MetricGroup> groups) {
+  public static boolean exportData(IMeasureConsumer consumer, final String group, final String metric, final String splitGroup, final String splitName, final SortedMap<String, Object> meta, final IDatum datum) {
+    meta.put(FLD_GROUP, group);
+    meta.put(FLD_METRIC, metric);
+    meta.put(FLD_MASTER, (splitGroup != null));
+    meta.put(FLD_SPLIT_GROUP, splitGroup);
+    meta.put(FLD_SPLIT_NAME, splitName);
+    return consumer.exportDatum(meta, datum);
+  }
+
+  public int exportMeasures(final SortedMap<String, Object> meta, final List<MetricGroup> groups) {
     int result = 0;
     if (groups != null) {
       for (final MetricGroup g : groups) {
@@ -107,13 +125,13 @@ public class GenericProducer implements IMeasureProducer {
     return result;
   }
 
-  public int exportMeasure(final Map<String, Object> meta, final String group, final IMetric<?> m) {
+  public int exportMeasure(final SortedMap<String, Object> meta, final String group, final IMetric<?> m) {
     int result = 0;
     final String metric = m.getMetadata().getInternalName();
     final IDatum value = m.getDatum();
     context.trace("processing metric: ", metric);
     if (value.hasValue()) {
-      if (consumer.exportData(group, metric, null, null, value, meta)) {
+      if (exportData(consumer, group, metric, null, null, meta, value)) {
         result++;
       }
     }
@@ -127,7 +145,7 @@ public class GenericProducer implements IMeasureProducer {
     return result;
   }
 
-  private int exportMesureSplittig(final Map<String, Object> meta, final String group, final String metric, final String splitGroup, final IMetric<?> split) {
+  private int exportMesureSplittig(final SortedMap<String, Object> meta, final String group, final String metric, final String splitGroup, final IMetric<?> split) {
     int result = 0;
     context.trace("processing metric splitting: ", splitGroup);
     final Datum sum = new Datum();
@@ -136,12 +154,12 @@ public class GenericProducer implements IMeasureProducer {
       final IMetric<?> splitValue = (IMetric<?>)sm.getValue();
       final IDatum val = splitValue.getDatum();
       sum.addValue(val.getValue());
-      if (consumer.exportData(group, metric, splitGroup, splitName, val, meta)) {
+      if (exportData(consumer, group, metric, splitGroup, splitName, meta, val)) {
         result++;
       }
     }
     if (!split.getDatum().hasValue()) {
-      if (consumer.exportData(group, metric, splitGroup, null, sum, meta)) {
+      if (exportData(consumer, group, metric, splitGroup, null, meta, sum)) {
         result++;
       }
     }
@@ -158,9 +176,9 @@ public class GenericProducer implements IMeasureProducer {
       final boolean ok = monitor.check(host);
       context.info(name, " ", host, " -> ", ok);
       if (ok) {
-        final Map<String, Object> meta = new TreeMap<>();
-        meta.put("source", name);
-        meta.put("host", host);
+        final SortedMap<String, Object> meta = new TreeMap<>();
+        meta.put(FLD_SOURCE, name);
+        meta.put(FLD_HOST, host);
         final Set<String> hostTags = (tagProvider != null) ? tagProvider.getTags(host) : null;
         if ((hostTags != null) && (hostTags.size() > 0)) {
           final List<String> _tags = new ArrayList<>();
@@ -168,11 +186,11 @@ public class GenericProducer implements IMeasureProducer {
           if (tags != null) {
             _tags.addAll(tags);
           }
-          meta.put("tags[]", _tags);
+          meta.put(FLD_TAGS, _tags);
         }
         else {
           if (tags != null) {
-            meta.put("tags[]", tags);
+            meta.put(FLD_TAGS, tags);
           }
         }
         exported_measure += exportMeasures(meta, groups);

@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.sysadm.monitoring.sdk;
+package net.eiroca.library.sysadm.monitoring.api;
 
 import net.eiroca.ext.library.gson.SimpleJson;
 
@@ -22,10 +22,12 @@ public class Event {
 
   private final long timestamp;
   private final SimpleJson data;
+  private EventRule rule;
 
-  public Event(final long timeStamp, final SimpleJson data) {
+  public Event(final long timeStamp, final SimpleJson data, EventRule rule) {
     timestamp = timeStamp;
     this.data = data;
+    this.rule = rule;
   }
 
   public long getTimestamp() {
@@ -34,6 +36,10 @@ public class Event {
 
   public SimpleJson getData() {
     return data;
+  }
+
+  public EventRule getRule() {
+    return rule;
   }
 
 }

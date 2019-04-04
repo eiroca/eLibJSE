@@ -16,16 +16,11 @@
  **/
 package net.eiroca.library.sysadm.monitoring.api;
 
-import java.util.Map;
+import java.util.SortedMap;
 import net.eiroca.library.metrics.datum.IDatum;
-import net.eiroca.library.system.IContext;
 
-public interface IMeasureConsumer {
+public interface IMeasureConsumer extends IContextEnabled {
 
-  public void setup(final IContext context) throws Exception;
-
-  public void teardown() throws Exception;
-
-  public boolean exportData(final String group, final String metric, final String splitGroup, final String splitName, final IDatum datum, Map<String, Object> meta);
+  public boolean exportDatum(SortedMap<String, Object> metadata, final IDatum datum);
 
 }

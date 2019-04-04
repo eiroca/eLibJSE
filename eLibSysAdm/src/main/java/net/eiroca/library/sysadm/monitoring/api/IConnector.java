@@ -16,6 +16,14 @@
  **/
 package net.eiroca.library.sysadm.monitoring.api;
 
-public interface IMeasureProducer extends Runnable, IContextEnabled {
+public interface IConnector extends IContextEnabled {
+
+  public String getId();
+
+  public boolean beginBulk();
+
+  public void process(Event event);
+
+  public void endBulk();
 
 }
