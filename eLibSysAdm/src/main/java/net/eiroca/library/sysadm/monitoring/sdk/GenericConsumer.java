@@ -22,28 +22,37 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TimeZone;
 import net.eiroca.ext.library.gson.SimpleJson;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.metrics.datum.IDatum;
+import net.eiroca.library.sysadm.monitoring.api.DatumCheck;
 import net.eiroca.library.sysadm.monitoring.api.Event;
 import net.eiroca.library.sysadm.monitoring.api.EventRule;
 import net.eiroca.library.sysadm.monitoring.api.IConnector;
 import net.eiroca.library.sysadm.monitoring.api.IMeasureConsumer;
-import net.eiroca.library.sysadm.monitoring.sdk.connector.ElasticConnector;
-import net.eiroca.library.sysadm.monitoring.sdk.connector.LoggerConnector;
+import net.eiroca.library.sysadm.monitoring.sdk.exporter.ElasticExporter;
+import net.eiroca.library.sysadm.monitoring.sdk.exporter.LoggerExporter;
+import net.eiroca.library.sysadm.monitoring.sdk.exporter.NotifyExporter;
 import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 
 public class GenericConsumer implements IMeasureConsumer, Runnable {
 
+  private static final String CONFIG_PREFIX = null;
   private static final String ARRAY_SUFFIX = "[]";
   private static final SimpleDateFormat ISO8601_FULL = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
   private static final String FLD_DATETIME = "datetime";
   private static final String FLD_VALUE = "value";
+  private static final String FLD_STATUS = "status";
+  private static final String STATUS_OK = "OK";
+  private static final String FLD_STATUS_DESC = "violation";
+  private static final String FLD_STATUS_MINVAL = "minval";
+  private static final String FLD_STATUS_MAXVAL = "maxval";
 
   public static ContextParameters config = new ContextParameters();
   public static StringParameter _timezone = new StringParameter(GenericConsumer.config, "timezone", null);
@@ -58,19 +67,20 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
 
   private static List<IConnector> connectors = new ArrayList<>();
   static {
-    connectors.add(new LoggerConnector());
-    connectors.add(new ElasticConnector());
+    GenericConsumer.connectors.add(new LoggerExporter());
+    GenericConsumer.connectors.add(new ElasticExporter());
+    GenericConsumer.connectors.add(new NotifyExporter());
   }
 
-  public GenericConsumer(RuleEngine ruleEngine) {
+  public GenericConsumer(final RuleEngine ruleEngine) {
     this.ruleEngine = ruleEngine;
   }
 
   @Override
   public void setup(final IContext context) throws Exception {
     this.context = context;
-    GenericConsumer.config.convert(context, null, this, "config_");
-    for (IConnector connector : connectors) {
+    GenericConsumer.config.convert(context, GenericConsumer.CONFIG_PREFIX, this, "config_");
+    for (final IConnector connector : GenericConsumer.connectors) {
       connector.setup(context);
     }
     context.info(this.getClass().getName(), " setup done");
@@ -79,12 +89,12 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   @Override
   public void teardown() throws Exception {
     context.info(this.getClass().getName(), " teardown");
-    for (IConnector connector : connectors) {
+    for (final IConnector connector : GenericConsumer.connectors) {
       connector.teardown();
     }
   }
 
-  public void addMeasure(EventRule rule, final long timeStamp, final SimpleJson data) {
+  public void addMeasure(final EventRule rule, final long timeStamp, final SimpleJson data) {
     if (data == null) { return; }
     final Event e = new Event(timeStamp, data, rule);
     synchronized (dataLock) {
@@ -122,38 +132,40 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
 
   private void flush(final List<Event> events) throws Exception {
     context.debug("flush events");
-    List<IConnector> validConnectors = new ArrayList<IConnector>();
-    for (IConnector connector : connectors) {
+    final List<IConnector> validConnectors = new ArrayList<>();
+    for (final IConnector connector : GenericConsumer.connectors) {
       if (connector.beginBulk()) {
         validConnectors.add(connector);
       }
     }
     for (final Event event : events) {
-      EventRule rule = event.getRule();
-      for (IConnector connector : validConnectors) {
+      final EventRule rule = event.getRule();
+      for (final IConnector connector : validConnectors) {
         if (rule.export(connector.getId())) {
           connector.process(event);
         }
       }
     }
-    for (IConnector connector : validConnectors) {
+    for (final IConnector connector : validConnectors) {
       connector.endBulk();
     }
     context.info("Exported measure(s): " + events.size());
   }
 
   @Override
-  public boolean exportDatum(SortedMap<String, Object> metadata, IDatum datum) {
+  public boolean exportDatum(final SortedMap<String, Object> metadata, final IDatum datum) {
     context.debug("exportData ", datum);
-    EventRule rule = (ruleEngine != null) ? ruleEngine.ruleFor(metadata) : null;
-    if (rule == null) return false;
+    final EventRule rule = (ruleEngine != null) ? ruleEngine.ruleFor(metadata) : null;
+    if (rule == null) { return false; }
     final SimpleJson json = new SimpleJson(true);
     final Calendar cal = Calendar.getInstance();
     if (config_timezone != null) {
       cal.setTimeZone(TimeZone.getTimeZone(config_timezone));
     }
     long timeStamp = datum.getTimeStamp();
-    if (timeStamp == 0) timeStamp = System.currentTimeMillis();
+    if (timeStamp == 0) {
+      timeStamp = System.currentTimeMillis();
+    }
     cal.setTime(new Date(timeStamp));
     timeStamp = cal.getTimeInMillis();
     json.addProperty(GenericConsumer.FLD_DATETIME, cal.getTime(), GenericConsumer.ISO8601_FULL);
@@ -176,6 +188,51 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
         else {
           json.addProperty(key, val.toString());
         }
+      }
+    }
+    final Set<DatumCheck> violations = rule.violations(datum);
+    if (violations != null) {
+      if (violations.size() > 0) {
+        double maxW = -1;
+        DatumCheck fail = null;
+        for (final DatumCheck chk : violations) {
+          if (fail == null) {
+            fail = chk;
+            maxW = fail.getWeight();
+          }
+          else {
+            final double w = chk.getWeight();
+            if (w > maxW) {
+              maxW = w;
+              fail = chk;
+            }
+          }
+        }
+        json.set(GenericConsumer.FLD_STATUS, fail.getCheckName().toUpperCase());
+        final Double min = fail.getMin();
+        if (min != null) {
+          json.addProperty(GenericConsumer.FLD_STATUS_MINVAL, min);
+        }
+        final Double max = fail.getMax();
+        if (max != null) {
+          json.addProperty(GenericConsumer.FLD_STATUS_MAXVAL, max);
+        }
+        switch (fail.check(datum)) {
+          case MIN:
+            json.set(GenericConsumer.FLD_STATUS_DESC, "Value lower than minimum");
+            break;
+          case MAX:
+            json.set(GenericConsumer.FLD_STATUS_DESC, "Value greather than maximum");
+            break;
+          case BOTH:
+            json.set(GenericConsumer.FLD_STATUS_DESC, "Value is invalid");
+            break;
+          default:
+            break;
+        }
+      }
+      else {
+        json.set(GenericConsumer.FLD_STATUS, GenericConsumer.STATUS_OK);
       }
     }
     json.addProperty(GenericConsumer.FLD_VALUE, datum.getValue());

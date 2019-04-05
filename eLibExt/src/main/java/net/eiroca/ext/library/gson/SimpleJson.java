@@ -176,4 +176,13 @@ public class SimpleJson {
     node.add(propertyName, value);
   }
 
+  public String getString(final String name) {
+    final String propertyName = getPropertyName(name);
+    final JsonObject node = getNode(name);
+    if (node == null) return null;
+    JsonElement e = node.get(propertyName);
+    if (e == null) return null;
+    return e.getAsString();
+  }
+
 }

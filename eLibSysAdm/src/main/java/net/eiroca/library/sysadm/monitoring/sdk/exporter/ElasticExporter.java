@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.sysadm.monitoring.sdk.connector;
+package net.eiroca.library.sysadm.monitoring.sdk.exporter;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,18 +30,19 @@ import net.eiroca.library.sysadm.monitoring.api.IConnector;
 import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 
-public class ElasticConnector implements IConnector {
+public class ElasticExporter implements IConnector {
 
+  private static final String CONFIG_PREFIX = null;
   public static final String ID = "elastic";
   //
   public static ContextParameters config = new ContextParameters();
   //
-  public static StringParameter _elasticURL = new StringParameter(ElasticConnector.config, "elasticURL", "http://localhost:9200/_bulk");
-  public static StringParameter _elasticIndex = new StringParameter(ElasticConnector.config, "elasticIndex", "metrics-");
-  public static IntegerParameter _elasticIndexMode = new IntegerParameter(ElasticConnector.config, "elasticIndexMode", 1, 0, 2);
-  public static StringParameter _indexDateFormat = new StringParameter(ElasticConnector.config, "indexDateFormat", "yyyy.MM.dd");
-  public static StringParameter _elasticType = new StringParameter(ElasticConnector.config, "elasticType", "metric");
-  public static StringParameter _elasticPipeline = new StringParameter(ElasticConnector.config, "elasticPipeline", null);
+  public static StringParameter _elasticURL = new StringParameter(ElasticExporter.config, "elasticURL", "http://localhost:9200/_bulk");
+  public static StringParameter _elasticIndex = new StringParameter(ElasticExporter.config, "elasticIndex", "metrics-");
+  public static IntegerParameter _elasticIndexMode = new IntegerParameter(ElasticExporter.config, "elasticIndexMode", 1, 0, 2);
+  public static StringParameter _indexDateFormat = new StringParameter(ElasticExporter.config, "indexDateFormat", "yyyy.MM.dd");
+  public static StringParameter _elasticType = new StringParameter(ElasticExporter.config, "elasticType", "metric");
+  public static StringParameter _elasticPipeline = new StringParameter(ElasticExporter.config, "elasticPipeline", null);
   // Dynamic mapped to parameters
   protected String config_elasticURL;
   protected String config_elasticIndex;
@@ -54,19 +55,18 @@ public class ElasticConnector implements IConnector {
   protected ElasticBulk elasticServer = null;
   protected SimpleDateFormat indexDateFormat;
 
-  public ElasticConnector() {
-    super();
+  public ElasticExporter() {
   }
 
   @Override
   public String getId() {
-    return ID;
+    return ElasticExporter.ID;
   }
 
   @Override
   public void setup(final IContext context) throws Exception {
     this.context = context;
-    ElasticConnector.config.convert(context, null, this, "config_");
+    ElasticExporter.config.convert(context, ElasticExporter.CONFIG_PREFIX, this, "config_");
     indexDateFormat = new SimpleDateFormat(config_indexDateFormat);
     elasticServer = LibStr.isNotEmptyOrNull(config_elasticURL) ? new ElasticBulk(config_elasticURL) : null;
     if (elasticServer != null) {
@@ -94,13 +94,13 @@ public class ElasticConnector implements IConnector {
     try {
       elasticServer.flush();
     }
-    catch (Exception e) {
+    catch (final Exception e) {
       context.error("Error flushing to elastic: " + e.getMessage(), e);
     }
   }
 
   @Override
-  public void process(Event event) {
+  public void process(final Event event) {
     final SimpleJson json = event.getData();
     final String _doc = json.toString();
     try {

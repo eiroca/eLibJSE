@@ -22,9 +22,9 @@ public class Event {
 
   private final long timestamp;
   private final SimpleJson data;
-  private EventRule rule;
+  private final EventRule rule;
 
-  public Event(final long timeStamp, final SimpleJson data, EventRule rule) {
+  public Event(final long timeStamp, final SimpleJson data, final EventRule rule) {
     timestamp = timeStamp;
     this.data = data;
     this.rule = rule;

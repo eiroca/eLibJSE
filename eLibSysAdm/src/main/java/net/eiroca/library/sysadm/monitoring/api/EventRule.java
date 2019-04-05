@@ -20,33 +20,46 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import net.eiroca.library.sysadm.monitoring.sdk.connector.ElasticConnector;
-import net.eiroca.library.sysadm.monitoring.sdk.connector.LoggerConnector;
 import java.util.Set;
 import java.util.SortedMap;
+import net.eiroca.library.metrics.datum.IDatum;
+import net.eiroca.library.sysadm.monitoring.api.DatumCheck.CheckViolation;
+import net.eiroca.library.sysadm.monitoring.sdk.exporter.ElasticExporter;
+import net.eiroca.library.sysadm.monitoring.sdk.exporter.LoggerExporter;
 
 public class EventRule {
 
-  private Map<String, String> filter = new HashMap<>();
-  private Set<String> enabledConnectors = new HashSet<>();
+  private final Map<String, String> filter = new HashMap<>();
+  private final Set<String> enabledConnectors = new HashSet<>();
+  private final Set<DatumCheck> checks = new HashSet<>();
 
   public EventRule() {
     connectors(true);
   }
 
-  public void addFilter(String keyName, String keyValue) {
+  public void addFilter(final String keyName, final String keyValue) {
     filter.put(keyName, keyValue);
   }
 
-  public boolean apply(SortedMap<String, Object> metadata) {
+  public boolean apply(final SortedMap<String, Object> metadata) {
     boolean found = true;
     if ((filter != null) && (filter.size() > 0)) {
-      for (Entry<String, String> filter : filter.entrySet()) {
-        String keyNam = filter.getKey();
+      for (final Entry<String, String> filter : filter.entrySet()) {
+        final String keyNam = filter.getKey();
+        boolean negate = false;
         String keyVal = filter.getValue();
-        Object eventKeyVal = metadata.get(keyNam);
+        if (keyVal.startsWith("!")) {
+          keyVal = keyVal.substring(1);
+          negate = true;
+        }
+        final Object eventKeyVal = metadata.get(keyNam);
         if ((eventKeyVal == null) || (!String.valueOf(eventKeyVal).equals(keyVal))) {
-          found = false;
+          found = negate;
+        }
+        else {
+          found = !negate;
+        }
+        if (!found) {
           break;
         }
       }
@@ -54,21 +67,53 @@ public class EventRule {
     return found;
   }
 
-  public boolean export(String connectorID) {
+  public boolean export(final String connectorID) {
     return enabledConnectors.contains(connectorID);
   }
 
-  public void connector(String connectorID, boolean enable) {
-    if (enable) enabledConnectors.add(connectorID);
-    else enabledConnectors.remove(connectorID);
+  public void connector(final String connectorID, final boolean enable) {
+    if (enable) {
+      enabledConnectors.add(connectorID);
+    }
+    else {
+      enabledConnectors.remove(connectorID);
+    }
   }
 
-  public void connectors(boolean enable) {
+  public void connectors(final boolean enable) {
     enabledConnectors.clear();
     if (enable) {
-      enabledConnectors.add(ElasticConnector.ID);
-      enabledConnectors.add(LoggerConnector.ID);
+      enabledConnectors.add(ElasticExporter.ID);
+      enabledConnectors.add(LoggerExporter.ID);
     }
+  }
+
+  public Set<String> getFilters() {
+    return (filter != null) ? filter.keySet() : null;
+  }
+
+  public void addCheck(final DatumCheck chk) {
+    checks.add(chk);
+  }
+
+  public Set<DatumCheck> violations(final IDatum d) {
+    if (checks.size() > 0) {
+      final Set<DatumCheck> result = new HashSet<>();
+      for (final DatumCheck chk : checks) {
+        if (chk.check(d) != CheckViolation.OK) {
+          result.add(chk);
+        }
+      }
+      return result;
+    }
+    else {
+      return null;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "EventRule [filter=" + filter + ", enabledConnectors=" + enabledConnectors + ", checks=" + checks + "]";
   }
 
 }

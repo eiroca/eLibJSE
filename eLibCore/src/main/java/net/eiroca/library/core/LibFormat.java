@@ -54,7 +54,7 @@ public class LibFormat {
     LibFormat.MODIFIERSTR.add(new Pair<>("h", 3600000.0));
   }
 
-  private static HashMap<String, Double> STRVALUE = new HashMap<>();
+  public static HashMap<String, Double> STRVALUE = new HashMap<>();
   static {
     LibFormat.STRVALUE.put("true", 1.0);
     LibFormat.STRVALUE.put("false", 0.0);
@@ -62,6 +62,15 @@ public class LibFormat {
     LibFormat.STRVALUE.put("ko", 1.0);
     LibFormat.STRVALUE.put("on", 1.0);
     LibFormat.STRVALUE.put("off", 0.0);
+    //
+    LibFormat.STRVALUE.put("panic", 1.0);
+    LibFormat.STRVALUE.put("critical", 1.0);
+    LibFormat.STRVALUE.put("fatal", 1.0);
+    LibFormat.STRVALUE.put("severe", .9);
+    LibFormat.STRVALUE.put("error", 0.9);
+    LibFormat.STRVALUE.put("warn", 0.5);
+    LibFormat.STRVALUE.put("warning", 0.5);
+    LibFormat.STRVALUE.put("info", 0.1);
   }
 
   public static final Double getValue(String value) {

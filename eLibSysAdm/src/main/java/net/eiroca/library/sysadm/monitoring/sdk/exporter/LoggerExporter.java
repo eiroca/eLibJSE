@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.sysadm.monitoring.sdk.connector;
+package net.eiroca.library.sysadm.monitoring.sdk.exporter;
 
 import org.slf4j.Logger;
 import net.eiroca.ext.library.gson.SimpleJson;
@@ -22,38 +22,37 @@ import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.sysadm.monitoring.api.Event;
 import net.eiroca.library.sysadm.monitoring.api.IConnector;
-import net.eiroca.library.sysadm.monitoring.sdk.GenericConsumer;
 import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 import net.eiroca.library.system.Logs;
 
-public class LoggerConnector implements IConnector {
+public class LoggerExporter implements IConnector {
 
+  private static final String CONFIG_PREFIX = null;
   public static final String ID = "logger";
   //
   public static ContextParameters config = new ContextParameters();
   //
-  public static StringParameter _logger = new StringParameter(GenericConsumer.config, "logger", "Metrics");
+  public static StringParameter _logger = new StringParameter(LoggerExporter.config, "logger", "Metrics");
   // Dynamic mapped to parameters
   protected String config_logger;
   //
   protected IContext context = null;
   protected Logger metricLog = null;
 
-  public LoggerConnector() {
+  public LoggerExporter() {
     super();
   }
 
   @Override
   public String getId() {
-    // TODO Auto-generated method stub
-    return ID;
+    return LoggerExporter.ID;
   }
 
   @Override
   public void setup(final IContext context) throws Exception {
     this.context = context;
-    LoggerConnector.config.convert(context, null, this, "config_");
+    LoggerExporter.config.convert(context, LoggerExporter.CONFIG_PREFIX, this, "config_");
     metricLog = LibStr.isNotEmptyOrNull(config_logger) ? Logs.getLogger(config_logger) : null;
     context.info(this.getClass().getName(), " setup done");
   }
@@ -64,12 +63,10 @@ public class LoggerConnector implements IConnector {
   }
 
   @Override
-  public void process(Event event) {
-    if (metricLog != null) {
-      final SimpleJson json = event.getData();
-      final String _doc = json.toString();
-      metricLog.info(_doc);
-    }
+  public void process(final Event event) {
+    final SimpleJson json = event.getData();
+    final String _doc = json.toString();
+    metricLog.info(_doc);
   }
 
   @Override

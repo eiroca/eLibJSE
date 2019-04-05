@@ -140,7 +140,7 @@ public class SchedulerThread extends Thread {
       try {
         lock.notify();
       }
-      catch (final IllegalStateException e) {
+      catch (final IllegalStateException | IllegalMonitorStateException e) {
       }
     }
   }

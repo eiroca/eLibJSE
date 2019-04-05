@@ -90,7 +90,7 @@ public abstract class Parameter<T extends Object> {
     final StringBuilder sb = new StringBuilder();
     sb.append(name);
     sb.append("=");
-    T v = get();
+    final T v = get();
     sb.append(v == null ? "_NULL_" : v);
     return sb.toString();
   }

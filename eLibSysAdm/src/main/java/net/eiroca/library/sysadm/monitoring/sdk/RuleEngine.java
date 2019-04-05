@@ -24,31 +24,44 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
+import org.slf4j.Logger;
+import net.eiroca.library.core.LibFormat;
 import net.eiroca.library.core.LibStr;
+import net.eiroca.library.sysadm.monitoring.api.DatumCheck;
 import net.eiroca.library.sysadm.monitoring.api.EventRule;
+import net.eiroca.library.system.Logs;
 
 public class RuleEngine {
 
-  private static final char HASH_SEPARATOR = '\t';
-  private Set<String> hashKeys = new HashSet<>();
-  private List<EventRule> ruleSet = new ArrayList<>();
-  private Map<String, EventRule> cache = new HashMap<>();
+  private static final Logger logger = Logs.getLogger();
 
-  public void loadRules(Properties config) {
-    Map<String, EventRule> alias = new HashMap<>();
-    for (String name : config.stringPropertyNames()) {
+  private static final char HASH_SEPARATOR = '\t';
+  private static final double ZERO = 0.000001;
+  private final Set<String> hashKeys = new HashSet<>();
+  private final List<EventRule> ruleSet = new ArrayList<>();
+  private final Map<String, EventRule> cache = new HashMap<>();
+
+  public void loadRules(final Properties config) {
+    final Map<String, EventRule> alias = new TreeMap<>();
+    for (final String name : config.stringPropertyNames()) {
       String val = config.getProperty(name);
-      String[] command = name.split("\\.", -1);
+      final String[] command = name.split("\\.", -1);
       String param = null;
-      if (command.length < 2) continue;
-      if (command.length == 3) param = command[2];
-      String ruleName = command[0];
+      if (command.length < 2) {
+        continue;
+      }
+      if (command.length == 3) {
+        param = command[2];
+      }
+      final String ruleName = command[0];
       EventRule rule = alias.get(ruleName);
       if (rule == null) {
         rule = new EventRule();
         alias.put(ruleName, rule);
       }
-      String ruleType = command[1];
+      final String ruleType = command[1];
+      boolean processed = true;
       switch (ruleType) {
         case "filter":
           if (param != null) {
@@ -59,10 +72,18 @@ public class RuleEngine {
           boolean enable = true;
           if (!LibStr.isEmptyOrNull(val)) {
             val = val.toLowerCase();
-            if (val.startsWith("f")) enable = false;
-            else if (val.equals("off")) enable = false;
-            else if (val.equals("disabled")) enable = false;
-            else if (val.equals("0")) enable = false;
+            if (val.startsWith("f")) {
+              enable = false;
+            }
+            else if (val.equals("off")) {
+              enable = false;
+            }
+            else if (val.equals("disabled")) {
+              enable = false;
+            }
+            else if (val.equals("0")) {
+              enable = false;
+            }
           }
           if ((param == null) || ("*".equals(param)) || ("all".equals(param.toLowerCase()))) {
             rule.connectors(enable);
@@ -71,29 +92,73 @@ public class RuleEngine {
             rule.connector(param, enable);
           }
           break;
+        default:
+          processed = false;
+          break;
       }
+      if (!processed) {
+        if (LibFormat.STRVALUE.containsKey(ruleType)) {
+          final double w = LibFormat.STRVALUE.get(ruleType);
+          if (param != null) {
+            final Double vl = LibFormat.getValue(val);
+            if (vl != null) {
+              DatumCheck chk = null;
+              switch (param.toLowerCase()) {
+                case "min":
+                case "minimum":
+                case "minvalue":
+                  chk = new DatumCheck(ruleType, w, vl, null);
+                  break;
+                case "max":
+                case "maximum":
+                case "maxvalue":
+                  chk = new DatumCheck(ruleType, w, null, vl);
+                  break;
+                case "equal":
+                  chk = new DatumCheck(ruleType, w, vl - RuleEngine.ZERO, vl + RuleEngine.ZERO);
+                  break;
+              }
+              if (chk != null) {
+                rule.addCheck(chk);
+              }
+            }
+          }
+        }
+      }
+    }
+    for (final EventRule rule : alias.values()) {
+      addRule(rule);
     }
   }
 
-  public void addRule(EventRule rule) {
+  public void addRule(final EventRule rule) {
     ruleSet.add(rule);
+    final Set<String> filters = rule.getFilters();
+    if (filters != null) {
+      hashKeys.addAll(filters);
+    }
   }
 
-  public EventRule ruleFor(SortedMap<String, Object> metadata) {
-    String hash = getHash(metadata);
-    EventRule result = getCached(hash, metadata);
+  public EventRule ruleFor(final SortedMap<String, Object> metadata) {
+    final String hash = getHash(metadata);
+    final EventRule result = getCached(hash, metadata);
     return result;
 
   }
 
-  private EventRule findRule(SortedMap<String, Object> metadata) {
-    for (EventRule rule : ruleSet) {
-      if (rule.apply(metadata)) { return rule; }
+  private EventRule findRule(final SortedMap<String, Object> metadata) {
+    EventRule result = null;
+    for (final EventRule rule : ruleSet) {
+      if (rule.apply(metadata)) {
+        result = rule;
+        break;
+      }
     }
-    return null;
+    RuleEngine.logger.debug("" + metadata + " -> " + result);
+    return result;
   }
 
-  private synchronized EventRule getCached(String hash, SortedMap<String, Object> metadata) {
+  private synchronized EventRule getCached(final String hash, final SortedMap<String, Object> metadata) {
     EventRule rule = cache.get(hash);
     if (rule == null) {
       rule = findRule(metadata);
@@ -102,16 +167,18 @@ public class RuleEngine {
     return rule;
   }
 
-  private String getHash(SortedMap<String, Object> metadata) {
-    StringBuffer hash = new StringBuffer();
+  private String getHash(final SortedMap<String, Object> metadata) {
+    final StringBuffer hash = new StringBuffer();
     boolean first = true;
-    for (String keyName : hashKeys) {
-      Object key = metadata.get(keyName);
-      if (!first) hash.append(HASH_SEPARATOR);
+    for (final String keyName : hashKeys) {
+      final Object key = metadata.get(keyName);
+      if (!first) {
+        hash.append(RuleEngine.HASH_SEPARATOR);
+      }
       hash.append(String.valueOf(key));
       first = true;
     }
-    return null;
+    return hash.toString();
   }
 
 }
