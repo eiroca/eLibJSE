@@ -59,7 +59,9 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
   public URL getURL(final InetAddress host) throws MalformedURLException {
     final String port = "" + context.getConfigInt(eSysAdmServerMonitor.CONFIG_PORT, 2000);
     namespace = context.getConfigString(eSysAdmServerMonitor.CONFIG_NAMESPACE, eSysAdmServerMonitor.DEF_NAMESPACE);
-    if (namespace != null) namespace = namespace.trim();
+    if (namespace != null) {
+      namespace = namespace.trim();
+    }
     final String fmtURL = LibStr.isEmptyOrNull(namespace) ? "http://{0}:{1}/rest/export" : "http://{0}:{1}/rest/export/{2}";
     final String urlStr = MessageFormat.format(fmtURL, host.getHostName(), port, namespace);
     context.info("URL: ", urlStr);

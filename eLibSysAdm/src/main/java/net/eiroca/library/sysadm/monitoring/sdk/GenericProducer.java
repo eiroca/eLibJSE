@@ -34,14 +34,14 @@ import net.eiroca.library.system.IContext;
 
 public class GenericProducer implements IMeasureProducer {
 
-  private static final String FLD_GROUP = "group";
-  private static final String FLD_METRIC = "metric";
-  private static final String FLD_MASTER = "master";
-  private static final String FLD_SPLIT_GROUP = "splitGroup";
-  private static final String FLD_SPLIT_NAME = "splitName";
-  private static final String FLD_HOST = "host";
-  private static final String FLD_SOURCE = "source";
-  private static final String FLD_TAGS = "tags[]";
+  public static final String FLD_GROUP = "group";
+  public static final String FLD_METRIC = "metric";
+  public static final String FLD_MASTER = "master";
+  public static final String FLD_SPLIT_GROUP = "splitGroup";
+  public static final String FLD_SPLIT_NAME = "splitName";
+  public static final String FLD_HOST = "host";
+  public static final String FLD_SOURCE = "source";
+  public static final String FLD_TAGS = "tags[]";
 
   protected String id;
 

@@ -28,6 +28,7 @@ import java.util.TimeZone;
 import net.eiroca.ext.library.gson.SimpleJson;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
+import net.eiroca.library.core.LibStr;
 import net.eiroca.library.metrics.datum.IDatum;
 import net.eiroca.library.sysadm.monitoring.api.DatumCheck;
 import net.eiroca.library.sysadm.monitoring.api.Event;
@@ -46,7 +47,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   private static final String ARRAY_SUFFIX = "[]";
   private static final SimpleDateFormat ISO8601_FULL = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-  private static final String FLD_DATETIME = "datetime";
+  private static final String FLD_DATETIME = "@timestamp";
   private static final String FLD_VALUE = "value";
   private static final String FLD_STATUS = "status";
   private static final String STATUS_OK = "OK";
@@ -64,6 +65,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   //
   protected IContext context = null;
   protected RuleEngine ruleEngine;
+  protected Map<String, String> alias;
 
   private static List<IConnector> connectors = new ArrayList<>();
   static {
@@ -72,8 +74,9 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     GenericConsumer.connectors.add(new NotifyExporter());
   }
 
-  public GenericConsumer(final RuleEngine ruleEngine) {
+  public GenericConsumer(final RuleEngine ruleEngine, final Map<String, String> alias) {
     this.ruleEngine = ruleEngine;
+    this.alias = alias;
   }
 
   @Override
@@ -172,9 +175,19 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     if (metadata != null) {
       for (final Map.Entry<String, Object> metaEntry : metadata.entrySet()) {
         String key = metaEntry.getKey();
-        final Object val = metaEntry.getValue();
+        Object val = metaEntry.getValue();
         if (val == null) {
           continue;
+        }
+        if (alias != null) {
+          final String aliasKey = key.toLowerCase() + "." + String.valueOf(val).toLowerCase();
+          final String newVal = alias.get(aliasKey);
+          if (newVal != null) {
+            if (LibStr.isEmptyOrNull(newVal)) {
+              continue;
+            }
+            val = newVal;
+          }
         }
         if (key.endsWith(GenericConsumer.ARRAY_SUFFIX)) {
           key = key.substring(0, key.length() - GenericConsumer.ARRAY_SUFFIX.length());

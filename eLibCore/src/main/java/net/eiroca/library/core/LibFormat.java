@@ -64,9 +64,9 @@ public class LibFormat {
     LibFormat.STRVALUE.put("off", 0.0);
     //
     LibFormat.STRVALUE.put("panic", 1.0);
-    LibFormat.STRVALUE.put("critical", 1.0);
     LibFormat.STRVALUE.put("fatal", 1.0);
-    LibFormat.STRVALUE.put("severe", .9);
+    LibFormat.STRVALUE.put("critical", 0.95);
+    LibFormat.STRVALUE.put("severe", .95);
     LibFormat.STRVALUE.put("error", 0.9);
     LibFormat.STRVALUE.put("warn", 0.5);
     LibFormat.STRVALUE.put("warning", 0.5);

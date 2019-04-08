@@ -50,7 +50,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
   private static final String DEF_CAPTUREMODE = "Single value";
   private static final HashMap<String, CaputeMode> CONFIG_CAPTUREMODE_VAL = new HashMap<>();
   static {
-    DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.put(DEF_CAPTUREMODE, CaputeMode.SINGLE);
+    DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.put(DatabaseMonitor.DEF_CAPTUREMODE, CaputeMode.SINGLE);
     DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.put("Single value", CaputeMode.SINGLE);
     DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.put("Metrics on columns", CaputeMode.COLUMNS);
     DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.put("Metrics on rows", CaputeMode.ROW_SINGLEMETRIC);
@@ -113,7 +113,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
     runSQL = context.getConfigBoolean(DatabaseMonitor.CONFIG_RUNSQL, true);
     metricGroup = context.getConfigString(DatabaseMonitor.CONFIG_SPLITTINGNAME, DatabaseMonitor.CONFIG_SPLITTINGNAME_DEFAULT);
     resultColumn = context.getConfigString(DatabaseMonitor.CONFIG_RESULTCOLUMN, null);
-    final String modeStr = context.getConfigString(DatabaseMonitor.CFG_CAPTUREMODE, DEF_CAPTUREMODE);
+    final String modeStr = context.getConfigString(DatabaseMonitor.CFG_CAPTUREMODE, DatabaseMonitor.DEF_CAPTUREMODE);
     captureMode = (modeStr != null) ? DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.get(modeStr) : null;
     if (captureMode == null) {
       CommandException.ConfigurationError("Invalid capture mode:" + modeStr);
