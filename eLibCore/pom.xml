@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>net.eiroca</groupId>
 		<artifactId>eLibJSE</artifactId>
-		<version>0.0.7</version>
+		<version>0.0.8</version>
 	</parent>
 	<name>eLibCore</name>
 	<artifactId>eLibCore</artifactId>

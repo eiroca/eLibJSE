@@ -4,7 +4,7 @@
    <name>eLib for JSE</name>
    <groupId>net.eiroca</groupId>
    <artifactId>eLibJSE</artifactId>
-   <version>0.0.7</version>
+   <version>0.0.8</version>
    <packaging>pom</packaging>
    <organization>
       <name>net.eiroca</name>
