@@ -49,7 +49,7 @@ public class ByteParameter extends Parameter<Byte> {
   public Byte convertString(final String strValue) {
     Byte value;
     if (LibStr.isEmptyOrNull(strValue)) {
-      value = defValue;
+      value = getDefault();
     }
     else {
       final int byNum = Helper.getInt(strValue, 999);
@@ -62,7 +62,7 @@ public class ByteParameter extends Parameter<Byte> {
           value = val[0];
         }
         else {
-          value = defValue;
+          value = getDefault();
         }
       }
     }

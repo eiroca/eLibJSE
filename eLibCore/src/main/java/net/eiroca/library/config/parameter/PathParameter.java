@@ -40,12 +40,12 @@ public class PathParameter extends Parameter<Path> {
   public Path convertString(final String strValue) {
     Path value;
     if (LibStr.isEmptyOrNull(strValue)) {
-      value = defValue;
+      value = getDefault();
     }
     else {
       value = Helper.getDirPath(strValue);
       if (value == null) {
-        value = defValue;
+        value = getDefault();
       }
     }
     return value;

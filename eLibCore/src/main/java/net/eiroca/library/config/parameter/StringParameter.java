@@ -57,7 +57,7 @@ public class StringParameter extends Parameter<String> {
   public String convertString(final String strValue) {
     String value;
     if (LibStr.isEmptyOrNull(strValue)) {
-      value = defValue;
+      value = getDefault();
     }
     else {
       if (trimQuote) {

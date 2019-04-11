@@ -21,12 +21,12 @@ import net.eiroca.ext.library.gson.SimpleJson;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.sysadm.monitoring.api.Event;
-import net.eiroca.library.sysadm.monitoring.api.IConnector;
+import net.eiroca.library.sysadm.monitoring.api.IExporter;
 import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 import net.eiroca.library.system.Logs;
 
-public class LoggerExporter implements IConnector {
+public class LoggerExporter implements IExporter {
 
   private static final String CONFIG_PREFIX = null;
   public static final String ID = "logger";

@@ -33,11 +33,9 @@ import net.eiroca.library.metrics.datum.IDatum;
 import net.eiroca.library.sysadm.monitoring.api.DatumCheck;
 import net.eiroca.library.sysadm.monitoring.api.Event;
 import net.eiroca.library.sysadm.monitoring.api.EventRule;
-import net.eiroca.library.sysadm.monitoring.api.IConnector;
+import net.eiroca.library.sysadm.monitoring.api.IExporter;
 import net.eiroca.library.sysadm.monitoring.api.IMeasureConsumer;
-import net.eiroca.library.sysadm.monitoring.sdk.exporter.ElasticExporter;
-import net.eiroca.library.sysadm.monitoring.sdk.exporter.LoggerExporter;
-import net.eiroca.library.sysadm.monitoring.sdk.exporter.NotifyExporter;
+import net.eiroca.library.sysadm.monitoring.sdk.exporter.Exporters;
 import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 
@@ -67,11 +65,11 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   protected RuleEngine ruleEngine;
   protected Map<String, String> alias;
 
-  private static List<IConnector> connectors = new ArrayList<>();
+  private static List<IExporter> exporters = new ArrayList<>();
   static {
-    GenericConsumer.connectors.add(new LoggerExporter());
-    GenericConsumer.connectors.add(new ElasticExporter());
-    GenericConsumer.connectors.add(new NotifyExporter());
+    for (String name : Exporters.registry.getNames()) {
+      GenericConsumer.exporters.add(Exporters.newInstance(name));
+    }
   }
 
   public GenericConsumer(final RuleEngine ruleEngine, final Map<String, String> alias) {
@@ -83,7 +81,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   public void setup(final IContext context) throws Exception {
     this.context = context;
     GenericConsumer.config.convert(context, GenericConsumer.CONFIG_PREFIX, this, "config_");
-    for (final IConnector connector : GenericConsumer.connectors) {
+    for (final IExporter connector : GenericConsumer.exporters) {
       connector.setup(context);
     }
     context.info(this.getClass().getName(), " setup done");
@@ -92,7 +90,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   @Override
   public void teardown() throws Exception {
     context.info(this.getClass().getName(), " teardown");
-    for (final IConnector connector : GenericConsumer.connectors) {
+    for (final IExporter connector : GenericConsumer.exporters) {
       connector.teardown();
     }
   }
@@ -135,21 +133,21 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
 
   private void flush(final List<Event> events) throws Exception {
     context.debug("flush events");
-    final List<IConnector> validConnectors = new ArrayList<>();
-    for (final IConnector connector : GenericConsumer.connectors) {
+    final List<IExporter> validConnectors = new ArrayList<>();
+    for (final IExporter connector : GenericConsumer.exporters) {
       if (connector.beginBulk()) {
         validConnectors.add(connector);
       }
     }
     for (final Event event : events) {
       final EventRule rule = event.getRule();
-      for (final IConnector connector : validConnectors) {
+      for (final IExporter connector : validConnectors) {
         if (rule.export(connector.getId())) {
           connector.process(event);
         }
       }
     }
-    for (final IConnector connector : validConnectors) {
+    for (final IExporter connector : validConnectors) {
       connector.endBulk();
     }
     context.info("Exported measure(s): " + events.size());

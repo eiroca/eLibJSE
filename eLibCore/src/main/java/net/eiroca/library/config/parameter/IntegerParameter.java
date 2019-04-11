@@ -51,17 +51,17 @@ public class IntegerParameter extends Parameter<Integer> {
   public Integer convertString(final String strValue) {
     Integer value;
     if (LibStr.isEmptyOrNull(strValue)) {
-      value = defValue;
+      value = getDefault();
     }
     else {
       try {
         value = new Integer(strValue.trim());
         if ((value < minVal) || (value > maxVal)) {
-          value = defValue;
+          value = getDefault();
         }
       }
       catch (final NumberFormatException e) {
-        value = defValue;
+        value = getDefault();
       }
     }
     return value;

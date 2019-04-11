@@ -38,7 +38,7 @@ public class BooleanParameter extends Parameter<Boolean> {
   public Boolean convertString(final String strValue) {
     Boolean value;
     if (LibStr.isEmptyOrNull(strValue)) {
-      value = defValue;
+      value = getDefault();
     }
     else {
       value = Boolean.parseBoolean(strValue.trim());

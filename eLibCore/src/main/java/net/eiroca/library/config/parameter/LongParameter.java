@@ -48,14 +48,14 @@ public class LongParameter extends Parameter<Long> {
   public Long convertString(final String strValue) {
     Long value;
     if (LibStr.isEmptyOrNull(strValue)) {
-      value = defValue;
+      value = getDefault();
     }
     else {
       try {
         value = new Long(strValue.trim());
       }
       catch (final NumberFormatException e) {
-        value = defValue;
+        value = getDefault();
       }
     }
     return value;

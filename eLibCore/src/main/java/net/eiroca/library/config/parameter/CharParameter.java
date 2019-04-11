@@ -38,7 +38,7 @@ public class CharParameter extends Parameter<Character> {
   public Character convertString(String strValue) {
     Character value;
     if (LibStr.isEmptyOrNull(strValue)) {
-      value = defValue;
+      value = getDefault();
     }
     else {
       if (strValue.length() > 2) {
@@ -50,7 +50,7 @@ public class CharParameter extends Parameter<Character> {
         value = strValue.charAt(0);
       }
       else {
-        value = defValue;
+        value = getDefault();
       }
     }
     return value;

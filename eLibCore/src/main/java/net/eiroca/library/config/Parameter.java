@@ -22,7 +22,7 @@ public abstract class Parameter<T extends Object> {
   protected String name;
   protected boolean required;
   protected boolean nullable;
-  protected T defValue;
+  private T defValue;
 
   public Parameter(final Parameters owner, final String paramName) {
     this(owner, paramName, null, true, false);

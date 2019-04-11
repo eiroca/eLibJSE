@@ -78,7 +78,7 @@ public class Parameters {
       final String key = LibStr.concatenate(prefix, p.getName());
       Object val = values.get(p);
       if (val == null) {
-        val = p.defValue;
+        val = p.getDefault();
       }
       if (val != null) {
         final String value = p.encodeString(val);
@@ -92,7 +92,7 @@ public class Parameters {
       final String key = p.getName();
       Object val = values.get(p);
       if (val == null) {
-        val = p.defValue;
+        val = p.getDefault();
       }
       if (val != null) {
         config.setProperty(key, val);
@@ -107,13 +107,13 @@ public class Parameters {
   public void saveConfig(final Object config, final String namePrefix, final boolean forceAccess) {
     final Map<String, Field> fields = LibReflection.getFieldMap(config, true);
     for (final Parameter<?> p : params) {
-      String key = p.getName().replace('-', '_');
+      String key = Parameters.getVarName(p.getName());
       if (namePrefix != null) {
         key = namePrefix + key;
       }
       Object val = values.get(p);
       if (val == null) {
-        val = p.defValue;
+        val = p.getDefault();
       }
       final Field f = fields.get(key);
       if (f != null) {
@@ -129,10 +129,34 @@ public class Parameters {
     }
   }
 
+  private static String getVarName(final String p) {
+    final StringBuilder sb = new StringBuilder();
+    final int l = p.length();
+    if (l > 0) {
+      final char c = p.charAt(0);
+      if (Character.isJavaIdentifierStart(c)) {
+        sb.append(c);
+      }
+      else {
+        sb.append('_');
+      }
+    }
+    for (int i = 1; i < l; i++) {
+      final char c = p.charAt(i);
+      if (Character.isJavaIdentifierPart(c)) {
+        sb.append(c);
+      }
+      else {
+        sb.append('_');
+      }
+    }
+    return sb.toString();
+  }
+
   public Object getValue(final Parameter<?> param) {
     Object v = values.get(param);
     if (v == null) {
-      v = param.defValue;
+      v = param.getDefault();
     }
     return v;
   }

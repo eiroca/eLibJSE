@@ -16,7 +16,7 @@
  **/
 package net.eiroca.library.sysadm.monitoring.api;
 
-public interface IConnector extends IContextEnabled {
+public interface IExporter extends IContextEnabled {
 
   public String getId();
 

@@ -27,29 +27,29 @@ public class RegExParameter extends Parameter<Pattern> {
   private Throwable lastError = null;
 
   public RegExParameter(final Parameters owner, final String paramName, final String defRegExStr, final boolean required, final boolean nullable) {
-    super(owner, paramName, null, required, nullable);
-    defValue = decodePattern(defRegExStr);
+    super(owner, paramName, RegExParameter._decodePattern(defRegExStr), required, nullable);
   }
 
   public RegExParameter(final Parameters owner, final String paramName, final String defRegExStr) {
-    super(owner, paramName, null);
-    defValue = decodePattern(defRegExStr);
+    super(owner, paramName, RegExParameter._decodePattern(defRegExStr));
   }
 
   public RegExParameter(final Parameters owner, final String paramName) {
     super(owner, paramName);
   }
 
+  private static Pattern _decodePattern(final String regex) throws PatternSyntaxException {
+    if (regex != null) { return Pattern.compile(regex); }
+    return null;
+  }
+
   protected Pattern decodePattern(final String regex) {
     lastError = null;
-    if (regex != null) {
-      try {
-        return Pattern.compile(regex);
-      }
-      catch (final PatternSyntaxException e) {
-        lastError = e;
-        // RegExParameter.logger.warn("Error in RegEx: " + regex, e);
-      }
+    try {
+      return RegExParameter._decodePattern(regex);
+    }
+    catch (final PatternSyntaxException e) {
+      lastError = e;
     }
     return null;
   }
@@ -62,7 +62,7 @@ public class RegExParameter extends Parameter<Pattern> {
   public Pattern convertString(final String strValue) {
     Pattern value;
     if (LibStr.isEmptyOrNull(strValue)) {
-      value = defValue;
+      value = getDefault();
     }
     else {
       value = decodePattern(strValue);

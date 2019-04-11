@@ -25,15 +25,13 @@ public class ListParameter extends Parameter<String[]> {
   String separator = "[\\s\\t]+";
 
   public ListParameter(final Parameters owner, final String paramName, final String separator, final String paramDef, final boolean required, final boolean nullable) {
-    super(owner, paramName, null, required, nullable);
+    super(owner, paramName, (paramDef != null) ? paramDef.split(separator) : null, required, nullable);
     this.separator = separator;
-    defValue = (paramDef != null) ? paramDef.split(separator) : null;
   }
 
   public ListParameter(final Parameters owner, final String paramName, final String separator, final String paramDef) {
-    super(owner, paramName, null);
+    super(owner, paramName, paramDef.split(separator));
     this.separator = separator;
-    defValue = paramDef.split(separator);
   }
 
   public ListParameter(final Parameters owner, final String paramName, final String[] paramDef) {
@@ -56,7 +54,7 @@ public class ListParameter extends Parameter<String[]> {
   public String[] convertString(final String strValue) {
     String[] value;
     if (LibStr.isEmptyOrNull(strValue)) {
-      value = defValue;
+      value = getDefault();
     }
     else {
       value = strValue.split(separator);

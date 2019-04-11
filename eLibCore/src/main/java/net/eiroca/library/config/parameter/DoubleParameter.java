@@ -43,14 +43,14 @@ public class DoubleParameter extends Parameter<Double> {
   public Double convertString(final String strValue) {
     Double value;
     if (LibStr.isEmptyOrNull(strValue)) {
-      value = defValue;
+      value = getDefault();
     }
     else {
       try {
         value = new Double(strValue.trim());
       }
       catch (final NumberFormatException e) {
-        value = defValue;
+        value = getDefault();
       }
     }
     return value;
