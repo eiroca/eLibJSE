@@ -60,4 +60,31 @@ public class TestLibStr {
     Assert.assertTrue(res.get(1).equals("1"));
   }
 
+  @Test
+  public void listSplitTest() {
+    String val = "     A     C       B  ";
+    List<String> c = LibStr.getList(val, -1);
+    Assert.assertTrue((c != null) && (c.size() == 3));
+    c = LibStr.getList(val, 3);
+    Assert.assertTrue((c != null) && (c.size() == 3));
+    c = LibStr.getList(val, 4);
+    Assert.assertTrue((c == null));
+    c = LibStr.getList(null, 1);
+    Assert.assertTrue((c == null));
+    c = LibStr.getList("A", 0);
+    Assert.assertTrue((c == null));
+  }
+
+  @Test
+  public void listSplitSepTest() {
+    String val = ",A,,C,B  ";
+    List<String> c = LibStr.getList(val, ',', -1);
+    Assert.assertTrue((c != null) && (c.size() == 5));
+    c = LibStr.getList(val, ',', 3);
+    Assert.assertTrue((c != null) && (c.size() == 3));
+    c = LibStr.getList(null, ',', 1);
+    Assert.assertTrue((c == null));
+    c = LibStr.getList("A", ',', 0);
+    Assert.assertTrue((c == null));
+  }
 }

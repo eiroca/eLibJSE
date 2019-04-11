@@ -298,4 +298,99 @@ final public class LibStr {
     return res;
   }
 
+  public static String getVarName(final String p) {
+    final StringBuilder sb = new StringBuilder();
+    final int l = p.length();
+    if (l > 0) {
+      final char c = p.charAt(0);
+      if (Character.isJavaIdentifierStart(c)) {
+        sb.append(c);
+      }
+      else {
+        sb.append('_');
+      }
+    }
+    for (int i = 1; i < l; i++) {
+      final char c = p.charAt(i);
+      if (Character.isJavaIdentifierPart(c)) {
+        sb.append(c);
+      }
+      else {
+        sb.append('_');
+      }
+    }
+    return sb.toString();
+  }
+
+  public static void addAll(List<String> list, String[] elems) {
+    for (String s : elems) {
+      list.add(s);
+    }
+  }
+
+  private static boolean isSep(char ch) {
+    return (ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r');
+  }
+
+  public static List<String> getList(final String valueList, int num_fields) {
+    if ((num_fields == 0) || (valueList == null)) { return null; }
+    List<String> result = new ArrayList<>();
+    int l = valueList.length();
+    int s = 0;
+    int e = l - 1;
+    while ((s < l) && isSep(valueList.charAt(s))) {
+      s++;
+    }
+    while ((e > 0) && isSep(valueList.charAt(e))) {
+      e--;
+    }
+    if (e > 0) {
+      int max_fields = num_fields > 0 ? num_fields : Integer.MAX_VALUE;
+      for (int c = 1; c < max_fields; c++) {
+        int cur = s + 1;
+        while ((cur <= e) && !isSep(valueList.charAt(cur))) {
+          cur++;
+        }
+        result.add(valueList.substring(s, cur));
+        s = cur + 1;
+        while ((s <= e) && isSep(valueList.charAt(s))) {
+          s++;
+        }
+        if (s > e) break;
+      }
+      if (s <= e) result.add(valueList.substring(s, e + 1));
+    }
+    else {
+      result.add("");
+    }
+    if ((num_fields > 0) && (result.size() != num_fields)) return null;
+    return result;
+  }
+
+  public static List<String> getList(final String valueList, char sep, int num_fields) {
+    if ((num_fields == 0) || (valueList == null)) { return null; }
+    List<String> result = new ArrayList<>();
+    int l = valueList.length();
+    int s = 0;
+    int e = l - 1;
+    if (e > 0) {
+      int max_fields = num_fields > 0 ? num_fields : Integer.MAX_VALUE;
+      for (int c = 1; c < max_fields; c++) {
+        int cur = s ;
+        while ((cur <= e) && (sep != valueList.charAt(cur))) {
+          cur++;
+        }
+        result.add(valueList.substring(s, cur));
+        s = cur + 1;
+        if (s > e) break;
+      }
+      if (s <= e) result.add(valueList.substring(s, e + 1));
+    }
+    else {
+      result.add("");
+    }
+    if ((num_fields > 0) && (result.size() != num_fields)) return null;
+    return result;
+  }
+
 }

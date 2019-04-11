@@ -107,7 +107,7 @@ public class Parameters {
   public void saveConfig(final Object config, final String namePrefix, final boolean forceAccess) {
     final Map<String, Field> fields = LibReflection.getFieldMap(config, true);
     for (final Parameter<?> p : params) {
-      String key = Parameters.getVarName(p.getName());
+      String key = p.getInternalName();
       if (namePrefix != null) {
         key = namePrefix + key;
       }
@@ -127,30 +127,6 @@ public class Parameters {
         }
       }
     }
-  }
-
-  private static String getVarName(final String p) {
-    final StringBuilder sb = new StringBuilder();
-    final int l = p.length();
-    if (l > 0) {
-      final char c = p.charAt(0);
-      if (Character.isJavaIdentifierStart(c)) {
-        sb.append(c);
-      }
-      else {
-        sb.append('_');
-      }
-    }
-    for (int i = 1; i < l; i++) {
-      final char c = p.charAt(i);
-      if (Character.isJavaIdentifierPart(c)) {
-        sb.append(c);
-      }
-      else {
-        sb.append('_');
-      }
-    }
-    return sb.toString();
   }
 
   public Object getValue(final Parameter<?> param) {

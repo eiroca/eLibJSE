@@ -16,9 +16,13 @@
  **/
 package net.eiroca.library.config;
 
+import net.eiroca.library.core.LibStr;
+
 public abstract class Parameter<T extends Object> {
 
   protected Parameters owner;
+  protected String internalName;
+
   protected String name;
   protected boolean required;
   protected boolean nullable;
@@ -33,7 +37,7 @@ public abstract class Parameter<T extends Object> {
   }
 
   public Parameter(final Parameters owner, final String paramName, final T defValue, final boolean required, final boolean nullable) {
-    this.name = paramName;
+    setName(paramName);
     this.required = required;
     this.nullable = nullable;
     this.defValue = defValue;
@@ -83,6 +87,19 @@ public abstract class Parameter<T extends Object> {
 
   public T getDefault() {
     return defValue;
+  }
+
+  public String getInternalName() {
+    if (internalName == null) internalName = LibStr.getVarName(name);
+    return internalName;
+  }
+
+  public void setInternalName(String internalName) {
+    this.internalName = internalName;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   @Override
