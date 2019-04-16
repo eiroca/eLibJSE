@@ -62,7 +62,7 @@ public class TestLibStr {
 
   @Test
   public void listSplitTest() {
-    String val = "     A     C       B  ";
+    final String val = "     A     C       B  ";
     List<String> c = LibStr.getList(val, -1);
     Assert.assertTrue((c != null) && (c.size() == 3));
     c = LibStr.getList(val, 3);
@@ -77,7 +77,7 @@ public class TestLibStr {
 
   @Test
   public void listSplitSepTest() {
-    String val = ",A,,C,B  ";
+    final String val = ",A,,C,B  ";
     List<String> c = LibStr.getList(val, ',', -1);
     Assert.assertTrue((c != null) && (c.size() == 5));
     c = LibStr.getList(val, ',', 3);

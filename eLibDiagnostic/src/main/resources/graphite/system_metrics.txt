@@ -1,0 +1,11 @@
+carbon.*.*.*
+carbon.*.*.*.*
+carbon.*.*.*.*.*
+stats.*.*
+stats.*.*.*
+stats.*.*.*.*
+stats.*.*.*.*.*.*.*
+stats.*.*.*.*.*.*.*.*
+stats_counts.*.*
+stats_counts.*.*.*
+statsd.*

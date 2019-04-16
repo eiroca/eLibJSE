@@ -337,6 +337,14 @@ final public class Helper {
   }
 
   public static URL getResourceURL(final String resourceName, final Class<?> callingClass) {
+    return getResourceURL(resourceName, callingClass, false);
+  }
+
+  public static URL getResourceURL(final String resourceName) {
+    return getResourceURL(resourceName, null, false);
+  }
+
+  public static URL getResourceURL(final String resourceName, final Class<?> callingClass, boolean last) {
     if (LibStr.isEmptyOrNull(resourceName)) { return null; }
     ClassLoader cl1 = null;
     ClassLoader cl2 = null;
@@ -360,11 +368,11 @@ final public class Helper {
         url = cl3.getResource(resourceName);
       }
     }
-    if ((url == null) && (resourceName.charAt(0) != '/')) {
-      url = Helper.getResourceURL('/' + resourceName, callingClass);
+    if ((url == null) && (resourceName.charAt(0) != '/') && !last) {
+      url = Helper.getResourceURL('/' + resourceName, callingClass, true);
     }
-    else if ((url == null) && (resourceName.charAt(0) == '/')) {
-      url = Helper.getResourceURL(resourceName.substring(1), callingClass);
+    else if ((url == null) && (resourceName.charAt(0) == '/') && !last) {
+      url = Helper.getResourceURL(resourceName.substring(1), callingClass, true);
     }
     return url;
   }

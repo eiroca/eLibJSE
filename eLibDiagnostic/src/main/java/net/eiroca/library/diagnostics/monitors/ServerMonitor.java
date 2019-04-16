@@ -27,13 +27,16 @@ import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.diagnostics.validators.GenericValidator;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricGroup;
+import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 
 public abstract class ServerMonitor implements IServerMonitor {
 
+  // parameters
+  protected static ContextParameters params = new ContextParameters();
+
   // measure constants
   protected MetricGroup mgServerInfo = new MetricGroup("Server Monitor");
-
   protected Measure mServerConnectionTimeout = mgServerInfo.createMeasure("ConnectionTimedOut", "1 if connection timed out", "boolean");
   protected Measure mServerLatency = mgServerInfo.createMeasure("ServerLatency", "Server latency", "ms");
   protected Measure mServerReachable = mgServerInfo.createMeasure("HostReachable", "1 if host is reachable", "boolean");

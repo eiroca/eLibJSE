@@ -69,7 +69,7 @@ public class MetricGroup {
     return false;
   }
 
-  private IMetric<?> find(final String measureName, final boolean createIfMissing) {
+  public IMetric<?> find(final String measureName, final boolean createIfMissing) {
     IMetric<?> m = null;
     for (final IMetric<?> cur : metrics) {
       if (isNamed(cur, measureName)) {

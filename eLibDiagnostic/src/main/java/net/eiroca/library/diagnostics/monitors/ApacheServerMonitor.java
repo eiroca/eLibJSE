@@ -27,7 +27,7 @@ import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricGroup;
 
-public class ApacheServerMonitor extends WebServerMonitor {
+public class ApacheServerMonitor extends GenericHTTPMonitor {
 
   private static final String CONFIG_MODSTATUSURL = "modStatusURL";
 
@@ -59,7 +59,6 @@ public class ApacheServerMonitor extends WebServerMonitor {
 
   public ApacheServerMonitor() {
     super();
-    defaultHasProbe = false;
   }
 
   @Override
@@ -76,9 +75,6 @@ public class ApacheServerMonitor extends WebServerMonitor {
 
   @Override
   public boolean runCheck() throws CommandException {
-    if (urlCheck) {
-      super.runCheck();
-    }
     context.info("Loading mod_status: ", fetcher.getURL());
     String result;
     try {
@@ -129,7 +125,6 @@ public class ApacheServerMonitor extends WebServerMonitor {
   @Override
   public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
-    groups.remove(mgProbe);
     groups.add(mgApachePerformance);
     groups.add(mgApacheScoreboard);
   }

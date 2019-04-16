@@ -1,0 +1,72 @@
+#Pay attention to the order!
+carbon\.agents\.(?<id>[^\.]*)\.activeConnections;Agents - activeConnections;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.avgUpdateTime;Agents - avgUpdateTime;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.blacklistMatches;Agents - blacklistMatches;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.cache.bulk_queries;Agents - cache.bulk_queries;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.cache.overflow;Agents - cache.overflow;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.cache.queries;Agents - cache.queries;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.cache.queues;Agents - cache.queues;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.cache.size;Agents - cache.size;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.committedPoints;Agents - committedPoints;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.cpuUsage;Agents - cpuUsage;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.creates;Agents - creates;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.droppedCreates;Agents - droppedCreates;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.errors;Agents - errors;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.memUsage;Agents - memUsage;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.metricsReceived;Agents - metricsReceived;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.pointsPerUpdate;Agents - pointsPerUpdate;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.updateOperations;Agents - updateOperations;Agent;${id}
+carbon\.agents\.(?<id>[^\.]*)\.whitelistRejects;Agents - whitelistRejects;Agent;${id}
+carbon\.aggregator\.(?<id>[^\.]*)\.activeConnections;Aggregator - activeConnections;Aggregator;${id}
+carbon\.aggregator\.(?<id>[^\.]*)\.aggregateDatapointsSent;Aggregator - aggregateDatapointsSent;Aggregator;${id}
+carbon\.aggregator\.(?<id>[^\.]*)\.allocatedBuffers;Aggregator - allocatedBuffers;Aggregator;${id}
+carbon\.aggregator\.(?<id>[^\.]*)\.blacklistMatches;Aggregator - blacklistMatches;Aggregator;${id}
+carbon\.aggregator\.(?<id>[^\.]*)\.bufferedDatapoints;Aggregator - bufferedDatapoints;Aggregator;${id}
+carbon\.aggregator\.(?<id>[^\.]*)\.cpuUsage;Aggregator - cpuUsage;Aggregator;${id}
+carbon\.aggregator\.(?<id>[^\.]*)\.destinations.(?<destination>[^\.]*)\.attemptedRelays;Aggregator - destinations - attemptedRelays;Destionation;${destination}
+carbon\.aggregator\.(?<id>[^\.]*)\.destinations.(?<destination>[^\.]*)\.batchesSent;Aggregator - destinations - batchesSent;Destionation;${destination}
+carbon\.aggregator\.(?<id>[^\.]*)\.destinations.(?<destination>[^\.]*)\.relayMaxQueueLength;Aggregator - destinations - relayMaxQueueLength;Destionation;${destination}
+carbon\.aggregator\.(?<id>[^\.]*)\.destinations.(?<destination>[^\.]*)\.sent;Aggregator - destinations - sent;Destionation;${destination}
+carbon\.aggregator\.(?<id>[^\.]*)\.memUsage;Aggregator - memUsage;Aggregator;${id}
+carbon\.aggregator\.(?<id>[^\.]*)\.metricsReceived;Aggregator - metricsReceived;Aggregator;${id}
+carbon\.aggregator\.(?<id>[^\.]*)\.whitelistRejects;Aggregator - whitelistRejects;Aggregator;${id}
+stats\.gauges\.statsd\.timestamp_lag;Stats - timestamp_lag;;
+stats\.response\.(?<response>.*);Stats - response;Response;${response}
+stats\.statsd\.bad_lines_seen;Stats - deamom - bad_lines_seen;;
+stats\.statsd\.graphiteStats\.calculationtime;Stats - deamom - calculationtime;;
+stats\.statsd\.graphiteStats\.flush_length;Stats - deamom - flush_length;;
+stats\.statsd\.graphiteStats\.flush_time;Stats - deamom - flush_time;;
+stats\.statsd\.graphiteStats\.last_exception;Stats - deamom - last_exception;;
+stats\.statsd\.graphiteStats\.last_flush;Stats - deamom - last_flush;;
+stats\.statsd\.metrics_received;Stats - deamom - metrics_received;;
+stats\.statsd\.packets_received;Stats - deamom - packets_received;;
+stats\.statsd\.processing_time;Stats - deamom - processing_time;;
+statsd\.numStats;Stats - numStats;;
+stats_counts\.response\.(?<response>.*);Stats_counts - response;Response;${response}
+stats_counts\.statsd\.bad_lines_seen;Stats_counts - deamom - bad_lines_seen;;
+stats_counts\.statsd\.metrics_received;Stats_counts - deamom - metrics_received;;
+stats_counts\.statsd\.packets_received;Stats_counts - deamom - packets_received;;
+stats\.timers\.view\.(?<action>.*)\.count_90;Stats - timers - count_90;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.count_ps;Stats - timers - count_ps;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.count;Stats - timers - count;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.lower_90;Stats - timers - lower_90;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.lower_ps;Stats - timers - lower_ps;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.lower;Stats - timers - lower;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.mean_90;Stats - timers - mean_90;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.mean_ps;Stats - timers - mean_ps;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.mean;Stats - timers - mean;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.median;Stats - timers - median;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.std;Stats - timers - std;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.sum_squares_90;Stats - timers - sum_squares_90;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.sum_squares_ps;Stats - timers - sum_squares_ps;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.sum_squares;Stats - timers - sum_squares;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.sum_90;Stats - timers - sum_90;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.sum_ps;Stats - timers - sum_ps;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.sum;Stats - timers - sum;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.upper_90;Stats - timers - upper_90;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.upper_ps;Stats - timers - upper_ps;Action;${action}
+stats\.timers\.view\.(?<action>.*)\.upper;Stats - timers - upper;Action;${action}
+carbon\.(?<split>.*)\.(?<group>.*);Others - Stats;${group};${split}
+stats\.(?<split>.*)\.(?<group>.*);Others - Stats;${group};${split}
+stats_counts\.(?<split>.*)\.(?<group>.*);Others - Stats;${group};${split}
+statsd\.(?<split>.*)\.(?<group>.*);Others - Stats;${group};${split}

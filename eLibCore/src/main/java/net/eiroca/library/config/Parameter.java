@@ -90,15 +90,17 @@ public abstract class Parameter<T extends Object> {
   }
 
   public String getInternalName() {
-    if (internalName == null) internalName = LibStr.getVarName(name);
+    if (internalName == null) {
+      internalName = LibStr.getVarName(name);
+    }
     return internalName;
   }
 
-  public void setInternalName(String internalName) {
+  public void setInternalName(final String internalName) {
     this.internalName = internalName;
   }
 
-  public void setName(String name) {
+  public void setName(final String name) {
     this.name = name;
   }
 

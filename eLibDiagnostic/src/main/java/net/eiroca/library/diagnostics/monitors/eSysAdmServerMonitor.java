@@ -147,7 +147,6 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
     else {
       parseNameSpace(null, measureAggregation, splitAggregation, result);
     }
-
   }
 
   private void parseNameSpace(final String splitPrefix, final MetricAggregation measureAggregation, final MetricAggregation splitAggregation, final JSONObject result) {
@@ -207,4 +206,5 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
       }
     }
   }
+
 }

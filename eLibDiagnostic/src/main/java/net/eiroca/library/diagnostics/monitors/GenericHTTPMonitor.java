@@ -107,18 +107,23 @@ public class GenericHTTPMonitor extends ServerMonitor {
     return summary;
   }
 
-  public URL getURL(final String confEntry, final String host) throws CommandException {
+  protected URL getURL(final String confEntry, final String host) throws CommandException {
     final String URLstring = context.getConfigString(confEntry, null);
-    if (LibStr.isEmptyOrNull(URLstring)) {
-      CommandException.ConfigurationError("Invalid " + confEntry);
-    }
     URL url = null;
     try {
-      url = new URL(URLstring.replaceAll("\\{host\\}", host));
+      url = new URL(formatURL(URLstring, host));
     }
     catch (final MalformedURLException e) {
-      CommandException.ConfigurationError("Invalid " + confEntry + " -> " + e.getMessage());
+      CommandException.ConfigurationError("Invalid " + URLstring + " -> " + e.getMessage());
     }
+    return url;
+  }
+
+  protected String formatURL(final String urlFormat, final String host) throws CommandException {
+    if (LibStr.isEmptyOrNull(urlFormat)) {
+      CommandException.ConfigurationError("Invalid " + urlFormat);
+    }
+    final String url = urlFormat.replaceAll("\\{host\\}", host);
     return url;
   }
 

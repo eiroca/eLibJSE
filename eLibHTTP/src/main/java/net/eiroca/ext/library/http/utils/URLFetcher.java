@@ -18,6 +18,7 @@ package net.eiroca.ext.library.http.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -215,6 +216,16 @@ public class URLFetcher implements AutoCloseable {
 
   public void setProtocol(final String protocol) {
     config.setProtocol(protocol);
+  }
+
+  public boolean setURL(final String url) {
+    try {
+      setURL(new URL(url));
+    }
+    catch (MalformedURLException e) {
+      return false;
+    }
+    return true;
   }
 
   public void setURL(final URL url) {

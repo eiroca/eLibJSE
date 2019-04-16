@@ -31,13 +31,24 @@ import net.eiroca.library.system.ILog;
 
 public class FLUMEServerMonitor extends RESTServerMonitor {
 
-  /*
-   * Each Source, Sink or Channel will provide metrics like this: { “CHANNEL.fc1”: {
-   * “ChannelCapacity”: “1000000”, “ChannelFillPercentage”: “0.0”, “ChannelSize”: “0”,
-   * “EventPutAttemptCount”: “0”, “EventPutSuccessCount”: “0”, “EventTakeAttemptCount”: “3203”,
-   * “EventTakeSuccessCount”: “0”, “StartTime”: “1367940231789”, “StopTime”: “0”, “Type”: “CHANNEL”
-   * } }
-   */
+  /* @formatter:off
+    Each Source, Sink or Channel will provide metrics like this:
+    {
+      “CHANNEL.fc1”: {
+        “ChannelCapacity”: “1000000”,
+        “ChannelFillPercentage”: “0.0”,
+        “ChannelSize”:
+        “0”,
+        “EventPutAttemptCount”: “0”,
+        “EventPutSuccessCount”: “0”,
+        “EventTakeAttemptCount”: “3203”,
+        “EventTakeSuccessCount”: “0”,
+        “StartTime”: “1367940231789”,
+        “StopTime”: “0”,
+        “Type”: “CHANNEL”
+      }
+    }
+    @formatter:on */
   static public class JSONMapping {
 
     IMetric<?> measure;

@@ -26,16 +26,15 @@ import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.metrics.MetricGroup;
 
-public class RESTServerMonitor extends WebServerMonitor {
+public class RESTServerMonitor extends GenericHTTPMonitor {
 
   public RESTServerMonitor() {
-    defaultHasProbe = false;
+    super();
   }
 
   @Override
   public void loadMetricGroup(final List<MetricGroup> groups) {
     super.loadMetricGroup(groups);
-    groups.remove(mgProbe);
   }
 
   @Override

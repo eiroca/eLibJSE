@@ -121,4 +121,47 @@ public class LibRegEx {
     return namedGroups;
   }
 
+  final public static String expand(final String macro, Matcher m) {
+    if (macro == null) { return null; }
+    final StringBuffer sb = new StringBuffer();
+    int i = 0;
+    final int size = macro.length();
+    while (i < (size - 1)) {
+      final char ch = macro.charAt(i);
+      i++;
+      final char nc = macro.charAt(i);
+      if (ch == '$') {
+        switch (nc) {
+          case '$':
+            sb.append(ch);
+            break;
+          case '{':
+            String name = null;
+            for (int j = i + 1; j < size; j++) {
+              if (macro.charAt(j) == '}') {
+                name = macro.substring(i + 1, j);
+                i = j + 1;
+                break;
+              }
+            }
+            if (name != null) {
+              String newVal = LibRegEx.getGroup(m, name);
+              if (newVal != null) sb.append(newVal);
+            }
+            else {
+              i = size;
+            }
+            break;
+        }
+      }
+      else {
+        sb.append(ch);
+      }
+    }
+    if (i < size) {
+      sb.append(macro.charAt(i));
+    }
+    return sb.toString();
+  }
+
 }
