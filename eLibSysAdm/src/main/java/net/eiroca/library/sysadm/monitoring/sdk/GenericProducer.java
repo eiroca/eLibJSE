@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import net.eiroca.library.data.ITagsProvider;
 import net.eiroca.library.data.Status;
 import net.eiroca.library.diagnostics.IServerMonitor;
 import net.eiroca.library.metrics.IMetric;

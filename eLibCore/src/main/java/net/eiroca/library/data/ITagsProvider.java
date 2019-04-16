@@ -14,12 +14,10 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.sysadm.monitoring.sdk;
-
-import java.util.Set;
+package net.eiroca.library.data;
 
 public interface ITagsProvider {
 
-  public Set<String> getTags(String key);
+  public Tags getTags(String key);
 
 }
