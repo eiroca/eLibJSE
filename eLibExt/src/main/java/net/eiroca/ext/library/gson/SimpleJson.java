@@ -35,8 +35,17 @@ public class SimpleJson {
   private static final JsonParser parser = new JsonParser();
 
   private final Map<String, JsonObject> treeCache = new HashMap<>();
-  private final JsonObject root;
-  private final boolean expandName;
+  final JsonObject root;
+  final boolean expandName;
+
+  private final ThreadLocal<Cursor> position = new ThreadLocal<Cursor>() {
+
+    @Override
+    protected Cursor initialValue() {
+      return new Cursor(SimpleJson.this);
+    }
+
+  };
 
   public SimpleJson(final boolean expandName) {
     this.expandName = expandName;
@@ -76,7 +85,7 @@ public class SimpleJson {
     return node;
   }
 
-  private JsonObject getNode(final JsonObject e, final String nodeName) {
+  JsonObject getNode(final JsonObject e, final String nodeName) {
     JsonObject node = treeCache.get(nodeName);
     if (node == null) {
       final String parent = getParent(nodeName);
@@ -89,59 +98,74 @@ public class SimpleJson {
   }
 
   public void addJson(final String name, final String value) {
-    final String propertyName = getPropertyName(name);
-    final JsonObject node = getNode(name);
-    node.add(propertyName, SimpleJson.parser.parse(value));
+    final Cursor c = position.get();
+    c.seek(name);
+    c.node.add(c.propertyName, SimpleJson.parser.parse(value));
   }
 
   public void addProperty(final String name, final String val) {
-    final String propertyName = getPropertyName(name);
-    final JsonObject node = getNode(name);
-    node.addProperty(propertyName, val);
+    final Cursor c = position.get();
+    c.seek(name);
+    c.node.addProperty(c.propertyName, val);
   }
 
   public void addProperty(final String name, final double value) {
-    final String propertyName = getPropertyName(name);
-    final JsonObject node = getNode(name);
-    node.addProperty(propertyName, value);
+    final Cursor c = position.get();
+    c.seek(name);
+    c.node.addProperty(c.propertyName, value);
   }
 
   public void addProperty(final String name, final boolean value) {
-    final String propertyName = getPropertyName(name);
-    final JsonObject node = getNode(name);
-    node.addProperty(propertyName, value);
+    final Cursor c = position.get();
+    c.seek(name);
+    c.node.addProperty(c.propertyName, value);
   }
 
   public void addProperty(final String name, final String[] value) {
-    final String propertyName = getPropertyName(name);
-    final JsonObject node = getNode(name);
+    final Cursor c = position.get();
+    c.seek(name);
     final JsonArray e = new JsonArray();
     for (final String s : value) {
       e.add(s);
     }
-    node.add(propertyName, e);
+    c.node.add(c.propertyName, e);
   }
 
   public void addProperty(final String name, final List<?> value) {
-    final String propertyName = getPropertyName(name);
-    final JsonObject node = getNode(name);
+    final Cursor c = position.get();
+    c.seek(name);
     final JsonArray e = new JsonArray();
     for (final Object s : value) {
       e.add(s != null ? String.valueOf(s) : null);
     }
-    node.add(propertyName, e);
+    c.node.add(c.propertyName, e);
   }
 
   public void addProperty(final String name, final Date value, final SimpleDateFormat sdf) {
-    final String propertyName = getPropertyName(name);
-    final JsonObject node = getNode(name);
-    node.addProperty(propertyName, sdf.format(value));
+    final Cursor c = position.get();
+    c.seek(name);
+    c.node.addProperty(c.propertyName, sdf.format(value));
   }
 
   public void addProperty(final String name, final Date value) {
-    final String propertyName = getPropertyName(name);
-    final JsonObject node = getNode(name);
-    node.addProperty(propertyName, SimpleJson.ISO8601.format(value));
+    final Cursor c = position.get();
+    c.seek(name);
+    c.node.addProperty(c.propertyName, SimpleJson.ISO8601.format(value));
+  }
+
+  public void addProperty(final String name, final JsonElement value) {
+    final Cursor c = position.get();
+    c.seek(name);
+    c.node.add(c.propertyName, value);
+  }
+
+  public String getString(final String name) {
+    final Cursor c = position.get();
+    c.seek(name);
+    if (c.node == null) { return null; }
+    final JsonElement e = c.node.get(c.propertyName);
+    if (e == null) { return null; }
+    return e.getAsString();
   }
 
   public void set(final String name, final double val) {
@@ -168,21 +192,6 @@ public class SimpleJson {
 
   public void set(final String name, final boolean val) {
     addProperty(name, val);
-  }
-
-  public void addProperty(final String name, final JsonElement value) {
-    final String propertyName = getPropertyName(name);
-    final JsonObject node = getNode(name);
-    node.add(propertyName, value);
-  }
-
-  public String getString(final String name) {
-    final String propertyName = getPropertyName(name);
-    final JsonObject node = getNode(name);
-    if (node == null) return null;
-    JsonElement e = node.get(propertyName);
-    if (e == null) return null;
-    return e.getAsString();
   }
 
 }

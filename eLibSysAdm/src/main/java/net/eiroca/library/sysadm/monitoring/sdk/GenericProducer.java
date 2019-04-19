@@ -17,6 +17,7 @@
 package net.eiroca.library.sysadm.monitoring.sdk;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -24,6 +25,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import net.eiroca.library.data.ITagsProvider;
 import net.eiroca.library.data.Status;
+import net.eiroca.library.data.Tags;
 import net.eiroca.library.diagnostics.IServerMonitor;
 import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.MetricGroup;
@@ -131,8 +133,34 @@ public class GenericProducer implements IMeasureProducer {
     final String metric = m.getMetadata().getInternalName();
     final IDatum value = m.getDatum();
     context.trace("processing metric: ", metric);
+    // Merge metric tags
+    Tags tags = m.getTags();
+    SortedMap<String, Object> newMeta;
+    if ((tags == null) || (tags.size() == 0)) {
+      newMeta = meta;
+    }
+    else {
+      newMeta = new TreeMap<>();
+      newMeta.putAll(meta);
+      @SuppressWarnings("unchecked")
+      List<String> oldTags = (List<String>)newMeta.get(FLD_TAGS);
+      Iterator<Entry<String, Object>> i = tags.namedIterator();
+      while (i.hasNext()) {
+        Entry<String, Object> t = i.next();
+        String tagName = t.getKey();
+        Object tagVal = t.getValue();
+        if (tagVal != null) {
+          newMeta.put(tagName, tagVal);
+        }
+        else {
+          if (oldTags == null) oldTags = new ArrayList<>();
+          oldTags.add(tagName);
+        }
+      }
+      if (oldTags != null) newMeta.put(FLD_TAGS, oldTags);
+    }
     if (value.hasValue()) {
-      if (GenericProducer.exportData(consumer, group, metric, null, null, meta, value)) {
+      if (GenericProducer.exportData(consumer, group, metric, null, null, newMeta, value)) {
         result++;
       }
     }
@@ -140,7 +168,7 @@ public class GenericProducer implements IMeasureProducer {
       for (final Entry<String, ?> s : m.getSplittings().entrySet()) {
         final String splitGroup = s.getKey();
         final IMetric<?> split = (IMetric<?>)s.getValue();
-        result += exportMesureSplittig(meta, group, metric, splitGroup, split);
+        result += exportMesureSplittig(newMeta, group, metric, splitGroup, split);
       }
     }
     return result;

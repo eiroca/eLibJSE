@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.UUID;
 import net.eiroca.library.core.LibStr;
+import net.eiroca.library.data.Tags;
 import net.eiroca.library.metrics.datum.IDatum;
 
 public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements IMetric<D> {
@@ -30,6 +31,7 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
   private static final String TAG_EMPTY = "null";
 
   transient protected MetricMetadata metadata = null;
+  transient protected Tags tags = new Tags();
   protected UUID id = UUID.randomUUID();
   protected D datum = null;
   protected Map<String, IMetric<D>> splittings = null;
@@ -89,6 +91,7 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
 
   @Override
   public void reset() {
+    tags.clear();
     datum.init((metadata != null) ? metadata.getDefValue() : 0.0);
     splittings = null;
   }
@@ -187,6 +190,11 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
   @Override
   public void toJson(final StringBuilder sb, final boolean simple) {
     datum.toJson(sb, simple);
+  }
+
+  @Override
+  public Tags getTags() {
+    return tags;
   }
 
 }

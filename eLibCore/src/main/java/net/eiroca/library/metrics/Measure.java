@@ -23,8 +23,6 @@ public class Measure extends Metric<Measure, Datum> {
   private static final double VALUE_TRUE = 1.0;
   private static final double VALUE_FALSE = 0.0;
 
-  protected MetricGroup group;
-
   public Measure() {
     this((MetricMetadata)null);
   }

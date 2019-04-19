@@ -30,6 +30,7 @@ import net.eiroca.library.config.parameter.IntegerParameter;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
+import net.eiroca.library.data.Tags;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.metrics.IMetric;
@@ -120,9 +121,10 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   protected static BooleanParameter _customMetrics = new BooleanParameter(ServerMonitor.params, "customMetrics", true);
   protected static StringParameter _target = new StringParameter(ServerMonitor.params, "target", "");
   protected static StringParameter _mapping = new StringParameter(ServerMonitor.params, "mapping", "");
-  protected static StringParameter _from = new StringParameter(ServerMonitor.params, "from", "-15m");
+  protected static StringParameter _from = new StringParameter(ServerMonitor.params, "from", "-15min");
   protected static StringParameter _until = new StringParameter(ServerMonitor.params, "until", null);
   protected static IntegerParameter _groupLevel = new IntegerParameter(ServerMonitor.params, "groupLevel", -1);
+  protected static StringParameter _tagPrefix = new StringParameter(ServerMonitor.params, "tagPrefix", "graphite.");
   //
   protected String config_graphiteURL;
   protected boolean config_allMetrics;
@@ -133,6 +135,7 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   protected String config_from;
   protected String config_until;
   protected int config_groupLevel;
+  protected String config_tagPrefix;
   //
   protected String baseURL;
 
@@ -250,6 +253,10 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
               CommandException.Invalid("Parsing JSON response failed");
             }
           }
+          else {
+            context.warn("Invalid response from graphite: ", sb.toString(), " -> ", response.getRetCode());
+            context.debug(sb.toString(), " -> ", response.getOutput());
+          }
         }
         else {
           CommandException.Invalid("Invalid URL " + sb.toString());
@@ -286,13 +293,14 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
       final JSONObject o = obj.getJSONObject(i);
       final String target = o.getString("target");
       final JSONArray datapoints = o.getJSONArray("datapoints");
+      final JSONObject tags = o.optJSONObject("tags");
       if (datapoints.length() > 0) {
-        processTarget(target, rules, datapoints);
+        processTarget(target, rules, datapoints, tags);
       }
     }
   }
 
-  private void processTarget(final String target, List<RuleEntry> rules, final JSONArray datapoints) {
+  private void processTarget(final String target, List<RuleEntry> rules, final JSONArray datapoints, JSONObject tags) {
     double v = 0;
     long t = -1;
     for (int i = 0; i < datapoints.length(); i++) {
@@ -305,11 +313,11 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
       t = Helper.getLong(String.valueOf(entry.get(1)), 0);
     }
     if (t > 0) {
-      processEntry(target, rules, v, t);
+      processEntry(target, rules, v, t, tags);
     }
   }
 
-  private void processEntry(final String target, List<RuleEntry> rules, final double v, final long t) {
+  private void processEntry(final String target, List<RuleEntry> rules, final double v, final long t, JSONObject tags) {
     IMetric<?> m = mServerResult;
     String g = "metrics";
     String s = target;
@@ -345,6 +353,15 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
     }
     context.debug(m.getMetadata().getDisplayName() + "#" + g + "[" + s + "]->" + v);
     m.getSplitting(g, s).addValue(v);
+    if (tags != null) addTags(m, tags);
+  }
+
+  private void addTags(IMetric<?> m, JSONObject tags) {
+    Tags metricTag = m.getTags();
+    for (String tagName : tags.keySet()) {
+      String tagVal = tags.getString(tagName);
+      metricTag.add(LibStr.isEmptyOrNull(config_tagPrefix) ? tagName : config_tagPrefix + tagName, tagVal);
+    }
   }
 
   private RuleEntry findEntry(final String target, List<RuleEntry> rules) {

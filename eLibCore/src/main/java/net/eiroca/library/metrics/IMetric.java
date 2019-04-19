@@ -18,6 +18,7 @@ package net.eiroca.library.metrics;
 
 import java.util.Map;
 import java.util.UUID;
+import net.eiroca.library.data.Tags;
 import net.eiroca.library.metrics.datum.IDatum;
 
 public interface IMetric<D extends IDatum> extends IDatum {
@@ -31,6 +32,8 @@ public interface IMetric<D extends IDatum> extends IDatum {
   public D getDatum();
 
   public MetricMetadata getMetadata();
+
+  public Tags getTags();
 
   public boolean hasSplittings();
 
