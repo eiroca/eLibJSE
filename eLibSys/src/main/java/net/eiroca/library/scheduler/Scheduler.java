@@ -101,8 +101,8 @@ public class Scheduler implements AutoCloseable {
   }
 
   public void onTaskEnd(final Task task) {
-    long nextRun = task.nextRun();
-    if (nextRun < this.schedulerThread.getNextRun()) {
+    final long nextRun = task.nextRun();
+    if (nextRun < schedulerThread.getNextRun()) {
       schedulerThread.wakeup();
     }
   }

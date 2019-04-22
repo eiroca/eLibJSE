@@ -337,14 +337,14 @@ final public class Helper {
   }
 
   public static URL getResourceURL(final String resourceName, final Class<?> callingClass) {
-    return getResourceURL(resourceName, callingClass, false);
+    return Helper.getResourceURL(resourceName, callingClass, false);
   }
 
   public static URL getResourceURL(final String resourceName) {
-    return getResourceURL(resourceName, null, false);
+    return Helper.getResourceURL(resourceName, null, false);
   }
 
-  public static URL getResourceURL(final String resourceName, final Class<?> callingClass, boolean last) {
+  public static URL getResourceURL(final String resourceName, final Class<?> callingClass, final boolean last) {
     if (LibStr.isEmptyOrNull(resourceName)) { return null; }
     ClassLoader cl1 = null;
     ClassLoader cl2 = null;

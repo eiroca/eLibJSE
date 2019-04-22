@@ -14,7 +14,7 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.system;
+package net.eiroca.library.regex;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
+import net.eiroca.library.system.Logs;
 
 public class LibRegEx {
 
@@ -51,7 +52,7 @@ public class LibRegEx {
     return val != null ? Double.valueOf(val) : def;
   }
 
-  final public static String getGroup(final Matcher matcher, final String[] groupNames, final String sep) {
+  final public static String getGroups(final Matcher matcher, final String[] groupNames, final String sep) {
     // Merge matching group
     final StringBuilder sb = new StringBuilder();
     boolean first = true;
@@ -121,7 +122,7 @@ public class LibRegEx {
     return namedGroups;
   }
 
-  final public static String expand(final String macro, Matcher m) {
+  final public static String expand(final String macro, final Matcher m) {
     if (macro == null) { return null; }
     final StringBuffer sb = new StringBuffer();
     int i = 0;
@@ -145,8 +146,10 @@ public class LibRegEx {
               }
             }
             if (name != null) {
-              String newVal = LibRegEx.getGroup(m, name);
-              if (newVal != null) sb.append(newVal);
+              final String newVal = LibRegEx.getGroup(m, name);
+              if (newVal != null) {
+                sb.append(newVal);
+              }
             }
             else {
               i = size;

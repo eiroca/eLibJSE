@@ -35,7 +35,7 @@ public class Tags implements ITags {
   public Tags() {
   }
 
-  public Tags(Tags t) {
+  public Tags(final Tags t) {
     addTags(t);
   }
 
@@ -43,8 +43,8 @@ public class Tags implements ITags {
     return defaultTagValue;
   }
 
-  public void setDefaultTagValue(String defaultTagValue) {
-    if (defaultTagValue == null) throw new IllegalArgumentException("Default tag value cannot be null");
+  public void setDefaultTagValue(final String defaultTagValue) {
+    if (defaultTagValue == null) { throw new IllegalArgumentException("Default tag value cannot be null"); }
     this.defaultTagValue = defaultTagValue;
   }
 
@@ -52,8 +52,8 @@ public class Tags implements ITags {
     return tagFormat;
   }
 
-  public void setTagFormat(String tagFormat) {
-    if (tagFormat == null) throw new IllegalArgumentException("Tag format value cannot be null");
+  public void setTagFormat(final String tagFormat) {
+    if (tagFormat == null) { throw new IllegalArgumentException("Tag format value cannot be null"); }
     this.tagFormat = tagFormat;
   }
 

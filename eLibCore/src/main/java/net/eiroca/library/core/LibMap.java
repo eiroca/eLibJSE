@@ -17,6 +17,7 @@
 package net.eiroca.library.core;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -60,6 +61,27 @@ public class LibMap {
       }
     }
     return sb.toString();
+  }
+
+  public static Map<String, String> buildMap(final List<String> names, final List<String> values) {
+    Map<String, String> result = null;
+    if ((names != null) && (values != null)) {
+      result = new HashMap<>(names.size() * 2);
+      for (int i = 0; i < names.size(); i++) {
+        final String key = names.get(i);
+        final String val = values.get(i);
+        result.put(key, val);
+      }
+    }
+    else if (values != null) {
+      result = new HashMap<>(values.size() * 2);
+      for (int i = 0; i < values.size(); i++) {
+        final String key = String.valueOf(i);
+        final String val = values.get(i);
+        result.put(key, val);
+      }
+    }
+    return result;
   }
 
 }

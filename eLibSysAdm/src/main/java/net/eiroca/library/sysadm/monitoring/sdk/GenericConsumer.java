@@ -67,7 +67,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
 
   private static List<IExporter> exporters = new ArrayList<>();
   static {
-    for (String name : Exporters.registry.getNames()) {
+    for (final String name : Exporters.registry.getNames()) {
       GenericConsumer.exporters.add(Exporters.newInstance(name));
     }
   }

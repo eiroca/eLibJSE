@@ -134,7 +134,7 @@ public class GenericProducer implements IMeasureProducer {
     final IDatum value = m.getDatum();
     context.trace("processing metric: ", metric);
     // Merge metric tags
-    Tags tags = m.getTags();
+    final Tags tags = m.getTags();
     SortedMap<String, Object> newMeta;
     if ((tags == null) || (tags.size() == 0)) {
       newMeta = meta;
@@ -143,21 +143,25 @@ public class GenericProducer implements IMeasureProducer {
       newMeta = new TreeMap<>();
       newMeta.putAll(meta);
       @SuppressWarnings("unchecked")
-      List<String> oldTags = (List<String>)newMeta.get(FLD_TAGS);
-      Iterator<Entry<String, Object>> i = tags.namedIterator();
+      List<String> oldTags = (List<String>)newMeta.get(GenericProducer.FLD_TAGS);
+      final Iterator<Entry<String, Object>> i = tags.namedIterator();
       while (i.hasNext()) {
-        Entry<String, Object> t = i.next();
-        String tagName = t.getKey();
-        Object tagVal = t.getValue();
+        final Entry<String, Object> t = i.next();
+        final String tagName = t.getKey();
+        final Object tagVal = t.getValue();
         if (tagVal != null) {
           newMeta.put(tagName, tagVal);
         }
         else {
-          if (oldTags == null) oldTags = new ArrayList<>();
+          if (oldTags == null) {
+            oldTags = new ArrayList<>();
+          }
           oldTags.add(tagName);
         }
       }
-      if (oldTags != null) newMeta.put(FLD_TAGS, oldTags);
+      if (oldTags != null) {
+        newMeta.put(GenericProducer.FLD_TAGS, oldTags);
+      }
     }
     if (value.hasValue()) {
       if (GenericProducer.exportData(consumer, group, metric, null, null, newMeta, value)) {

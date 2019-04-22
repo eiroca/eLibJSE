@@ -30,7 +30,7 @@ public class Exporters {
     Exporters.registry.addEntry(NotifyExporter.ID, NotifyExporter.class.getName());
   }
 
-  public static IExporter newInstance(String name) {
+  public static IExporter newInstance(final String name) {
     IExporter obj = null;
     try {
       obj = (IExporter)Class.forName(Exporters.registry.className(name)).newInstance();

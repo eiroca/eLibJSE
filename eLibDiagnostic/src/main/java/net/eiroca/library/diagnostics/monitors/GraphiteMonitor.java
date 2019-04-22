@@ -36,8 +36,8 @@ import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricGroup;
+import net.eiroca.library.regex.LibRegEx;
 import net.eiroca.library.system.LibFile;
-import net.eiroca.library.system.LibRegEx;
 
 public class GraphiteMonitor extends GenericHTTPMonitor {
 
@@ -159,19 +159,25 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
     decodeRules(LibFile.readFile("graphite/system_rules.csv"), systemRules, true);
   }
 
-  private void decodeRules(String rules, List<RuleEntry> result, boolean isSystemRule) throws CommandException {
-    int base = isSystemRule ? 2 : 1;
-    int cnt = isSystemRule ? 4 : 3;
-    for (String x : LibStr.splitNL(rules, (char)0)) {
-      if (LibStr.isEmptyOrNull(x)) continue;
-      List<String> r = LibStr.split(x.trim(), ';', '"');
-      if (r.size() != cnt) continue;
-      RuleEntry e = new RuleEntry();
+  private void decodeRules(final String rules, final List<RuleEntry> result, final boolean isSystemRule) throws CommandException {
+    final int base = isSystemRule ? 2 : 1;
+    final int cnt = isSystemRule ? 4 : 3;
+    for (final String x : LibStr.splitNL(rules, (char)0)) {
+      if (LibStr.isEmptyOrNull(x)) {
+        continue;
+      }
+      final List<String> r = LibStr.split(x.trim(), ';', '"');
+      if (r.size() != cnt) {
+        continue;
+      }
+      final RuleEntry e = new RuleEntry();
       e.regex = Pattern.compile(r.get(0));
       if (isSystemRule) {
         e.metric = mgGraphite.find(r.get(1), false);
       }
-      else e.metric = mServerResult;
+      else {
+        e.metric = mServerResult;
+      }
       e.splitGroup = r.get(base + 0);
       e.splitName = r.get(base + 1);
       if (e.metric != null) {
@@ -183,9 +189,11 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
     }
   }
 
-  private void decodeMetrics(String metrics, List<String> result) {
-    for (String x : LibStr.splitNL(metrics, (char)0)) {
-      if (LibStr.isEmptyOrNull(x)) continue;
+  private void decodeMetrics(final String metrics, final List<String> result) {
+    for (final String x : LibStr.splitNL(metrics, (char)0)) {
+      if (LibStr.isEmptyOrNull(x)) {
+        continue;
+      }
       result.add(x.trim());
     }
   }
@@ -241,7 +249,7 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
           final ReturnObject response = httpCall(fetcher);
           validateResponse(response, validator);
           if (response.getRetCode() < 400) {
-            String json = response.getOutput();
+            final String json = response.getOutput();
             context.info("JSON: " + json);
             try {
               final JSONArray obj = new JSONArray(json);
@@ -267,17 +275,23 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   }
 
   private List<RuleEntry> getRules() {
-    List<RuleEntry> result = new ArrayList<>();
-    if (config_customMetrics) result.addAll(customRules);
+    final List<RuleEntry> result = new ArrayList<>();
+    if (config_customMetrics) {
+      result.addAll(customRules);
+    }
     result.addAll(systemRules);
     return result;
   }
 
   private List<String> getTargets() {
-    if (config_allMetrics) return getIndex();
-    List<String> result = new ArrayList<>();
-    if (config_systemMetrics) result.addAll(systemMetrics);
-    if (config_customMetrics) result.addAll(customMetrics);
+    if (config_allMetrics) { return getIndex(); }
+    final List<String> result = new ArrayList<>();
+    if (config_systemMetrics) {
+      result.addAll(systemMetrics);
+    }
+    if (config_customMetrics) {
+      result.addAll(customMetrics);
+    }
     return result;
   }
 
@@ -288,7 +302,7 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
     return null;
   }
 
-  private void parseJSON(final JSONArray obj, List<RuleEntry> rules) {
+  private void parseJSON(final JSONArray obj, final List<RuleEntry> rules) {
     for (int i = 0; i < obj.length(); i++) {
       final JSONObject o = obj.getJSONObject(i);
       final String target = o.getString("target");
@@ -300,7 +314,7 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
     }
   }
 
-  private void processTarget(final String target, List<RuleEntry> rules, final JSONArray datapoints, JSONObject tags) {
+  private void processTarget(final String target, final List<RuleEntry> rules, final JSONArray datapoints, final JSONObject tags) {
     double v = 0;
     long t = -1;
     for (int i = 0; i < datapoints.length(); i++) {
@@ -317,7 +331,7 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
     }
   }
 
-  private void processEntry(final String target, List<RuleEntry> rules, final double v, final long t, JSONObject tags) {
+  private void processEntry(final String target, final List<RuleEntry> rules, final double v, final long t, final JSONObject tags) {
     IMetric<?> m = mServerResult;
     String g = "metrics";
     String s = target;
@@ -353,18 +367,20 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
     }
     context.debug(m.getMetadata().getDisplayName() + "#" + g + "[" + s + "]->" + v);
     m.getSplitting(g, s).addValue(v);
-    if (tags != null) addTags(m, tags);
+    if (tags != null) {
+      addTags(m, tags);
+    }
   }
 
-  private void addTags(IMetric<?> m, JSONObject tags) {
-    Tags metricTag = m.getTags();
-    for (String tagName : tags.keySet()) {
-      String tagVal = tags.getString(tagName);
+  private void addTags(final IMetric<?> m, final JSONObject tags) {
+    final Tags metricTag = m.getTags();
+    for (final String tagName : tags.keySet()) {
+      final String tagVal = tags.getString(tagName);
       metricTag.add(LibStr.isEmptyOrNull(config_tagPrefix) ? tagName : config_tagPrefix + tagName, tagVal);
     }
   }
 
-  private RuleEntry findEntry(final String target, List<RuleEntry> rules) {
+  private RuleEntry findEntry(final String target, final List<RuleEntry> rules) {
     for (final RuleEntry e : rules) {
       final Pattern rule = e.regex;
       final Matcher m = rule.matcher(target);
