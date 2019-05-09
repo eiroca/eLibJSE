@@ -32,11 +32,10 @@ public class RegExJava extends ARegEx {
   }
 
   private Matcher getMatcher(final String text) {
-    count++;
     final String match = LibStr.limit(text, sizeLimit);
     boolean success = false;
     Matcher matcher = null;
-    final long now = System.currentTimeMillis();
+    tic();
     try {
       matcher = regEx.matcher(match);
       success = matcher.find();
@@ -44,12 +43,8 @@ public class RegExJava extends ARegEx {
     catch (final StackOverflowError err) {
       ruleFail();
     }
-    final long elapsed = (System.currentTimeMillis() - now);
-    totalTime += elapsed;
-    if (success && (elapsed > timeLimit)) {
-      timeFail();
-    }
-    return matcher;
+    toc(success);
+    return success ? matcher : null;
   }
 
   @Override

@@ -30,7 +30,7 @@ public class LibRegEx {
   transient private static final Logger logger = Logs.getLogger();
   private static Pattern groupExtractor = Pattern.compile("\\(\\?<([a-zA-Z][a-zA-Z0-9]*)>");
 
-  public static final int REGEX_TIMELIMIT = 150;
+  public static final int REGEX_TIMELIMIT = 150_000;
 
   public static String getField(final Matcher m, final String field) {
     String val = null;
@@ -94,7 +94,7 @@ public class LibRegEx {
 
   public static boolean find(final Pattern regEx, String match, final int sizeLimit) {
     boolean result = false;
-    final long now = System.currentTimeMillis();
+    final long now = System.nanoTime();
     try {
       if ((sizeLimit > 0) && (sizeLimit < match.length())) {
         match = match.substring(0, sizeLimit);
@@ -104,7 +104,7 @@ public class LibRegEx {
     catch (final StackOverflowError err) {
       LibRegEx.logger.warn("Pattern too complex: {}", regEx.pattern());
     }
-    final long elapsed = (System.currentTimeMillis() - now);
+    final long elapsed = (System.nanoTime() - now);
     if (elapsed >= LibRegEx.REGEX_TIMELIMIT) {
       LibRegEx.logger.info(String.format("find REGEX SLOW: %s", regEx.pattern()));
     }

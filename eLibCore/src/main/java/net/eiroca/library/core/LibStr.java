@@ -452,4 +452,39 @@ final public class LibStr {
     return result;
   }
 
+  public static void encodeJava(StringBuilder sb, String string) {
+    if ((string == null) || string.isEmpty()) { return; }
+    char ch = 0;
+    for (int i = 0; i < string.length(); i++) {
+      ch = string.charAt(i);
+      switch (ch) {
+        case '\\':
+        case '"':
+          sb.append('\\');
+          sb.append(ch);
+          break;
+        case '\b':
+        case '\t':
+        case '\n':
+        case '\f':
+        case '\r':
+          sb.append('\\');
+          sb.append((char)(ch + 64));
+          break;
+        default:
+          if ((ch < ' ') || ((ch >= '\u0080') && (ch < '\u00a0')) || ((ch >= '\u2000') && (ch < '\u2100'))) {
+            sb.append("\\u");
+            final String hhhh = Integer.toHexString(ch);
+            for (int l = 0; l < (4 - hhhh.length()); l++) {
+              sb.append('0');
+            }
+            sb.append(hhhh);
+          }
+          else {
+            sb.append(ch);
+          }
+      }
+    }
+  }
+
 }

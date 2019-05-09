@@ -25,13 +25,17 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
+import net.eiroca.library.core.LibStr;
 import net.eiroca.library.system.Logs;
 
 public class RegularExpression {
 
+  private static final String REG_EX_REPORTING = "RegEx Reporting";
   private static final int REGEX_DUMPTIME = 5 * 60;
 
   transient protected static final Logger logger = Logs.getLogger();
+  transient protected static final Logger reporter = Logs.getLogger(REG_EX_REPORTING);
+
   private static List<ARegEx> rules = new ArrayList<>();
 
   static {
@@ -40,7 +44,7 @@ public class RegularExpression {
       @Override
       public Thread newThread(final Runnable r) {
         final Thread t = Executors.defaultThreadFactory().newThread(r);
-        t.setName("RegEx Reporting");
+        t.setName(REG_EX_REPORTING);
         t.setDaemon(true);
         return t;
       }
@@ -95,13 +99,17 @@ public class RegularExpression {
     final List<ARegEx> r = RegularExpression.getRules();
     long totalTime = 0;
     long totalCount = 0;
-    RegularExpression.logger.info("RegEx Report");
+    RegularExpression.reporter.info(REG_EX_REPORTING);
+    StringBuilder sb = new StringBuilder(128);
     for (final ARegEx e : r) {
+      sb.setLength(0);
       totalCount += e.count;
       totalTime += e.totalTime;
-      RegularExpression.logger.info(e.pattern + "\t" + e.count + "\t" + e.totalTime);
+      LibStr.encodeJava(sb, e.pattern);
+      sb.append('\t').append(e.count).append('\t').append(e.totalTime / 1_000_000.0);
+      RegularExpression.reporter.info(sb.toString());
     }
-    RegularExpression.logger.info("Total \t" + totalCount + "\t" + totalTime);
+    RegularExpression.reporter.info("Total \t" + totalCount + "\t" + totalTime);
   }
 
 }

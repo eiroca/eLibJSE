@@ -17,6 +17,7 @@
 package net.eiroca.library.regex;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import net.eiroca.library.system.Logs;
 
@@ -25,11 +26,15 @@ public abstract class ARegEx {
   transient protected static final Logger logger = Logs.getLogger();
 
   public int count = 0;
+  // time in nanoseconds
   public long totalTime = 0;
-  public int sizeLimit = 0;
-  public int timeLimit = Integer.MAX_VALUE;
+  protected int sizeLimit = 0;
+  protected long timeLimit = Long.MAX_VALUE;
   public int sizeMin = 0;
   public String pattern = null;
+
+  private long now;
+  private long elapsed;
 
   public ARegEx(final String pattern) {
     this.pattern = pattern;
@@ -70,5 +75,30 @@ public abstract class ARegEx {
   abstract public List<String> extract(List<String> namedFields, String text);
 
   abstract public List<String> extract(String text);
+
+  public void setSizeLimit(int sizeLimit) {
+    this.sizeLimit = sizeLimit;
+  }
+
+  public void setSizeMin(int sizeMin) {
+    this.sizeMin = sizeMin;
+  }
+
+  public void setTimeLimit(int duration, TimeUnit tu) {
+    this.timeLimit = tu.toNanos(duration);
+  }
+
+  protected void tic() {
+    count++;
+    now = System.nanoTime();
+  }
+
+  protected void toc(boolean success) {
+    elapsed = (System.nanoTime() - now);
+    totalTime += elapsed;
+    if (success && (elapsed > timeLimit)) {
+      timeFail();
+    }
+  }
 
 }
