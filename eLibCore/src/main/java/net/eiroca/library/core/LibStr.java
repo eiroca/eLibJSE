@@ -23,7 +23,6 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
-import java.util.ArrayList;
 import java.util.List;
 
 final public class LibStr {
@@ -249,98 +248,6 @@ final public class LibStr {
     sb.append('"');
   }
 
-  final public static List<String> split(final String row, final char separator, final char quote) {
-    final List<String> result = new ArrayList<>();
-    final StringBuffer sb = new StringBuffer();
-    boolean inQuote = false;
-    for (int i = 0; i < row.length(); i++) {
-      final char ch = row.charAt(i);
-      if (inQuote) {
-        if (ch == quote) {
-          char nextCh = 0;
-          if (i < (row.length() - 1)) {
-            nextCh = row.charAt(i + 1);
-          }
-          if (nextCh == quote) {
-            sb.append(ch);
-            i++;
-          }
-          else {
-            inQuote = false;
-          }
-        }
-        else {
-          sb.append(ch);
-        }
-      }
-      else {
-        if (ch == separator) {
-          result.add(sb.toString());
-          sb.setLength(0);
-        }
-        else if (ch == quote) {
-          inQuote = true;
-        }
-        else {
-          sb.append(ch);
-        }
-      }
-    }
-    result.add(sb.toString());
-    return result;
-  }
-
-  final public static List<String> splitNL(final String row, final char quote) {
-    final List<String> result = new ArrayList<>();
-    final StringBuffer sb = new StringBuffer();
-    boolean inQuote = false;
-    char lc = 0;
-    for (int i = 0; i < row.length(); i++) {
-      final char ch = row.charAt(i);
-      if (inQuote) {
-        if (ch == quote) {
-          char nextCh = 0;
-          if (i < (row.length() - 1)) {
-            nextCh = row.charAt(i + 1);
-          }
-          if (nextCh == quote) {
-            sb.append(ch);
-            i++;
-          }
-          else {
-            inQuote = false;
-          }
-        }
-        else {
-          sb.append(ch);
-        }
-      }
-      else {
-        if ((ch == '\n') || (ch == '\r')) {
-          if ((ch == '\n') && (lc == '\r')) {
-          }
-          else if ((ch == '\r') && (lc == '\n')) {
-          }
-          else {
-            result.add(sb.toString());
-            sb.setLength(0);
-            lc = ch;
-          }
-        }
-        else if (ch == quote) {
-          lc = 0;
-          inQuote = true;
-        }
-        else {
-          lc = 0;
-          sb.append(ch);
-        }
-      }
-    }
-    result.add(sb.toString());
-    return result;
-  }
-
   public static String[] toArray(final List<String> row) {
     final String[] res = new String[row.size()];
     for (int i = 0; i < row.size(); i++) {
@@ -379,80 +286,7 @@ final public class LibStr {
     }
   }
 
-  private static boolean isSep(final char ch) {
-    return ((ch == ' ') || (ch == '\t') || (ch == '\n') || (ch == '\r'));
-  }
-
-  public static List<String> getList(final String valueList, final int num_fields) {
-    if ((num_fields == 0) || (valueList == null)) { return null; }
-    final List<String> result = new ArrayList<>();
-    final int l = valueList.length();
-    int s = 0;
-    int e = l - 1;
-    while ((s < l) && LibStr.isSep(valueList.charAt(s))) {
-      s++;
-    }
-    while ((e > 0) && LibStr.isSep(valueList.charAt(e))) {
-      e--;
-    }
-    if (e > 0) {
-      final int max_fields = num_fields > 0 ? num_fields : Integer.MAX_VALUE;
-      for (int c = 1; c < max_fields; c++) {
-        int cur = s + 1;
-        while ((cur <= e) && !LibStr.isSep(valueList.charAt(cur))) {
-          cur++;
-        }
-        result.add(valueList.substring(s, cur));
-        s = cur + 1;
-        while ((s <= e) && LibStr.isSep(valueList.charAt(s))) {
-          s++;
-        }
-        if (s > e) {
-          break;
-        }
-      }
-      if (s <= e) {
-        result.add(valueList.substring(s, e + 1));
-      }
-    }
-    else {
-      result.add("");
-    }
-    if ((num_fields > 0) && (result.size() != num_fields)) { return null; }
-    return result;
-  }
-
-  public static List<String> getList(final String valueList, final char sep, final int num_fields) {
-    if ((num_fields == 0) || (valueList == null)) { return null; }
-    final List<String> result = new ArrayList<>();
-    final int l = valueList.length();
-    int s = 0;
-    final int e = l - 1;
-    if (e > 0) {
-      final int max_fields = num_fields > 0 ? num_fields : Integer.MAX_VALUE;
-      for (int c = 1; c < max_fields; c++) {
-        int cur = s;
-        while ((cur <= e) && (sep != valueList.charAt(cur))) {
-          cur++;
-        }
-        result.add(valueList.substring(s, cur));
-        s = cur + 1;
-        if (s > e) {
-          break;
-        }
-      }
-      if (s <= e) {
-        result.add(valueList.substring(s, e + 1));
-      }
-    }
-    else {
-      result.add("");
-    }
-    if ((num_fields > 0) && (result.size() != num_fields)) { return null; }
-    return result;
-  }
-
-  public static void encodeJava(StringBuilder sb, String string) {
+  public static void encodeJava(final StringBuilder sb, final String string) {
     if ((string == null) || string.isEmpty()) { return; }
     char ch = 0;
     for (int i = 0; i < string.length(); i++) {

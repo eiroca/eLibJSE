@@ -222,7 +222,7 @@ public class URLFetcher implements AutoCloseable {
     try {
       setURL(new URL(url));
     }
-    catch (MalformedURLException e) {
+    catch (final MalformedURLException e) {
       return false;
     }
     return true;

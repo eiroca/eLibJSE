@@ -32,9 +32,10 @@ public class RegularExpression {
 
   private static final String REG_EX_REPORTING = "RegEx Reporting";
   private static final int REGEX_DUMPTIME = 5 * 60;
+  private static final double ONE_NANO = 1_000_000.0;
 
   transient protected static final Logger logger = Logs.getLogger();
-  transient protected static final Logger reporter = Logs.getLogger(REG_EX_REPORTING);
+  transient protected static final Logger reporter = Logs.getLogger(RegularExpression.REG_EX_REPORTING);
 
   private static List<ARegEx> rules = new ArrayList<>();
 
@@ -44,7 +45,7 @@ public class RegularExpression {
       @Override
       public Thread newThread(final Runnable r) {
         final Thread t = Executors.defaultThreadFactory().newThread(r);
-        t.setName(REG_EX_REPORTING);
+        t.setName(RegularExpression.REG_EX_REPORTING);
         t.setDaemon(true);
         return t;
       }
@@ -99,17 +100,17 @@ public class RegularExpression {
     final List<ARegEx> r = RegularExpression.getRules();
     long totalTime = 0;
     long totalCount = 0;
-    RegularExpression.reporter.info(REG_EX_REPORTING);
-    StringBuilder sb = new StringBuilder(128);
+    RegularExpression.reporter.info(RegularExpression.REG_EX_REPORTING);
+    final StringBuilder sb = new StringBuilder(128);
     for (final ARegEx e : r) {
       sb.setLength(0);
       totalCount += e.count;
       totalTime += e.totalTime;
       LibStr.encodeJava(sb, e.pattern);
-      sb.append('\t').append(e.count).append('\t').append(e.totalTime / 1_000_000.0);
+      sb.append('\t').append(e.count).append('\t').append(e.totalTime / RegularExpression.ONE_NANO);
       RegularExpression.reporter.info(sb.toString());
     }
-    RegularExpression.reporter.info("Total \t" + totalCount + "\t" + totalTime);
+    RegularExpression.reporter.info("Total \t" + totalCount + "\t" + (totalTime / RegularExpression.ONE_NANO));
   }
 
 }

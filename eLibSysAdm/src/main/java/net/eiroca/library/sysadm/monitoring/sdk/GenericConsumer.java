@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TimeZone;
+import net.eiroca.ext.library.gson.Cursor;
 import net.eiroca.ext.library.gson.SimpleJson;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
@@ -159,6 +160,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     final EventRule rule = (ruleEngine != null) ? ruleEngine.ruleFor(metadata) : null;
     if (rule == null) { return false; }
     final SimpleJson json = new SimpleJson(true);
+    final Cursor c = new Cursor();
     final Calendar cal = Calendar.getInstance();
     if (config_timezone != null) {
       cal.setTimeZone(TimeZone.getTimeZone(config_timezone));
@@ -169,7 +171,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     }
     cal.setTime(new Date(timeStamp));
     timeStamp = cal.getTimeInMillis();
-    json.addProperty(GenericConsumer.FLD_DATETIME, cal.getTime(), GenericConsumer.ISO8601_FULL);
+    json.addProperty(c, GenericConsumer.FLD_DATETIME, cal.getTime(), GenericConsumer.ISO8601_FULL);
     if (metadata != null) {
       for (final Map.Entry<String, Object> metaEntry : metadata.entrySet()) {
         String key = metaEntry.getKey();
@@ -190,14 +192,14 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
         if (key.endsWith(GenericConsumer.ARRAY_SUFFIX)) {
           key = key.substring(0, key.length() - GenericConsumer.ARRAY_SUFFIX.length());
           if (val instanceof String[]) {
-            json.addProperty(key, (String[])val);
+            json.addProperty(c, key, (String[])val);
           }
           else {
-            json.addProperty(key, (List<?>)val);
+            json.addProperty(c, key, (List<?>)val);
           }
         }
         else {
-          json.addProperty(key, val.toString());
+          json.addProperty(c, key, val.toString());
         }
       }
     }
@@ -219,34 +221,34 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
             }
           }
         }
-        json.set(GenericConsumer.FLD_STATUS, fail.getCheckName().toUpperCase());
+        json.set(c, GenericConsumer.FLD_STATUS, fail.getCheckName().toUpperCase());
         final Double min = fail.getMin();
         if (min != null) {
-          json.addProperty(GenericConsumer.FLD_STATUS_MINVAL, min);
+          json.addProperty(c, GenericConsumer.FLD_STATUS_MINVAL, min);
         }
         final Double max = fail.getMax();
         if (max != null) {
-          json.addProperty(GenericConsumer.FLD_STATUS_MAXVAL, max);
+          json.addProperty(c, GenericConsumer.FLD_STATUS_MAXVAL, max);
         }
         switch (fail.check(datum)) {
           case MIN:
-            json.set(GenericConsumer.FLD_STATUS_DESC, "Value lower than minimum");
+            json.set(c, GenericConsumer.FLD_STATUS_DESC, "Value lower than minimum");
             break;
           case MAX:
-            json.set(GenericConsumer.FLD_STATUS_DESC, "Value greather than maximum");
+            json.set(c, GenericConsumer.FLD_STATUS_DESC, "Value greather than maximum");
             break;
           case BOTH:
-            json.set(GenericConsumer.FLD_STATUS_DESC, "Value is invalid");
+            json.set(c, GenericConsumer.FLD_STATUS_DESC, "Value is invalid");
             break;
           default:
             break;
         }
       }
       else {
-        json.set(GenericConsumer.FLD_STATUS, GenericConsumer.STATUS_OK);
+        json.set(c, GenericConsumer.FLD_STATUS, GenericConsumer.STATUS_OK);
       }
     }
-    json.addProperty(GenericConsumer.FLD_VALUE, datum.getValue());
+    json.addProperty(c, GenericConsumer.FLD_VALUE, datum.getValue());
     addMeasure(rule, timeStamp, json);
     return true;
   }

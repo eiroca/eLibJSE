@@ -20,16 +20,14 @@ import com.google.gson.JsonObject;
 
 public class Cursor {
 
-  private final SimpleJson simpleJson;
   public String propertyName;
   public String parent;
   public JsonObject node;
 
-  public Cursor(final SimpleJson simpleJson) {
-    this.simpleJson = simpleJson;
+  public Cursor() {
   }
 
-  public void seek(final String name) {
+  public void seek(final SimpleJson simpleJson, final String name) {
     if (!simpleJson.expandName) {
       parent = null;
       propertyName = name;

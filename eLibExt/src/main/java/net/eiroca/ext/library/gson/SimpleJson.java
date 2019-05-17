@@ -38,15 +38,6 @@ public class SimpleJson {
   final JsonObject root;
   final boolean expandName;
 
-  private final ThreadLocal<Cursor> position = new ThreadLocal<Cursor>() {
-
-    @Override
-    protected Cursor initialValue() {
-      return new Cursor(SimpleJson.this);
-    }
-
-  };
-
   public SimpleJson(final boolean expandName) {
     this.expandName = expandName;
     root = new JsonObject();
@@ -85,7 +76,7 @@ public class SimpleJson {
     return node;
   }
 
-  JsonObject getNode(final JsonObject e, final String nodeName) {
+  public JsonObject getNode(final JsonObject e, final String nodeName) {
     JsonObject node = treeCache.get(nodeName);
     if (node == null) {
       final String parent = getParent(nodeName);
@@ -97,33 +88,28 @@ public class SimpleJson {
     return node;
   }
 
-  public void addJson(final String name, final String value) {
-    final Cursor c = position.get();
-    c.seek(name);
+  public void addJson(final Cursor c, final String name, final String value) {
+    c.seek(this, name);
     c.node.add(c.propertyName, SimpleJson.parser.parse(value));
   }
 
-  public void addProperty(final String name, final String val) {
-    final Cursor c = position.get();
-    c.seek(name);
+  public void addProperty(final Cursor c, final String name, final String val) {
+    c.seek(this, name);
     c.node.addProperty(c.propertyName, val);
   }
 
-  public void addProperty(final String name, final double value) {
-    final Cursor c = position.get();
-    c.seek(name);
+  public void addProperty(final Cursor c, final String name, final double value) {
+    c.seek(this, name);
     c.node.addProperty(c.propertyName, value);
   }
 
-  public void addProperty(final String name, final boolean value) {
-    final Cursor c = position.get();
-    c.seek(name);
+  public void addProperty(final Cursor c, final String name, final boolean value) {
+    c.seek(this, name);
     c.node.addProperty(c.propertyName, value);
   }
 
-  public void addProperty(final String name, final String[] value) {
-    final Cursor c = position.get();
-    c.seek(name);
+  public void addProperty(final Cursor c, final String name, final String[] value) {
+    c.seek(this, name);
     final JsonArray e = new JsonArray();
     for (final String s : value) {
       e.add(s);
@@ -131,9 +117,8 @@ public class SimpleJson {
     c.node.add(c.propertyName, e);
   }
 
-  public void addProperty(final String name, final List<?> value) {
-    final Cursor c = position.get();
-    c.seek(name);
+  public void addProperty(final Cursor c, final String name, final List<?> value) {
+    c.seek(this, name);
     final JsonArray e = new JsonArray();
     for (final Object s : value) {
       e.add(s != null ? String.valueOf(s) : null);
@@ -141,57 +126,53 @@ public class SimpleJson {
     c.node.add(c.propertyName, e);
   }
 
-  public void addProperty(final String name, final Date value, final SimpleDateFormat sdf) {
-    final Cursor c = position.get();
-    c.seek(name);
+  public void addProperty(final Cursor c, final String name, final Date value, final SimpleDateFormat sdf) {
+    c.seek(this, name);
     c.node.addProperty(c.propertyName, sdf.format(value));
   }
 
-  public void addProperty(final String name, final Date value) {
-    final Cursor c = position.get();
-    c.seek(name);
+  public void addProperty(final Cursor c, final String name, final Date value) {
+    c.seek(this, name);
     c.node.addProperty(c.propertyName, SimpleJson.ISO8601.format(value));
   }
 
-  public void addProperty(final String name, final JsonElement value) {
-    final Cursor c = position.get();
-    c.seek(name);
+  public void addProperty(final Cursor c, final String name, final JsonElement value) {
+    c.seek(this, name);
     c.node.add(c.propertyName, value);
   }
 
-  public String getString(final String name) {
-    final Cursor c = position.get();
-    c.seek(name);
+  public String getString(final Cursor c, final String name) {
+    c.seek(this, name);
     if (c.node == null) { return null; }
     final JsonElement e = c.node.get(c.propertyName);
     if (e == null) { return null; }
     return e.getAsString();
   }
 
-  public void set(final String name, final double val) {
-    addProperty(name, val);
+  public void set(final Cursor c, final String name, final double val) {
+    addProperty(c, name, val);
   }
 
-  public void set(final String name, final String val) {
+  public void set(final Cursor c, final String name, final String val) {
     if (LibStr.isNotEmptyOrNull(val)) {
-      addProperty(name, val);
+      addProperty(c, name, val);
     }
   }
 
-  public void set(final String name, final List<String> val) {
+  public void set(final Cursor c, final String name, final List<String> val) {
     if ((val != null) && (val.size() > 0)) {
-      addProperty(name, val);
+      addProperty(c, name, val);
     }
   }
 
-  public void set(final String name, final Date val, final SimpleDateFormat sdf) {
+  public void set(final Cursor c, final String name, final Date val, final SimpleDateFormat sdf) {
     if (val != null) {
-      addProperty(name, sdf.format(val));
+      addProperty(c, name, sdf.format(val));
     }
   }
 
-  public void set(final String name, final boolean val) {
-    addProperty(name, val);
+  public void set(final Cursor c, final String name, final boolean val) {
+    addProperty(c, name, val);
   }
 
 }

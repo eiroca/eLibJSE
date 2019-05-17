@@ -20,6 +20,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.slf4j.Logger;
+import net.eiroca.ext.library.gson.Cursor;
 import net.eiroca.ext.library.gson.SimpleJson;
 import net.eiroca.ext.library.http.HttpClientHelper;
 import net.eiroca.library.config.parameter.StringParameter;
@@ -94,11 +95,12 @@ public class NotifyExporter implements IExporter {
 
   public String expand(final Event event, final String s) {
     final SimpleJson data = event.getData();
+    final Cursor c = new Cursor();
     final Matcher m = NotifyExporter.regExParams.matcher(s);
     String result = s;
     while (m.find()) {
       final String p = m.group(1);
-      String v = data.getString(p);
+      String v = data.getString(c, p);
       if (v == null) {
         v = "";
       }

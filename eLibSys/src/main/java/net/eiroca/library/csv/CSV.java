@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 import net.eiroca.library.core.Helper;
+import net.eiroca.library.core.LibParser;
 import net.eiroca.library.core.LibStr;
 
 public class CSV {
@@ -47,14 +48,14 @@ public class CSV {
       String headerLine;
       // Get header line from CSV file
       if ((headerLine = br.readLine()) != null) {
-        final List<String> fieldNames = LibStr.split(headerLine, sepChar, quoteChar);
+        final List<String> fieldNames = LibParser.split(headerLine, sepChar, quoteChar);
         reader.notifyHeaders(fieldNames);
         // Iterate over the lines of CSV file
         while ((line = br.readLine()) != null) {
           if (LibStr.isEmptyOrNull(line) || (line.charAt(0) == comment)) {
             continue;
           }
-          final List<String> csvLine = LibStr.split(line, sepChar, quoteChar);
+          final List<String> csvLine = LibParser.split(line, sepChar, quoteChar);
           if (csvLine.size() != fieldNames.size()) {
             reader.notifyError("Invalid row " + line);
           }

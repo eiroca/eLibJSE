@@ -29,6 +29,7 @@ import net.eiroca.library.config.parameter.BooleanParameter;
 import net.eiroca.library.config.parameter.IntegerParameter;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
+import net.eiroca.library.core.LibParser;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.data.Tags;
 import net.eiroca.library.diagnostics.CommandException;
@@ -162,11 +163,11 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   private void decodeRules(final String rules, final List<RuleEntry> result, final boolean isSystemRule) throws CommandException {
     final int base = isSystemRule ? 2 : 1;
     final int cnt = isSystemRule ? 4 : 3;
-    for (final String x : LibStr.splitNL(rules, (char)0)) {
+    for (final String x : LibParser.splitWithNL(rules, (char)0)) {
       if (LibStr.isEmptyOrNull(x)) {
         continue;
       }
-      final List<String> r = LibStr.split(x.trim(), ';', '"');
+      final List<String> r = LibParser.split(x.trim(), ';', '"');
       if (r.size() != cnt) {
         continue;
       }
@@ -190,7 +191,7 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   }
 
   private void decodeMetrics(final String metrics, final List<String> result) {
-    for (final String x : LibStr.splitNL(metrics, (char)0)) {
+    for (final String x : LibParser.splitWithNL(metrics, (char)0)) {
       if (LibStr.isEmptyOrNull(x)) {
         continue;
       }

@@ -76,16 +76,16 @@ public abstract class ARegEx {
 
   abstract public List<String> extract(String text);
 
-  public void setSizeLimit(int sizeLimit) {
+  public void setSizeLimit(final int sizeLimit) {
     this.sizeLimit = sizeLimit;
   }
 
-  public void setSizeMin(int sizeMin) {
+  public void setSizeMin(final int sizeMin) {
     this.sizeMin = sizeMin;
   }
 
-  public void setTimeLimit(int duration, TimeUnit tu) {
-    this.timeLimit = tu.toNanos(duration);
+  public void setTimeLimit(final int duration, final TimeUnit tu) {
+    timeLimit = tu.toNanos(duration);
   }
 
   protected void tic() {
@@ -93,7 +93,7 @@ public abstract class ARegEx {
     now = System.nanoTime();
   }
 
-  protected void toc(boolean success) {
+  protected void toc(final boolean success) {
     elapsed = (System.nanoTime() - now);
     totalTime += elapsed;
     if (success && (elapsed > timeLimit)) {
