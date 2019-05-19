@@ -16,15 +16,15 @@
  **/
 package net.eiroca.library.sysadm.monitoring.api;
 
-import net.eiroca.ext.library.gson.SimpleJson;
+import net.eiroca.ext.library.gson.SimpleGson;
 
 public class Event {
 
   private final long timestamp;
-  private final SimpleJson data;
+  private final SimpleGson data;
   private final EventRule rule;
 
-  public Event(final long timeStamp, final SimpleJson data, final EventRule rule) {
+  public Event(final long timeStamp, final SimpleGson data, final EventRule rule) {
     timestamp = timeStamp;
     this.data = data;
     this.rule = rule;
@@ -34,7 +34,7 @@ public class Event {
     return timestamp;
   }
 
-  public SimpleJson getData() {
+  public SimpleGson getData() {
     return data;
   }
 

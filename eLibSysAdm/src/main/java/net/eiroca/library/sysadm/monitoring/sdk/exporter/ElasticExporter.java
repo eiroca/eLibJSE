@@ -20,7 +20,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 import net.eiroca.ext.library.elastic.ElasticBulk;
-import net.eiroca.ext.library.gson.SimpleJson;
+import net.eiroca.ext.library.gson.SimpleGson;
 import net.eiroca.library.config.parameter.IntegerParameter;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
@@ -101,7 +101,7 @@ public class ElasticExporter implements IExporter {
 
   @Override
   public void process(final Event event) {
-    final SimpleJson json = event.getData();
+    final SimpleGson json = event.getData();
     final String _doc = json.toString();
     try {
       final String _id = getEventID(event);

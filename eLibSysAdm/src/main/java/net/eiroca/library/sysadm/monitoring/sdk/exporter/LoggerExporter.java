@@ -17,7 +17,7 @@
 package net.eiroca.library.sysadm.monitoring.sdk.exporter;
 
 import org.slf4j.Logger;
-import net.eiroca.ext.library.gson.SimpleJson;
+import net.eiroca.ext.library.gson.SimpleGson;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.sysadm.monitoring.api.Event;
@@ -64,7 +64,7 @@ public class LoggerExporter implements IExporter {
 
   @Override
   public void process(final Event event) {
-    final SimpleJson json = event.getData();
+    final SimpleGson json = event.getData();
     final String _doc = json.toString();
     metricLog.info(_doc);
   }
