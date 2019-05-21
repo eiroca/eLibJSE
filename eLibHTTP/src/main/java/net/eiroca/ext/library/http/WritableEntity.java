@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.zip.DeflaterOutputStream;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
@@ -32,13 +33,47 @@ public class WritableEntity extends AbstractHttpEntity implements Cloneable {
   protected DeflaterOutputStream gzipper = null;
   boolean deflate;
   protected byte[] content = new byte[0];
+  String charset;
 
-  public WritableEntity(final String contentType, final String mimetype, final String charset, final boolean deflate) {
-    setContentType(ContentType.create(mimetype, charset).toString());
+  public WritableEntity(final String mimetype, final String charset, final boolean deflate) {
+    this(ContentType.create(mimetype, charset).toString(), deflate);
+    this.charset = charset;
+  }
+
+  public WritableEntity(final String contentType, final boolean deflate) {
+    setContentType(contentType);
     if (deflate) {
       setContentEncoding("gzip");
     }
     this.deflate = deflate;
+  }
+
+  public boolean setContent(final byte[] data) {
+    boolean result = true;
+    final OutputStream os = openBuffer();
+    try {
+      os.write(data);
+    }
+    catch (final IOException e) {
+      result = false;
+    }
+    closeBuffer();
+    return result;
+
+  }
+
+  public boolean setContent(final String text) {
+    try {
+      if (charset != null) {
+        return setContent(text.getBytes(charset));
+      }
+      else {
+        return setContent(text.getBytes());
+      }
+    }
+    catch (final UnsupportedEncodingException e) {
+      return false;
+    }
   }
 
   public OutputStream openBuffer() {
@@ -51,7 +86,7 @@ public class WritableEntity extends AbstractHttpEntity implements Cloneable {
     return buffer;
   }
 
-  public void closeByuffer() {
+  public void closeBuffer() {
     Helper.close(gzipper, buffer);
     content = buffer.toByteArray();
   }

@@ -61,14 +61,14 @@ public class RegularExpression {
     }, RegularExpression.REGEX_DUMPTIME, RegularExpression.REGEX_DUMPTIME, TimeUnit.SECONDS);
   }
 
-  public static ARegEx build(final String pattern, final int engine) {
+  public static ARegEx build(final String name, final String pattern, final int engine) {
     ARegEx result = null;
     try {
       if (engine == 1) {
-        result = new RegExRE2J(pattern);
+        result = new RegExRE2J(name, pattern);
       }
       else {
-        result = new RegExJava(pattern);
+        result = new RegExJava(name, pattern);
       }
       RegularExpression.rules.add(result);
     }
@@ -106,8 +106,12 @@ public class RegularExpression {
       sb.setLength(0);
       totalCount += e.count;
       totalTime += e.totalTime;
+      sb.append(e.name != null ? e.name : "").append('\t');
       LibStr.encodeJava(sb, e.pattern);
-      sb.append('\t').append(e.count).append('\t').append(e.totalTime / RegularExpression.ONE_NANO);
+      sb.append('\t');
+      sb.append(e.count).append('\t');
+      sb.append(e.matches).append('\t');
+      sb.append(e.totalTime / RegularExpression.ONE_NANO);
       RegularExpression.reporter.info(sb.toString());
     }
     RegularExpression.reporter.info("Total \t" + totalCount + "\t" + (totalTime / RegularExpression.ONE_NANO));

@@ -26,17 +26,20 @@ public abstract class ARegEx {
   transient protected static final Logger logger = Logs.getLogger();
 
   public int count = 0;
+  public int matches = 0;
   // time in nanoseconds
   public long totalTime = 0;
   protected int sizeLimit = 0;
   protected long timeLimit = Long.MAX_VALUE;
   public int sizeMin = 0;
+  public String name = null;
   public String pattern = null;
 
   private long now;
   private long elapsed;
 
-  public ARegEx(final String pattern) {
+  public ARegEx(final String name, final String pattern) {
+    this.name = name;
     this.pattern = pattern;
   }
 
@@ -94,6 +97,9 @@ public abstract class ARegEx {
   }
 
   protected void toc(final boolean success) {
+    if (success) {
+      matches++;
+    }
     elapsed = (System.nanoTime() - now);
     totalTime += elapsed;
     if (success && (elapsed > timeLimit)) {

@@ -26,8 +26,8 @@ public class RegExRE2J extends ARegEx {
 
   public Pattern regEx;
 
-  public RegExRE2J(final String pattern) throws Exception {
-    super(pattern);
+  public RegExRE2J(final String name, final String pattern) throws Exception {
+    super(name, pattern);
     regEx = Pattern.compile(pattern);
   }
 
@@ -44,7 +44,7 @@ public class RegExRE2J extends ARegEx {
       ruleFail();
     }
     toc(success);
-    return matcher;
+    return success ? matcher : null;
   }
 
   @Override

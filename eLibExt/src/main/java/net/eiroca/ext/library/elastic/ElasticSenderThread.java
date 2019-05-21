@@ -17,6 +17,7 @@
 package net.eiroca.ext.library.elastic;
 
 import java.io.IOException;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -32,11 +33,8 @@ public class ElasticSenderThread implements Runnable {
 
   private static final Logger logger = Logs.getLogger();
 
-  private static final String HEADER_CONTENT_TYPE = "Content-type";
   private static final String HEADER_ACCEPT = "Accept";
-  private static final String STR_CHARSET = ";charset=";
   private static final String STR_APPLICATIONJSON = "application/json";
-  private static final String STR_BULKMIMETYPE = "application/json";
 
   CloseableHttpClient httpclient;
   HttpEntity entity;
@@ -54,14 +52,19 @@ public class ElasticSenderThread implements Runnable {
   @Override
   public void run() {
     ElasticSenderThread.logger.debug("Running...");
-    final HttpPost httpPut = new HttpPost(owner.elasticServer);
-    httpPut.setEntity(entity);
-    httpPut.setHeader(ElasticSenderThread.HEADER_ACCEPT, ElasticSenderThread.STR_APPLICATIONJSON);
-    httpPut.setHeader(ElasticSenderThread.HEADER_CONTENT_TYPE, ElasticSenderThread.STR_BULKMIMETYPE + ElasticSenderThread.STR_CHARSET + entity.getContentEncoding());
+    final HttpPost httpRequest = new HttpPost(owner.elasticServer);
+    httpRequest.setEntity(entity);
+    httpRequest.setHeader(ElasticSenderThread.HEADER_ACCEPT, ElasticSenderThread.STR_APPLICATIONJSON);
+    httpRequest.setHeader(entity.getContentType());
+    final Header encoding = entity.getContentEncoding();
+    if (encoding != null) {
+      httpRequest.setHeader(encoding);
+    }
     final long sendStartTime = System.currentTimeMillis();
     try {
       ElasticSenderThread.logger.trace("exceuting... {}", numEvents);
-      final CloseableHttpResponse response = getHttpClient().execute(httpPut, context);
+      final CloseableHttpClient client = getHttpClient();
+      final CloseableHttpResponse response = client.execute(httpRequest, context);
       final int responseCode = response.getStatusLine().getStatusCode();
       long elapsed = System.currentTimeMillis() - sendStartTime;
       if (elapsed < 1) {
@@ -69,7 +72,7 @@ public class ElasticSenderThread implements Runnable {
       }
       owner.stats.incEventSent(numEvents);
       owner.stats.addSendTime(elapsed);
-      ElasticSenderThread.logger.debug(numEvents + "\t" + httpPut + "\t" + responseCode + "\t" + Math.round((numEvents / (elapsed * .001))));
+      ElasticSenderThread.logger.debug(numEvents + "\t" + httpRequest + "\t" + responseCode + "\t" + Math.round((numEvents / (elapsed * .001))));
       final long checkStartTime = System.currentTimeMillis();
       try {
         final HttpEntity entity2 = response.getEntity();

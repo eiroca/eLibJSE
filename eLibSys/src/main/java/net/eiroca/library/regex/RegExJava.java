@@ -26,8 +26,8 @@ public class RegExJava extends ARegEx {
 
   public Pattern regEx;
 
-  public RegExJava(final String pattern) throws Exception {
-    super(pattern);
+  public RegExJava(final String name, final String pattern) throws Exception {
+    super(name, pattern);
     regEx = Pattern.compile(pattern);
   }
 

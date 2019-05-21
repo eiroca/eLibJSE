@@ -16,18 +16,19 @@
  **/
 package net.eiroca.ext.library.elastic;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.http.HttpEntity;
-import org.apache.http.entity.StringEntity;
 import org.slf4j.Logger;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.eiroca.ext.library.http.HttpClientHelper;
+import net.eiroca.ext.library.http.WritableEntity;
 import net.eiroca.library.system.Logs;
 
 public class ElasticBulk {
@@ -37,10 +38,13 @@ public class ElasticBulk {
   private static final int DEFAULT_THREADS = 1;
   private static final int DEFAULT_BULKSIZE = 1 * 1024 * 1024;
 
+  private static final String STR_BULKMIMETYPE = "application/x-ndjson";
+
   public ElasticBulkStats stats = new ElasticBulkStats();
 
   final private List<IndexEntry> data = new ArrayList<>();
   private int size = 0;
+  boolean deflate = true;
   String encoding = "UTF-8";
   String elasticServer;
   int bulkSize = ElasticBulk.DEFAULT_BULKSIZE;
@@ -83,14 +87,15 @@ public class ElasticBulk {
   public void flush() throws Exception {
     if (data.size() < 1) { return; }
     final long flushStartTime = System.currentTimeMillis();
-    final StringBuilder body = new StringBuilder();
+    final WritableEntity entity = new WritableEntity(ElasticBulk.STR_BULKMIMETYPE, encoding, deflate);
+    final OutputStream os = entity.openBuffer();
     final int events = data.size();
     for (final IndexEntry e : data) {
       final String indexReq = e.bulkEntry();
       ElasticBulk.logger.debug(indexReq);
-      body.append(indexReq);
+      os.write(indexReq.getBytes(encoding));
     }
-    final HttpEntity entity = new StringEntity(body.toString(), encoding);
+    entity.closeBuffer();
     final ElasticSenderThread sender = new ElasticSenderThread(this, entity, events);
     stats.addFlushTime(System.currentTimeMillis() - flushStartTime);
     if (numThreads > 1) {
@@ -159,6 +164,14 @@ public class ElasticBulk {
       }
     }
     return errors;
+  }
+
+  public boolean isDeflate() {
+    return deflate;
+  }
+
+  public void setDeflate(final boolean deflate) {
+    this.deflate = deflate;
   }
 
   public int getNumThreads() {
