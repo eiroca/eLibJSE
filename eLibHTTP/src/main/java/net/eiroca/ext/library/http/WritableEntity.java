@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import org.apache.http.entity.AbstractHttpEntity;
 import org.apache.http.entity.ContentType;
@@ -29,6 +30,7 @@ import net.eiroca.library.core.Helper;
 
 public class WritableEntity extends AbstractHttpEntity implements Cloneable {
 
+  private static final String CONTENT_ENCODING = "deflate";
   protected ByteArrayOutputStream buffer = null;
   protected DeflaterOutputStream gzipper = null;
   boolean deflate;
@@ -43,7 +45,7 @@ public class WritableEntity extends AbstractHttpEntity implements Cloneable {
   public WritableEntity(final String contentType, final boolean deflate) {
     setContentType(contentType);
     if (deflate) {
-      setContentEncoding("gzip");
+      setContentEncoding(CONTENT_ENCODING);
     }
     this.deflate = deflate;
   }
@@ -80,7 +82,9 @@ public class WritableEntity extends AbstractHttpEntity implements Cloneable {
     buffer = new ByteArrayOutputStream();
     gzipper = null;
     if (deflate) {
-      gzipper = new DeflaterOutputStream(buffer);
+      Deflater d = new Deflater();
+      d.setLevel(Deflater.BEST_SPEED);
+      gzipper = new DeflaterOutputStream(buffer, d);
       return gzipper;
     }
     return buffer;

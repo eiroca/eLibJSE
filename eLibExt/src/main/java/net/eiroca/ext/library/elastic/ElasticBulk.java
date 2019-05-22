@@ -38,7 +38,7 @@ public class ElasticBulk {
   private static final int DEFAULT_THREADS = 1;
   private static final int DEFAULT_BULKSIZE = 1 * 1024 * 1024;
 
-  private static final String STR_BULKMIMETYPE = "application/x-ndjson";
+  private static final String STR_BULKMIMETYPE = "application/json";
 
   public ElasticBulkStats stats = new ElasticBulkStats();
 

@@ -19,7 +19,6 @@ package net.eiroca.ext.library.elastic;
 import java.io.IOException;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -83,9 +82,6 @@ public class ElasticSenderThread implements Runnable {
       }
       owner.stats.addCheckTime(System.currentTimeMillis() - checkStartTime);
       ElasticSenderThread.logger.debug("Exiting... {}", responseCode);
-    }
-    catch (final ClientProtocolException e) {
-      ElasticSenderThread.logger.warn("Sending error " + e.getMessage(), e);
     }
     catch (final IOException e) {
       ElasticSenderThread.logger.warn("Sending error " + e.getMessage(), e);
