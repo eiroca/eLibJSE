@@ -33,6 +33,8 @@ import net.eiroca.library.system.Logs;
 
 public class ElasticBulk {
 
+  public static final int ELASTIC_OVERLOAD = 429;
+
   private static final Logger logger = Logs.getLogger();
 
   private static final int DEFAULT_THREADS = 1;
@@ -51,6 +53,8 @@ public class ElasticBulk {
   int numThreads = ElasticBulk.DEFAULT_THREADS;
   boolean checkResult;
   private final ThreadPoolExecutor senderPool;
+
+  private boolean overload;
 
   public ElasticBulk(final String server) {
     this(server, true, ElasticBulk.DEFAULT_BULKSIZE, ElasticBulk.DEFAULT_THREADS);
@@ -149,11 +153,16 @@ public class ElasticBulk {
           final IndexEntry entry = (data != null) ? data.get(idx) : null;
           if (status >= 400) {
             errors++;
-            if (entry != null) {
-              ElasticBulk.logger.warn("Elastic Error:\n" + entry.meta + "\n" + entry.data);
+            if (status == ELASTIC_OVERLOAD) {
+              ElasticBulk.logger.warn("Elastic Overload");
             }
             else {
-              ElasticBulk.logger.warn("Elastic Response: " + e);
+              if (entry != null) {
+                ElasticBulk.logger.warn("Elastic Error:\n" + entry.meta + "\n" + entry.data);
+              }
+              else {
+                ElasticBulk.logger.warn("Elastic Response: " + e);
+              }
             }
           }
           else if (entry != null) {
@@ -204,4 +213,11 @@ public class ElasticBulk {
     return numThreads > 1 ? senderPool.getQueue().size() : 0;
   }
 
+  public void setOverload(boolean overload) {
+    this.overload = overload;
+  }
+
+  public boolean isOverload() {
+    return overload;
+  }
 }

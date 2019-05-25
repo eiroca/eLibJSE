@@ -69,6 +69,7 @@ public class ElasticSenderThread implements Runnable {
       if (elapsed < 1) {
         elapsed = 1;
       }
+      owner.setOverload(responseCode == ElasticBulk.ELASTIC_OVERLOAD);
       owner.stats.incEventSent(numEvents);
       owner.stats.addSendTime(elapsed);
       ElasticSenderThread.logger.debug(numEvents + "\t" + httpRequest + "\t" + responseCode + "\t" + Math.round((numEvents / (elapsed * .001))));
