@@ -46,6 +46,7 @@ public class URLFetcherConfig {
   public static final String CONFIG_SERVER_AUTH = "serverAuth";
   public static final String CONFIG_SERVER_USERNAME = "serverUsername";
   public static final String CONFIG_SERVER_PASSWORD = "serverPassword";
+  public static final String CONFIG_SEND_AUTHORIZATION = "sendAuthorization";
 
   public static final String CONFIG_USE_PROXY = "useProxy";
   public static final String CONFIG_PROXY_HOST = "proxyHost";
@@ -108,6 +109,7 @@ public class URLFetcherConfig {
   public boolean serverAuth;
   public String serverUsername;
   public String serverPassword;
+  public boolean sendAuthorization = true;
 
   // proxy.
   public boolean useProxy;
@@ -158,6 +160,7 @@ public class URLFetcherConfig {
     if (serverAuth) {
       serverUsername = context.getConfigString(URLFetcherConfig.CONFIG_SERVER_USERNAME, null);
       serverPassword = context.getConfigPassword(URLFetcherConfig.CONFIG_SERVER_PASSWORD);
+      sendAuthorization = context.getConfigBoolean(URLFetcherConfig.CONFIG_SEND_AUTHORIZATION, true);
     }
     useProxy = context.getConfigBoolean(URLFetcherConfig.CONFIG_USE_PROXY, false);
     if (useProxy) {

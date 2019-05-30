@@ -83,7 +83,7 @@ public class ApacheServerMonitor extends GenericHTTPMonitor {
     catch (final URLFetcherException err) {
       final int errorCode = err.getErrorCode();
       CommandError resultError;
-      final String message = String.format("Fertching error %d: %s", err.getErrorCode(), err.getMessage());
+      final String message = String.format("Fetching error %d: %s", err.getErrorCode(), err.getMessage());
       if (errorCode < 100) {
         resultError = CommandError.Internal;
       }

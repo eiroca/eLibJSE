@@ -26,6 +26,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
+import net.eiroca.library.core.Helper;
 import net.eiroca.library.system.Logs;
 
 public class ElasticSenderThread implements Runnable {
@@ -51,7 +52,7 @@ public class ElasticSenderThread implements Runnable {
   @Override
   public void run() {
     ElasticSenderThread.logger.debug("Running...");
-    final HttpPost httpRequest = new HttpPost(owner.elasticServer);
+    final HttpPost httpRequest = new HttpPost(owner.getElasticServer());
     httpRequest.setEntity(entity);
     httpRequest.setHeader(ElasticSenderThread.HEADER_ACCEPT, ElasticSenderThread.STR_APPLICATIONJSON);
     httpRequest.setHeader(entity.getContentType());
@@ -79,13 +80,17 @@ public class ElasticSenderThread implements Runnable {
         owner.checkResult(responseCode, entity2, numEvents);
       }
       finally {
-        response.close();
+        Helper.close(response);
+        httpRequest.releaseConnection();
       }
       owner.stats.addCheckTime(System.currentTimeMillis() - checkStartTime);
       ElasticSenderThread.logger.debug("Exiting... {}", responseCode);
     }
     catch (final IOException e) {
       ElasticSenderThread.logger.warn("Sending error " + e.getMessage(), e);
+      Helper.close(httpclient);
+      httpclient = null;
+      httpclient = getHttpClient();
     }
   }
 

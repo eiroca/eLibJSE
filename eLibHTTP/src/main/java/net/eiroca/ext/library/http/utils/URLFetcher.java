@@ -38,6 +38,7 @@ import org.apache.http.HttpVersion;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.NTCredentials;
+import org.apache.http.client.AuthCache;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.RequestConfig;
@@ -46,13 +47,17 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicAuthCache;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
@@ -73,6 +78,7 @@ public class URLFetcher implements AutoCloseable {
 
   private CloseableHttpClient httpClient;
   private CredentialsProvider credsProvider;
+  private AuthCache authCache;
   private URLFetcherConfig config;
   private VirtualHostInterception virtualHostInterceptor;
 
@@ -114,9 +120,9 @@ public class URLFetcher implements AutoCloseable {
   public void setup(final URLFetcherConfig config) throws URLFetcherException {
     this.config = config;
     credsProvider = new BasicCredentialsProvider();
+    authCache = new BasicAuthCache();
     httpClient = getHttpClient();
     virtualHostInterceptor = (config.virtualHost != null) ? new VirtualHostInterception(config.virtualHost) : null;
-
   }
 
   @Override
@@ -237,7 +243,9 @@ public class URLFetcher implements AutoCloseable {
     config.host = host;
     if (config.serverAuth) {
       final Credentials credentials = getCredentials(config.serverUsername, config.serverPassword);
-      credsProvider.setCredentials(new AuthScope(host, config.port), credentials);
+      final HttpHost targetHost = new HttpHost(config.host, config.port, URLFetcherConfig.PROTOCOL_DEFS[config.protocol]);
+      credsProvider.setCredentials(new AuthScope(targetHost), credentials);
+      authCache.put(targetHost, new BasicScheme());
     }
   }
 
@@ -325,10 +333,14 @@ public class URLFetcher implements AutoCloseable {
     httpRequest = createRequest();
     HttpResponse response = null;
     HttpEntity entity = null;
+    final HttpClientContext httpContext = HttpClientContext.create();
+    if (config.serverAuth && config.sendAuthorization && (config.serverUsername != null)) {
+      httpContext.setAuthCache(authCache);
+    }
     try {
       // connect
       firstResponseStartTime = System.nanoTime();
-      response = httpClient.execute(httpRequest);
+      response = httpClient.execute(httpRequest, httpContext);
       httpStatusCode = response.getStatusLine().getStatusCode();
       firstResponseEndTime = System.nanoTime();
       // calculate header size
@@ -376,4 +388,13 @@ public class URLFetcher implements AutoCloseable {
     responseEndTime = System.nanoTime();
     return result;
   }
+
+  public void setPostType(final ContentType postType) {
+    config.postType = postType;
+  }
+
+  public void setPostData(final String data) {
+    config.postData = data;
+  }
+
 }

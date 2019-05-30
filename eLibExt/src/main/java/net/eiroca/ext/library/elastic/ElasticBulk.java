@@ -35,26 +35,26 @@ public class ElasticBulk {
 
   public static final int ELASTIC_OVERLOAD = 429;
 
-  private static final Logger logger = Logs.getLogger();
-
   private static final int DEFAULT_THREADS = 1;
   private static final int DEFAULT_BULKSIZE = 1 * 1024 * 1024;
-
   private static final String STR_BULKMIMETYPE = "application/json";
+
+  private static final Logger logger = Logs.getLogger();
 
   public ElasticBulkStats stats = new ElasticBulkStats();
 
   final private List<IndexEntry> data = new ArrayList<>();
   private int size = 0;
-  boolean deflate = true;
-  String encoding = "UTF-8";
-  String elasticServer;
-  int bulkSize = ElasticBulk.DEFAULT_BULKSIZE;
-  int numThreads = ElasticBulk.DEFAULT_THREADS;
-  boolean checkResult;
+  private boolean deflate = true;
+  private final String encoding = "UTF-8";
+  private String elasticServer;
+  private int bulkSize = ElasticBulk.DEFAULT_BULKSIZE;
+  private int numThreads = ElasticBulk.DEFAULT_THREADS;
+  private boolean checkResult;
   private final ThreadPoolExecutor senderPool;
 
-  private boolean overload;
+  private long discardTime = 1000;
+  private long lastOverload;
 
   public ElasticBulk(final String server) {
     this(server, true, ElasticBulk.DEFAULT_BULKSIZE, ElasticBulk.DEFAULT_THREADS);
@@ -64,7 +64,7 @@ public class ElasticBulk {
     super();
     this.numThreads = numThreads;
     this.bulkSize = bulkSize;
-    this.elasticServer = elasticServer;
+    setElasticServer(elasticServer);
     this.checkResult = checkResult;
     senderPool = (ThreadPoolExecutor)Executors.newFixedThreadPool(numThreads);
     open();
@@ -124,14 +124,14 @@ public class ElasticBulk {
       if (responseCode < 400) {
         final String resultStr = HttpClientHelper.consume(entity);
         if (resultStr != null) {
-          errors = ElasticBulk.checkResult(null, resultStr);
+          errors = checkResult(null, resultStr);
         }
       }
       stats.incEventErrors(errors);
     }
   }
 
-  public static int checkResult(final List<IndexEntry> data, final String resultStr) {
+  public int checkResult(final List<IndexEntry> data, final String resultStr) {
     final JsonParser parser = new JsonParser();
     final JsonElement result = parser.parse(resultStr);
     JsonArray items = null;
@@ -144,6 +144,7 @@ public class ElasticBulk {
     }
     else {
       if (items.size() > 0) {
+        boolean overload = false;
         for (idx = 0; idx < items.size(); idx++) {
           final JsonElement e = items.get(idx);
           final JsonObject o = (e != null) ? e.getAsJsonObject() : null;
@@ -153,8 +154,8 @@ public class ElasticBulk {
           final IndexEntry entry = (data != null) ? data.get(idx) : null;
           if (status >= 400) {
             errors++;
-            if (status == ELASTIC_OVERLOAD) {
-              ElasticBulk.logger.warn("Elastic Overload");
+            if (status == ElasticBulk.ELASTIC_OVERLOAD) {
+              overload = true;
             }
             else {
               if (entry != null) {
@@ -170,6 +171,7 @@ public class ElasticBulk {
             entry._id = (id != null) ? id.getAsString() : null;
           }
         }
+        setOverload(overload);
       }
     }
     return errors;
@@ -213,11 +215,42 @@ public class ElasticBulk {
     return numThreads > 1 ? senderPool.getQueue().size() : 0;
   }
 
-  public void setOverload(boolean overload) {
-    this.overload = overload;
+  public void setOverload(final boolean overload) {
+    if (overload) {
+      final long now = System.currentTimeMillis();
+      if (now > lastOverload) {
+        lastOverload = now + discardTime;
+        logger.info("Elastic overload {} until {}", now, lastOverload);
+      }
+    }
   }
 
   public boolean isOverload() {
-    return overload;
+    final long now = System.currentTimeMillis();
+    return (now <= lastOverload);
   }
+
+  public void setDiscarTime(long discardTime) {
+    if (discardTime < 0) {
+      discardTime = 0;
+    }
+    this.discardTime = discardTime;
+  }
+
+  public long getDiscardTime() {
+    return discardTime;
+  }
+
+  public long getLastOverload() {
+    return lastOverload > 0 ? lastOverload - discardTime : 0;
+  }
+
+  public String getElasticServer() {
+    return elasticServer;
+  }
+
+  public void setElasticServer(final String elasticServer) {
+    this.elasticServer = elasticServer;
+  }
+
 }
