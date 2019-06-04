@@ -152,7 +152,7 @@ public class TestParameters {
   @Test
   public void configTest3() {
     final Cofing3 config = new Cofing3();
-    params2.saveConfig(config, "_", true);
+    params2.saveConfig(config, "_", true, true);
     Assert.assertEquals(config.a, 1);
     Assert.assertEquals(config.getA(), 0);
     Assert.assertEquals(config.getB(), 0);
@@ -165,15 +165,15 @@ public class TestParameters {
     final Map<String, String> data = new HashMap<>();
     final Cofing2 config = new Cofing2();
     params.loadConfig(data, null);
-    params.saveConfig(config, null, true);
+    params.saveConfig(config, null, true, true);
     Assert.assertEquals(config.z, null);
     data.put("z", "");
     params.loadConfig(data, null);
-    params.saveConfig(config, null, true);
+    params.saveConfig(config, null, true, true);
     Assert.assertEquals(config.z, null);
     data.put("z", "x");
     params.loadConfig(data, null);
-    params.saveConfig(config, null, true);
+    params.saveConfig(config, null, true, true);
     Assert.assertEquals(config.z, "x");
   }
 

@@ -101,11 +101,11 @@ public class Parameters {
   }
 
   public void saveConfig(final Object config) {
-    saveConfig(config, null, false);
+    saveConfig(config, null, false, true);
   }
 
-  public void saveConfig(final Object config, final String namePrefix, final boolean forceAccess) {
-    final Map<String, Field> fields = LibReflection.getFieldMap(config, true);
+  public void saveConfig(final Object config, final String namePrefix, final boolean forceAccess, final boolean useSuperClass) {
+    final Map<String, Field> fields = LibReflection.getFieldMap(config, useSuperClass);
     for (final Parameter<?> p : params) {
       String key = p.getInternalName();
       if (namePrefix != null) {

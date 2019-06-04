@@ -35,8 +35,11 @@ public abstract class ServerMonitor implements IServerMonitor {
   // parameters
   protected static ContextParameters params = new ContextParameters();
 
+  // Mesures
+  protected MetricGroup mgMonitor = new MetricGroup(null, "Monitor");
+
   // measure constants
-  protected MetricGroup mgServerInfo = new MetricGroup("Server Monitor");
+  protected MetricGroup mgServerInfo = new MetricGroup(mgMonitor, "Server Statistics");
   protected Measure mServerConnectionTimeout = mgServerInfo.createMeasure("ConnectionTimedOut", "1 if connection timed out", "boolean");
   protected Measure mServerLatency = mgServerInfo.createMeasure("ServerLatency", "Server latency", "ms");
   protected Measure mServerReachable = mgServerInfo.createMeasure("HostReachable", "1 if host is reachable", "boolean");
@@ -136,9 +139,15 @@ public abstract class ServerMonitor implements IServerMonitor {
     }
   }
 
-  @Override
-  public void loadMetricGroup(final List<MetricGroup> groups) {
-    groups.add(mgServerInfo);
+  private void loadMetricGroup(final List<MetricGroup> groups, final MetricGroup mg) {
+    groups.add(mg);
+    for (final MetricGroup child : mg.getGroups()) {
+      loadMetricGroup(groups, child);
+    }
+  }
+
+  final public void loadMetricGroup(final List<MetricGroup> groups) {
+    loadMetricGroup(groups, mgMonitor);
   }
 
   @Override
@@ -163,6 +172,10 @@ public abstract class ServerMonitor implements IServerMonitor {
 
   @Override
   public void close() throws Exception {
+  }
+
+  public MetricGroup getMetricGroup() {
+    return mgMonitor;
   }
 
 }

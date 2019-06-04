@@ -21,7 +21,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import org.json.JSONObject;
 import net.eiroca.library.metrics.IMetric;
@@ -63,7 +62,7 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
   private static final String CONFIG_PORT = "port";
 
   // measurement variables
-  protected final MetricGroup mgFLUME = new MetricGroup("FLUME Statistics", "FLUME - {0}");
+  protected final MetricGroup mgFLUME = new MetricGroup(mgMonitor, "FLUME Statistics", "FLUME - {0}");
   protected final Measure mAppendAcceptedCount = mgFLUME.createMeasure("Append Accepted", "Append Accepted Count", "number");
   protected final Measure mAppendBatchAcceptedCount = mgFLUME.createMeasure("Append Batch Accepted", "Append batch accepted count", "number");
   protected final Measure mAppendBatchReceivedCount = mgFLUME.createMeasure("Append Batch Received", "Append batch received count", "number");
@@ -121,12 +120,6 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
     mappigns.put("OpenConnectionCount", new JSONMapping(mOpenConnectionCount, 1));
     mappigns.put("StartTime", new JSONMapping(mStartTime, 1));
     mappigns.put("StopTime", new JSONMapping(mStopTime, 1));
-  }
-
-  @Override
-  public void loadMetricGroup(final List<MetricGroup> groups) {
-    super.loadMetricGroup(groups);
-    groups.add(mgFLUME);
   }
 
   @Override

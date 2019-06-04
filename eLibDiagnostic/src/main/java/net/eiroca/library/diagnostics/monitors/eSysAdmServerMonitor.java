@@ -21,7 +21,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.MessageFormat;
 import java.util.Iterator;
-import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 import net.eiroca.library.core.LibMath;
@@ -41,19 +40,13 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
   private static final String CONFIG_AGGREGATION_SPLIT = "splitting_aggregation";
 
   // measurement variables
-  protected final MetricGroup mgeSysAdm = new MetricGroup("eSysAdm Monitor", "eSysAdm - {0}");
+  protected final MetricGroup mgeSysAdm = new MetricGroup(mgMonitor, "eSysAdm Statistics", "eSysAdm - {0}");
   protected final Measure mMetrics = mgeSysAdm.createMeasure("Metrics", "Metrics collected by eSysAdm server", "number");
   protected final Measure mAlerts = mgeSysAdm.createMeasure("Alerts", "Alerts collected by eSysAdm server", "number");
   protected final Measure mKPIs = mgeSysAdm.createMeasure("KPIs", "KPIs (%) collected by eSysAdm server", "percent");
   protected final Measure mTimings = mgeSysAdm.createMeasure("Timings", "Timings (ms) collected by eSysAdm server", "ms");
 
   private String namespace;
-
-  @Override
-  public void loadMetricGroup(final List<MetricGroup> groups) {
-    super.loadMetricGroup(groups);
-    groups.add(mgeSysAdm);
-  }
 
   @Override
   public URL getURL(final InetAddress host) throws MalformedURLException {

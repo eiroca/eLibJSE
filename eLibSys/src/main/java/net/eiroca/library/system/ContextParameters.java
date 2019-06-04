@@ -81,7 +81,7 @@ public class ContextParameters extends Parameters {
 
   public void convert(final IContext context, final String prefix, final Object target, final String namePrefix) throws IllegalArgumentException {
     loadConfig(context, prefix);
-    saveConfig(target, namePrefix, true);
+    saveConfig(target, namePrefix, true, true);
   }
 
 }

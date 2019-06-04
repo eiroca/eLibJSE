@@ -17,7 +17,6 @@
 package net.eiroca.library.diagnostics.monitors;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import net.eiroca.library.core.Helper;
@@ -34,7 +33,7 @@ public class RedisMonitor extends TCPServerMonitor {
   public static final String CONFIG_PORT = "port";
   public static final String CONFIG_AUTH = "redisAuth";
 
-  protected MetricGroup mgRedisInfo = new MetricGroup("Redis Statistics", "Redis - {0}");
+  protected MetricGroup mgRedisInfo = new MetricGroup(mgMonitor, "Redis Statistics", "Redis - {0}");
   protected Measure mRedisClientsConn = mgRedisInfo.createMeasure("Clients - connected clients", "Connected clients", "number");
   protected Measure mRedisKeyspaceKeys = mgRedisInfo.createMeasure("Keyspace - keys", "Keyspace - keys", "number");
   protected Measure mRedisMemoryOverhead = mgRedisInfo.createMeasure("Memory - used memory overhead", "Memory - used memory overhead", "bytes");
@@ -77,12 +76,6 @@ public class RedisMonitor extends TCPServerMonitor {
     mapping.put("rdb_last_bgsave_time_sec", mRedisRDBLstSave);
     mapping.put("rdb_bgsave_in_progress", mRedisRDBBkgSave);
     mapping.put("rdb_changes_since_last_save", mRedisRDBChanges);
-  }
-
-  @Override
-  public void loadMetricGroup(final List<MetricGroup> groups) {
-    super.loadMetricGroup(groups);
-    groups.add(mgRedisInfo);
   }
 
   @Override

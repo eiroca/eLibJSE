@@ -16,10 +16,14 @@
  **/
 package net.eiroca.library.diagnostics;
 
+import net.eiroca.library.metrics.MetricGroup;
+
 public interface IServerMonitor extends IMonitor, ICommand {
 
   public void resetMetrics();
 
   public boolean check(final String target) throws CommandException;
+
+  public MetricGroup getMetricGroup();
 
 }

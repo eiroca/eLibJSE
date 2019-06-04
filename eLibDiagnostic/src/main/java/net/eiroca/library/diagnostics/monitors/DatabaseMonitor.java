@@ -25,7 +25,6 @@ import java.sql.SQLException;
 import java.sql.SQLTimeoutException;
 import java.text.MessageFormat;
 import java.util.HashMap;
-import java.util.List;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.db.DBConfig;
@@ -66,8 +65,8 @@ public class DatabaseMonitor extends TCPServerMonitor {
 
   private static final String CONFIG_RUNSQL = "runSQL";
 
-  protected final MetricGroup mgDBMonitor = new MetricGroup("Database Monitor", "Database - {0}");
-  protected final Measure mDBQueryTime = mgDBMonitor.createMeasure("Query Time", "Tikem taken by the query ", "ms");
+  protected final MetricGroup mgDBMonitor = new MetricGroup(mgMonitor, "Database Statistics", "Database - {0}");
+  protected final Measure mDBQueryTime = mgDBMonitor.createMeasure("Query Time", "Tikem taken by the query", "ms");
   protected final Measure mDBQueryRows = mgDBMonitor.createMeasure("Query Rows", "Rows returned by the query", "number");
 
   protected GenericValidator validator;
@@ -128,12 +127,6 @@ public class DatabaseMonitor extends TCPServerMonitor {
     validator = null;
     config = null;
     super.close();
-  }
-
-  @Override
-  public void loadMetricGroup(final List<MetricGroup> groups) {
-    super.loadMetricGroup(groups);
-    groups.add(mgDBMonitor);
   }
 
   @Override

@@ -43,78 +43,81 @@ import net.eiroca.library.system.LibFile;
 public class GraphiteMonitor extends GenericHTTPMonitor {
 
   // measurement variables
-  protected final MetricGroup mgGraphite = new MetricGroup("Graphite Monitor", "Graphite - {0}");
-  protected final Measure mAgents_activeConnections = mgGraphite.createMeasure("Agents - activeConnections", "Agents - activeConnections", "num");
-  protected final Measure mAgents_avgUpdateTime = mgGraphite.createMeasure("Agents - avgUpdateTime", "Agents - avgUpdateTime", "ms");
-  protected final Measure mAgents_blacklistMatches = mgGraphite.createMeasure("Agents - blacklistMatches", "Agents - blacklistMatches", "num");
-  protected final Measure mAgents_cache_bulk_queries = mgGraphite.createMeasure("Agents - cache.bulk_queries", "Agents - cache.bulk_queries", "num");
-  protected final Measure mAgents_cache_overflow = mgGraphite.createMeasure("Agents - cache.overflow", "Agents - cache.overflow", "num");
-  protected final Measure mAgents_cache_queries = mgGraphite.createMeasure("Agents - cache.queries", "Agents - cache.queries", "num");
-  protected final Measure mAgents_cache_queues = mgGraphite.createMeasure("Agents - cache.queues", "Agents - cache.queues", "num");
-  protected final Measure mAgents_cache_size = mgGraphite.createMeasure("Agents - cache.size", "Agents - cache.size", "num");
-  protected final Measure mAgents_committedPoints = mgGraphite.createMeasure("Agents - committedPoints", "Agents - committedPoints", "num");
-  protected final Measure mAgents_cpuUsage = mgGraphite.createMeasure("Agents - cpuUsage", "Agents - cpuUsage", "num");
-  protected final Measure mAgents_creates = mgGraphite.createMeasure("Agents - creates", "Agents - creates", "num");
-  protected final Measure mAgents_droppedCreates = mgGraphite.createMeasure("Agents - droppedCreates", "Agents - droppedCreates", "num");
-  protected final Measure mAgents_errors = mgGraphite.createMeasure("Agents - errors", "Agents - errors", "num");
-  protected final Measure mAgents_memUsage = mgGraphite.createMeasure("Agents - memUsage", "Agents - memUsage", "num");
-  protected final Measure mAgents_metricsReceived = mgGraphite.createMeasure("Agents - metricsReceived", "Agents - metricsReceived", "num");
-  protected final Measure mAgents_pointsPerUpdate = mgGraphite.createMeasure("Agents - pointsPerUpdate", "Agents - pointsPerUpdate", "num");
-  protected final Measure mAgents_updateOperations = mgGraphite.createMeasure("Agents - updateOperations", "Agents - updateOperations", "num");
-  protected final Measure mAgents_whitelistRejects = mgGraphite.createMeasure("Agents - whitelistRejects", "Agents - whitelistRejects", "num");
-  protected final Measure mAggregator_activeConnections = mgGraphite.createMeasure("Aggregator - activeConnections", "Aggregator - activeConnections", "num");
-  protected final Measure mAggregator_aggregateDatapointsSent = mgGraphite.createMeasure("Aggregator - aggregateDatapointsSent", "Aggregator - aggregateDatapointsSent", "num");
-  protected final Measure mAggregator_allocatedBuffers = mgGraphite.createMeasure("Aggregator - allocatedBuffers", "Aggregator - allocatedBuffers", "num");
-  protected final Measure mAggregator_blacklistMatches = mgGraphite.createMeasure("Aggregator - blacklistMatches", "Aggregator - blacklistMatches", "num");
-  protected final Measure mAggregator_bufferedDatapoints = mgGraphite.createMeasure("Aggregator - bufferedDatapoints", "Aggregator - bufferedDatapoints", "num");
-  protected final Measure mAggregator_cpuUsage = mgGraphite.createMeasure("Aggregator - cpuUsage", "Aggregator - cpuUsage", "num");
-  protected final Measure mAggregator_destinations_attemptedRelays = mgGraphite.createMeasure("Aggregator - destinations - attemptedRelays", "Aggregator - destinations - attemptedRelays", "num");
-  protected final Measure mAggregator_destinations_batchesSent = mgGraphite.createMeasure("Aggregator - destinations - batchesSent", "Aggregator - destinations - batchesSent", "num");
-  protected final Measure mAggregator_destinations_relayMaxQueueLength = mgGraphite.createMeasure("Aggregator - destinations - relayMaxQueueLength", "Aggregator - destinations - relayMaxQueueLength", "num");
-  protected final Measure mAggregator_destinations_sent = mgGraphite.createMeasure("Aggregator - destinations - sent", "Aggregator - destinations - sent", "num");
-  protected final Measure mAggregator_memUsage = mgGraphite.createMeasure("Aggregator - memUsage", "Aggregator - memUsage", "num");
-  protected final Measure mAggregator_metricsReceived = mgGraphite.createMeasure("Aggregator - metricsReceived", "Aggregator - metricsReceived", "num");
-  protected final Measure mAggregator_whitelistRejects = mgGraphite.createMeasure("Aggregator - whitelistRejects", "Aggregator - whitelistRejects", "num");
-  protected final Measure mStats_deamom_calculationtime = mgGraphite.createMeasure("Stats - deamom - calculationtime", "Stats - deamom - calculationtime", "num");
-  protected final Measure mStats_deamom_flush_length = mgGraphite.createMeasure("Stats - deamom - flush_length", "Stats - deamom - flush_length", "num");
-  protected final Measure mStats_deamom_flush_time = mgGraphite.createMeasure("Stats - deamom - flush_time", "Stats - deamom - flush_time", "num");
-  protected final Measure mStats_deamom_last_exception = mgGraphite.createMeasure("Stats - deamom - last_exception", "Stats - deamom - last_exception", "num");
-  protected final Measure mStats_deamom_last_flush = mgGraphite.createMeasure("Stats - deamom - last_flush", "Stats - deamom - last_flush", "num");
-  protected final Measure mStats_deamom_processing_time = mgGraphite.createMeasure("Stats - deamom - processing_time", "Stats - deamom - processing_time", "num");
-  protected final Measure mStats_numStats = mgGraphite.createMeasure("Stats - numStats", "Stats - numStats", "num");
-  protected final Measure mStats_timestamp_lag = mgGraphite.createMeasure("Stats - timestamp_lag", "Stats - timestamp_lag", "num");
+  protected final MetricGroup mgGraphite = new MetricGroup(mgMonitor, "Graphite Statistics", "Graphite - {0}");
   //
-  protected final Measure mStats_response = mgGraphite.createMeasure("Stats - response", "Stats - response", "ms");
-  protected final Measure mStats_deamom_bad_lines_seen = mgGraphite.createMeasure("Stats - deamom - bad_lines_seen", "Stats - deamom - bad_lines_seen", "num");
-  protected final Measure mStats_deamom_metrics_received = mgGraphite.createMeasure("Stats - deamom - metrics_received", "Stats - deamom - metrics_received", "num");
-  protected final Measure mStats_deamom_packets_received = mgGraphite.createMeasure("Stats - deamom - packets_received", "Stats - deamom - packets_received", "num");
-  protected final Measure mStatsCounts_response = mgGraphite.createMeasure("Stats_counts - response", "Stats_counts - response", "ms");
-  protected final Measure mStatsCounts_deamom_bad_lines_seen = mgGraphite.createMeasure("Stats_counts - deamom - bad_lines_seen", "Stats_counts - deamom - bad_lines_seen", "num");
-  protected final Measure mStatsCounts_deamom_metrics_received = mgGraphite.createMeasure("Stats_counts - deamom - metrics_received", "Stats_counts - deamom - metrics_received", "num");
-  protected final Measure mStatsCounts_deamom_packets_received = mgGraphite.createMeasure("Stats_counts - deamom - packets_received", "Stats_counts - deamom - packets_received", "num");
+  protected final MetricGroup mgGraphiteAgents = new MetricGroup(mgGraphite, "Graphite Agents", "Graphite - Agents - {0}");
+  protected final Measure mAgents_activeConnections = mgGraphiteAgents.createMeasure("activeConnections", "Agents - activeConnections", "num");
+  protected final Measure mAgents_avgUpdateTime = mgGraphiteAgents.createMeasure("avgUpdateTime", "Agents - avgUpdateTime", "ms");
+  protected final Measure mAgents_blacklistMatches = mgGraphiteAgents.createMeasure("blacklistMatches", "Agents - blacklistMatches", "num");
+  protected final Measure mAgents_cache_bulk_queries = mgGraphiteAgents.createMeasure("cache.bulk_queries", "Agents - cache.bulk_queries", "num");
+  protected final Measure mAgents_cache_overflow = mgGraphiteAgents.createMeasure("cache.overflow", "Agents - cache.overflow", "num");
+  protected final Measure mAgents_cache_queries = mgGraphiteAgents.createMeasure("cache.queries", "Agents - cache.queries", "num");
+  protected final Measure mAgents_cache_queues = mgGraphiteAgents.createMeasure("cache.queues", "Agents - cache.queues", "num");
+  protected final Measure mAgents_cache_size = mgGraphiteAgents.createMeasure("cache.size", "Agents - cache.size", "num");
+  protected final Measure mAgents_committedPoints = mgGraphiteAgents.createMeasure("committedPoints", "Agents - committedPoints", "num");
+  protected final Measure mAgents_cpuUsage = mgGraphiteAgents.createMeasure("cpuUsage", "Agents - cpuUsage", "num");
+  protected final Measure mAgents_creates = mgGraphiteAgents.createMeasure("creates", "Agents - creates", "num");
+  protected final Measure mAgents_droppedCreates = mgGraphiteAgents.createMeasure("droppedCreates", "Agents - droppedCreates", "num");
+  protected final Measure mAgents_errors = mgGraphiteAgents.createMeasure("errors", "Agents - errors", "num");
+  protected final Measure mAgents_memUsage = mgGraphiteAgents.createMeasure("memUsage", "Agents - memUsage", "num");
+  protected final Measure mAgents_metricsReceived = mgGraphiteAgents.createMeasure("metricsReceived", "Agents - metricsReceived", "num");
+  protected final Measure mAgents_pointsPerUpdate = mgGraphiteAgents.createMeasure("pointsPerUpdate", "Agents - pointsPerUpdate", "num");
+  protected final Measure mAgents_updateOperations = mgGraphiteAgents.createMeasure("updateOperations", "Agents - updateOperations", "num");
+  protected final Measure mAgents_whitelistRejects = mgGraphiteAgents.createMeasure("whitelistRejects", "Agents - whitelistRejects", "num");
   //
-  protected final Measure mStats_timers_count = mgGraphite.createMeasure("Stats - timers - count", "Stats - timers - count", "num");
-  protected final Measure mStats_timers_count_90 = mgGraphite.createMeasure("Stats - timers - count_90", "Stats - timers - count_90", "num");
-  protected final Measure mStats_timers_count_ps = mgGraphite.createMeasure("Stats - timers - count_ps", "Stats - timers - count_ps", "num");
-  protected final Measure mStats_timers_lower = mgGraphite.createMeasure("Stats - timers - lower", "Stats - timers - lower", "ms");
-  protected final Measure mStats_timers_lower_90 = mgGraphite.createMeasure("Stats - timers - lower_90", "Stats - timers - lower_90", "ms");
-  protected final Measure mStats_timers_lower_ps = mgGraphite.createMeasure("Stats - timers - lower_ps", "Stats - timers - lower_ps", "ms");
-  protected final Measure mStats_timers_mean = mgGraphite.createMeasure("Stats - timers - mean", "Stats - timers - mean", "ms");
-  protected final Measure mStats_timers_mean_90 = mgGraphite.createMeasure("Stats - timers - mean_90", "Stats - timers - mean_90", "ms");
-  protected final Measure mStats_timers_mean_ps = mgGraphite.createMeasure("Stats - timers - mean_ps", "Stats - timers - mean_ps", "ms");
-  protected final Measure mStats_timers_median = mgGraphite.createMeasure("Stats - timers - median", "Stats - timers - median", "ms");
-  protected final Measure mStats_timers_std = mgGraphite.createMeasure("Stats - timers - std", "Stats - timers - std", "ms");
-  protected final Measure mStats_timers_sum = mgGraphite.createMeasure("Stats - timers - sum", "Stats - timers - sum", "ms");
-  protected final Measure mStats_timers_sum_90 = mgGraphite.createMeasure("Stats - timers - sum_90", "Stats - timers - sum_90", "ms");
-  protected final Measure mStats_timers_sum_ps = mgGraphite.createMeasure("Stats - timers - sum_ps", "Stats - timers - sum_ps", "ms");
-  protected final Measure mStats_timers_sum_squares = mgGraphite.createMeasure("Stats - timers - sum_squares", "Stats - timers - sum_squares", "num");
-  protected final Measure mStats_timers_sum_squares_90 = mgGraphite.createMeasure("Stats - timers - sum_squares_90", "Stats - timers - sum_squares_90", "num");
-  protected final Measure mStats_timers_sum_squares_ps = mgGraphite.createMeasure("Stats - timers - sum_squares_ps", "Stats - timers - sum_squares_ps", "num");
-  protected final Measure mStats_timers_upper = mgGraphite.createMeasure("Stats - timers - upper", "Stats - timers - upper", "ms");
-  protected final Measure mStats_timers_upper_90 = mgGraphite.createMeasure("Stats - timers - upper_90", "Stats - timers - upper_90", "ms");
-  protected final Measure mStats_timers_upper_ps = mgGraphite.createMeasure("Stats - timers - upper_ps", "Stats - timers - upper_ps", "ms");
+  protected final MetricGroup mgGraphiteAggregator = new MetricGroup(mgGraphite, "Graphite Aggregator", "Graphite - Aggregator - {0}");
+  protected final Measure mAggregator_activeConnections = mgGraphiteAggregator.createMeasure("activeConnections", "Aggregator - activeConnections", "num");
+  protected final Measure mAggregator_aggregateDatapointsSent = mgGraphiteAggregator.createMeasure("aggregateDatapointsSent", "Aggregator - aggregateDatapointsSent", "num");
+  protected final Measure mAggregator_allocatedBuffers = mgGraphiteAggregator.createMeasure("allocatedBuffers", "Aggregator - allocatedBuffers", "num");
+  protected final Measure mAggregator_blacklistMatches = mgGraphiteAggregator.createMeasure("blacklistMatches", "Aggregator - blacklistMatches", "num");
+  protected final Measure mAggregator_bufferedDatapoints = mgGraphiteAggregator.createMeasure("bufferedDatapoints", "Aggregator - bufferedDatapoints", "num");
+  protected final Measure mAggregator_cpuUsage = mgGraphiteAggregator.createMeasure("cpuUsage", "Aggregator - cpuUsage", "num");
+  protected final Measure mAggregator_destinations_attemptedRelays = mgGraphiteAggregator.createMeasure("destinations - attemptedRelays", "Aggregator - destinations - attemptedRelays", "num");
+  protected final Measure mAggregator_destinations_batchesSent = mgGraphiteAggregator.createMeasure("destinations - batchesSent", "Aggregator - destinations - batchesSent", "num");
+  protected final Measure mAggregator_destinations_relayMaxQueueLength = mgGraphiteAggregator.createMeasure("destinations - relayMaxQueueLength", "Aggregator - destinations - relayMaxQueueLength", "num");
+  protected final Measure mAggregator_destinations_sent = mgGraphiteAggregator.createMeasure("destinations - sent", "Aggregator - destinations - sent", "num");
+  protected final Measure mAggregator_memUsage = mgGraphiteAggregator.createMeasure("memUsage", "Aggregator - memUsage", "num");
+  protected final Measure mAggregator_metricsReceived = mgGraphiteAggregator.createMeasure("metricsReceived", "Aggregator - metricsReceived", "num");
+  protected final Measure mAggregator_whitelistRejects = mgGraphiteAggregator.createMeasure("whitelistRejects", "Aggregator - whitelistRejects", "num");
   //
-  protected final Measure mOthers_Stats = mgGraphite.createMeasure("Others - Stats", "Others - Stats", "num");
+  protected final MetricGroup mgGraphiteStats = new MetricGroup(mgGraphite, "Graphite Stats", "Graphite - Stats - {0}");
+  protected final Measure mStats_deamon_calculationtime = mgGraphiteStats.createMeasure("deamon.calculationtime", "Stats - deamom - calculationtime", "num");
+  protected final Measure mStats_deamon_flush_length = mgGraphiteStats.createMeasure("deamon.flush_length", "Stats - deamom - flush_length", "num");
+  protected final Measure mStats_deamon_flush_time = mgGraphiteStats.createMeasure("deamon.flush_time", "Stats - deamom - flush_time", "num");
+  protected final Measure mStats_deamon_last_exception = mgGraphiteStats.createMeasure("deamon.last_exception", "Stats - deamom - last_exception", "num");
+  protected final Measure mStats_deamon_last_flush = mgGraphiteStats.createMeasure("deamon.last_flush", "Stats - deamom - last_flush", "num");
+  protected final Measure mStats_deamon_processing_time = mgGraphiteStats.createMeasure("deamon.processing_time", "Stats - deamom - processing_time", "num");
+  protected final Measure mStats_numStats = mgGraphiteStats.createMeasure("numStats", "Stats - numStats", "num");
+  protected final Measure mStats_timestamp_lag = mgGraphiteStats.createMeasure("timestamp_lag", "Stats - timestamp_lag", "num");
+  protected final Measure mStats_response = mgGraphiteStats.createMeasure("response", "Stats - response", "ms");
+  protected final Measure mStats_deamon_bad_lines_seen = mgGraphiteStats.createMeasure("deamon.bad_lines_seen", "Stats - deamom - bad_lines_seen", "num");
+  protected final Measure mStats_deamon_metrics_received = mgGraphiteStats.createMeasure("deamon.metrics_received", "Stats - deamom - metrics_received", "num");
+  protected final Measure mStats_deamon_packets_received = mgGraphiteStats.createMeasure("deamon.packets_received", "Stats - deamom - packets_received", "num");
+  protected final Measure mStats_Counts_response = mgGraphiteStats.createMeasure("counts.response", "Stats_counts - response", "ms");
+  protected final Measure mStats_Counts_deamom_bad_lines_seen = mgGraphiteStats.createMeasure("counts.deamon.bad_lines_seen", "Stats_counts - deamom - bad_lines_seen", "num");
+  protected final Measure mStats_Counts_deamom_metrics_received = mgGraphiteStats.createMeasure("counts.deamon.metrics_received", "Stats_counts - deamom - metrics_received", "num");
+  protected final Measure mStats_Counts_deamom_packets_received = mgGraphiteStats.createMeasure("counts.deamon.packets_received", "Stats_counts - deamom - packets_received", "num");
+  protected final Measure mStats_timers_count = mgGraphiteStats.createMeasure("timers.count", "Stats - timers - count", "num");
+  protected final Measure mStats_timers_count_90 = mgGraphiteStats.createMeasure("timers.count_90", "Stats - timers - count_90", "num");
+  protected final Measure mStats_timers_count_ps = mgGraphiteStats.createMeasure("timers.count_ps", "Stats - timers - count_ps", "num");
+  protected final Measure mStats_timers_lower = mgGraphiteStats.createMeasure("timers.lower", "Stats - timers - lower", "ms");
+  protected final Measure mStats_timers_lower_90 = mgGraphiteStats.createMeasure("timers.lower_90", "Stats - timers - lower_90", "ms");
+  protected final Measure mStats_timers_lower_ps = mgGraphiteStats.createMeasure("timers.lower_ps", "Stats - timers - lower_ps", "ms");
+  protected final Measure mStats_timers_mean = mgGraphiteStats.createMeasure("timers.mean", "Stats - timers - mean", "ms");
+  protected final Measure mStats_timers_mean_90 = mgGraphiteStats.createMeasure("timers.mean_90", "Stats - timers - mean_90", "ms");
+  protected final Measure mStats_timers_mean_ps = mgGraphiteStats.createMeasure("timers.mean_ps", "Stats - timers - mean_ps", "ms");
+  protected final Measure mStats_timers_median = mgGraphiteStats.createMeasure("timers.median", "Stats - timers - median", "ms");
+  protected final Measure mStats_timers_std = mgGraphiteStats.createMeasure("timers.std", "Stats - timers - std", "ms");
+  protected final Measure mStats_timers_sum = mgGraphiteStats.createMeasure("timers.sum", "Stats - timers - sum", "ms");
+  protected final Measure mStats_timers_sum_90 = mgGraphiteStats.createMeasure("timers.sum_90", "Stats - timers - sum_90", "ms");
+  protected final Measure mStats_timers_sum_ps = mgGraphiteStats.createMeasure("timers.sum_ps", "Stats - timers - sum_ps", "ms");
+  protected final Measure mStats_timers_sum_squares = mgGraphiteStats.createMeasure("timers.sum_squares", "Stats - timers - sum_squares", "num");
+  protected final Measure mStats_timers_sum_squares_90 = mgGraphiteStats.createMeasure("timers.sum_squares_90", "Stats - timers - sum_squares_90", "num");
+  protected final Measure mStats_timers_sum_squares_ps = mgGraphiteStats.createMeasure("timers.sum_squares_ps", "Stats - timers - sum_squares_ps", "num");
+  protected final Measure mStats_timers_upper = mgGraphiteStats.createMeasure("timers.upper", "Stats - timers - upper", "ms");
+  protected final Measure mStats_timers_upper_90 = mgGraphiteStats.createMeasure("timers.upper_90", "Stats - timers - upper_90", "ms");
+  protected final Measure mStats_timers_upper_ps = mgGraphiteStats.createMeasure("timers.upper_ps", "Stats - timers - upper_ps", "ms");
+  protected final Measure mStats_Others = mgGraphiteStats.createMeasure("Others", "Others - Stats", "num");
   // Configuration
   protected static StringParameter _graphiteURL = new StringParameter(ServerMonitor.params, "graphiteURL", "http://{host}");
   protected static BooleanParameter _allMetrics = new BooleanParameter(ServerMonitor.params, "allMetrics", false);
@@ -126,6 +129,18 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   protected static StringParameter _until = new StringParameter(ServerMonitor.params, "until", null);
   protected static IntegerParameter _groupLevel = new IntegerParameter(ServerMonitor.params, "groupLevel", -1);
   protected static StringParameter _tagPrefix = new StringParameter(ServerMonitor.params, "tagPrefix", "graphite.");
+  static { // Configuration metadata
+    GraphiteMonitor._graphiteURL.setLabel("Graphite URL").setDescription("Enter the URL to Graphite service. {host} will be replaced with target host. Example: 'http://{host}:8888'.");
+    GraphiteMonitor._allMetrics.setLabel("All metrics extraction").setDescription("All metrics extraction");
+    GraphiteMonitor._systemMetrics.setLabel("System metrics extraction").setDescription("System metrics extraction");
+    GraphiteMonitor._customMetrics.setLabel("Custom metrics extraction").setDescription("Custom metrics extraction");
+    GraphiteMonitor._target.setLabel("Custom metrics to extract").setDescription("Custom metrics to extract");
+    GraphiteMonitor._mapping.setLabel("Custom metrics mapping").setDescription("Custom metrics mapping");
+    GraphiteMonitor._from.setLabel("Time range (from)").setDescription("Time range (from)");
+    GraphiteMonitor._until.setLabel("Time range (to)").setDescription("Time range (to)");
+    GraphiteMonitor._groupLevel.setLabel("Group level").setDescription("Group level");
+    GraphiteMonitor._tagPrefix.setLabel("Tag prefix").setDescription("Tag prefix");
+  }
   //
   protected String config_graphiteURL;
   protected boolean config_allMetrics;
@@ -174,7 +189,7 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
       final RuleEntry e = new RuleEntry();
       e.regex = Pattern.compile(r.get(0));
       if (isSystemRule) {
-        e.metric = mgGraphite.find(r.get(1), false);
+        e.metric = mgGraphite.find(r.get(1), false, true);
       }
       else {
         e.metric = mServerResult;
@@ -197,12 +212,6 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
       }
       result.add(x.trim());
     }
-  }
-
-  @Override
-  public void loadMetricGroup(final List<MetricGroup> groups) {
-    super.loadMetricGroup(groups);
-    groups.add(mgGraphite);
   }
 
   @Override

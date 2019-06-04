@@ -20,7 +20,6 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.json.JSONObject;
@@ -45,7 +44,7 @@ public class ElasticSearchMonitor extends GenericHTTPMonitor {
 
   protected static final String CONFIG_ELASTICURL = "elasticURL";
 
-  protected final MetricGroup mgElasticSearch = new MetricGroup("ElasticSearch Statistics", "ElasticSearch - {0}");
+  protected final MetricGroup mgElasticSearch = new MetricGroup(mgMonitor, "ElasticSearch Statistics", "ElasticSearch - {0}");
   protected final Measure mActivePrimaryShards = mgElasticSearch.createMeasure("ActivePrimaryShards", "The number of primary shards that are used across the cluster", "number");
   protected final Measure mActiveShards = mgElasticSearch.createMeasure("ActiveShards", "The number of shards (primary and replica) that are used across the cluster", "number");
   protected final Measure mActiveShardsPercent = mgElasticSearch.createMeasure("ActiveShardsPercent", "Percentage of shards that are active, a green cluster should have 100% here", "percent");
@@ -92,12 +91,6 @@ public class ElasticSearchMonitor extends GenericHTTPMonitor {
   protected final Measure mUnassignedShards = mgElasticSearch.createMeasure("UnassignedShards", "The number of shards that are currently uninitialized", "number");
 
   private String baseURL;
-
-  @Override
-  public void loadMetricGroup(final List<MetricGroup> groups) {
-    super.loadMetricGroup(groups);
-    groups.add(mgElasticSearch);
-  }
 
   @Override
   public boolean preCheck(final InetAddress host) throws CommandException {

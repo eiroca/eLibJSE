@@ -36,7 +36,7 @@ public class TestJSON1 {
     }
   }
 
-  public MetricGroup mgeSysAdm = new MetricGroup("eSysAdm Monitor", "FLUME - {0}");
+  public MetricGroup mgeSysAdm = new MetricGroup(null, "eSysAdm Monitor", "FLUME - {0}");
   public Measure mAppendAcceptedCount = mgeSysAdm.createMeasure("AppendAcceptedCount");
   public Measure mAppendBatchAcceptedCount = mgeSysAdm.createMeasure("AppendBatchAcceptedCount");
   public Measure mAppendBatchReceivedCount = mgeSysAdm.createMeasure("AppendBatchReceivedCount");

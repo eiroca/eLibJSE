@@ -16,7 +16,6 @@
  **/
 package net.eiroca.library.diagnostics.monitors;
 
-import java.util.List;
 import net.eiroca.library.db.DBConfig;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.diagnostics.util.SQLchecks;
@@ -26,31 +25,34 @@ import net.eiroca.library.system.IContext;
 
 public class PostgreSQLMonitor extends DatabaseMonitor {
 
-  protected final MetricGroup mgPostgreSQL = new MetricGroup("PostgreSQL Statistics", "PostgreSQL - {0}");
-  protected final Measure mblk_read_time = mgPostgreSQL.createMeasure("blk_read_time", "blk_read_time", "number");
-  protected final Measure mblk_write_time = mgPostgreSQL.createMeasure("blk_write_time", "blk_write_time", "number");
-  protected final Measure mblks_hit = mgPostgreSQL.createMeasure("blks_hit", "blks_hit", "number");
-  protected final Measure mblks_read = mgPostgreSQL.createMeasure("blks_read", "blks_read", "number");
-  protected final Measure mconflicts = mgPostgreSQL.createMeasure("conflicts", "conflicts", "number");
-  protected final Measure mdeadlocks = mgPostgreSQL.createMeasure("deadlocks", "deadlocks", "number");
-  protected final Measure mheap_hit = mgPostgreSQL.createMeasure("heap_hit", "heap_hit", "number");
-  protected final Measure mheap_ratio = mgPostgreSQL.createMeasure("heap_ratio", "heap_ratio", "number");
-  protected final Measure mheap_read = mgPostgreSQL.createMeasure("heap_read", "heap_read", "number");
-  protected final Measure midx_hit = mgPostgreSQL.createMeasure("idx_hit", "idx_hit", "number");
-  protected final Measure midx_ratio = mgPostgreSQL.createMeasure("idx_ratio", "idx_ratio", "number");
-  protected final Measure midx_read = mgPostgreSQL.createMeasure("idx_read", "idx_read", "number");
-  protected final Measure mnumbackends = mgPostgreSQL.createMeasure("numbackends", "numbackends", "number");
-  protected final Measure mstat_activity = mgPostgreSQL.createMeasure("stat_activity", "stat_activity", "number");
-  protected final Measure mtemp_bytes = mgPostgreSQL.createMeasure("temp_bytes", "temp_bytes", "number");
-  protected final Measure mtup_deleted = mgPostgreSQL.createMeasure("tup_deleted", "tup_deleted", "number");
-  protected final Measure mtup_fetched = mgPostgreSQL.createMeasure("tup_fetched", "tup_fetched", "number");
-  protected final Measure mtup_inserted = mgPostgreSQL.createMeasure("tup_inserted", "tup_inserted", "number");
-  protected final Measure mtup_returned = mgPostgreSQL.createMeasure("tup_returned", "tup_returned", "number");
-  protected final Measure mtup_updated = mgPostgreSQL.createMeasure("tup_updated", "tup_updated", "number");
-  protected final Measure mxact_commit = mgPostgreSQL.createMeasure("xact_commit", "xact_commit", "number");
-  protected final Measure mxact_rollback = mgPostgreSQL.createMeasure("xact_rollback", "xact_rollback", "number");
-
-  protected final MetricGroup mgPostgreSQLTables = new MetricGroup("PostgreSQL Statistics", "PostgreSQL - Tables - {0}");
+  //
+  protected final MetricGroup mgPostgreSQL = new MetricGroup(mgMonitor, "PostgreSQL Statistics", "PostgreSQL - {0}");
+  //
+  protected final MetricGroup mgPostgreSQLStats = new MetricGroup(mgPostgreSQL, "PostgreSQL Stats", "PostgreSQL - {0}");
+  protected final Measure mblk_read_time = mgPostgreSQLStats.createMeasure("blk_read_time", "blk_read_time", "number");
+  protected final Measure mblk_write_time = mgPostgreSQLStats.createMeasure("blk_write_time", "blk_write_time", "number");
+  protected final Measure mblks_hit = mgPostgreSQLStats.createMeasure("blks_hit", "blks_hit", "number");
+  protected final Measure mblks_read = mgPostgreSQLStats.createMeasure("blks_read", "blks_read", "number");
+  protected final Measure mconflicts = mgPostgreSQLStats.createMeasure("conflicts", "conflicts", "number");
+  protected final Measure mdeadlocks = mgPostgreSQLStats.createMeasure("deadlocks", "deadlocks", "number");
+  protected final Measure mheap_hit = mgPostgreSQLStats.createMeasure("heap_hit", "heap_hit", "number");
+  protected final Measure mheap_ratio = mgPostgreSQLStats.createMeasure("heap_ratio", "heap_ratio", "number");
+  protected final Measure mheap_read = mgPostgreSQLStats.createMeasure("heap_read", "heap_read", "number");
+  protected final Measure midx_hit = mgPostgreSQLStats.createMeasure("idx_hit", "idx_hit", "number");
+  protected final Measure midx_ratio = mgPostgreSQLStats.createMeasure("idx_ratio", "idx_ratio", "number");
+  protected final Measure midx_read = mgPostgreSQLStats.createMeasure("idx_read", "idx_read", "number");
+  protected final Measure mnumbackends = mgPostgreSQLStats.createMeasure("numbackends", "numbackends", "number");
+  protected final Measure mstat_activity = mgPostgreSQLStats.createMeasure("stat_activity", "stat_activity", "number");
+  protected final Measure mtemp_bytes = mgPostgreSQLStats.createMeasure("temp_bytes", "temp_bytes", "number");
+  protected final Measure mtup_deleted = mgPostgreSQLStats.createMeasure("tup_deleted", "tup_deleted", "number");
+  protected final Measure mtup_fetched = mgPostgreSQLStats.createMeasure("tup_fetched", "tup_fetched", "number");
+  protected final Measure mtup_inserted = mgPostgreSQLStats.createMeasure("tup_inserted", "tup_inserted", "number");
+  protected final Measure mtup_returned = mgPostgreSQLStats.createMeasure("tup_returned", "tup_returned", "number");
+  protected final Measure mtup_updated = mgPostgreSQLStats.createMeasure("tup_updated", "tup_updated", "number");
+  protected final Measure mxact_commit = mgPostgreSQLStats.createMeasure("xact_commit", "xact_commit", "number");
+  protected final Measure mxact_rollback = mgPostgreSQLStats.createMeasure("xact_rollback", "xact_rollback", "number");
+  //
+  protected final MetricGroup mgPostgreSQLTables = new MetricGroup(mgPostgreSQL, "PostgreSQL Tables", "PostgreSQL - Tables - {0}");
   protected final Measure mTables_analyze_count = mgPostgreSQLTables.createMeasure("Tables - analyze_count", "Tables - analyze_count", "number");
   protected final Measure mTables_autoanalyze_count = mgPostgreSQLTables.createMeasure("Tables - autoanalyze_count", "Tables - autoanalyze_count", "number");
   protected final Measure mTables_autovacuum_count = mgPostgreSQLTables.createMeasure("Tables - autovacuum_count", "Tables - autovacuum_count", "number");
@@ -74,26 +76,17 @@ public class PostgreSQLMonitor extends DatabaseMonitor {
   protected final Measure mTables_toast_blks_hit = mgPostgreSQLTables.createMeasure("Tables - toast_blks_hit", "Tables - toast_blks_hit", "number");
   protected final Measure mTables_toast_blks_read = mgPostgreSQLTables.createMeasure("Tables - toast_blks_read", "Tables - toast_blks_read", "number");
   protected final Measure mTables_vacuum_count = mgPostgreSQLTables.createMeasure("Tables - vacuum_count", "Tables - vacuum_count", "number");
-
-  protected final MetricGroup mgPostgreSQLIndexes = new MetricGroup("PostgreSQL Statistics", "PostgreSQL - Indexes - {0}");
+  //
+  protected final MetricGroup mgPostgreSQLIndexes = new MetricGroup(mgPostgreSQL, "PostgreSQL Indexes", "PostgreSQL - Indexes - {0}");
   protected final Measure mIndexes_idx_blks_hit = mgPostgreSQLIndexes.createMeasure("idx_blks_hit", "Indexes - idx_blks_hit", "number");
   protected final Measure mIndexes_idx_blks_read = mgPostgreSQLIndexes.createMeasure("idx_blks_read", "Indexes - idx_blks_read", "number");
   protected final Measure mIndexes_idx_scan = mgPostgreSQLIndexes.createMeasure("idx_scan", "Indexes - idx_scan", "number");
   protected final Measure mIndexes_idx_tup_fetch = mgPostgreSQLIndexes.createMeasure("idx_tup_fetch", "Indexes - idx_tup_fetch", "number");
   protected final Measure mIndexes_idx_tup_read = mgPostgreSQLIndexes.createMeasure("idx_tup_read", "Indexes - idx_tup_read", "number");
-
-  protected final MetricGroup mgPostgreSQLSequences = new MetricGroup("PostgreSQL Statistics", "PostgreSQL - Sequences - {0}");
+  //
+  protected final MetricGroup mgPostgreSQLSequences = new MetricGroup(mgPostgreSQL, "PostgreSQL Sequences", "PostgreSQL - Sequences - {0}");
   protected final Measure mSequences_blks_read = mgPostgreSQLSequences.createMeasure("blks_read", "blks_read", "number");
   protected final Measure mSequences_blks_hit = mgPostgreSQLSequences.createMeasure("blks_hit", "blks_hit", "number");
-
-  @Override
-  public void loadMetricGroup(final List<MetricGroup> groups) {
-    super.loadMetricGroup(groups);
-    groups.add(mgPostgreSQL);
-    groups.add(mgPostgreSQLTables);
-    groups.add(mgPostgreSQLIndexes);
-    groups.add(mgPostgreSQLSequences);
-  }
 
   @Override
   public void readConf() throws CommandException {
@@ -108,7 +101,7 @@ public class PostgreSQLMonitor extends DatabaseMonitor {
   public void setup(final IContext context) throws CommandException {
     super.setup(context);
     checks = new SQLchecks[] {
-        new SQLchecks(mgPostgreSQL, "/sql/postgres_metrics.sql"), //
+        new SQLchecks(mgPostgreSQLStats, "/sql/postgres_metrics.sql"), //
         new SQLchecks(mgPostgreSQLTables, "/sql/postgres_table.sql", 2, "Table"), //
         new SQLchecks(mgPostgreSQLIndexes, "/sql/postgres_index.sql", 2, "Index"), //
         new SQLchecks(mgPostgreSQLSequences, "/sql/postgres_sequence.sql", 2, "Sequence"), //

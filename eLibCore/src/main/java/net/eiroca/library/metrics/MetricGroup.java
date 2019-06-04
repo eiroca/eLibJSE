@@ -23,6 +23,9 @@ import net.eiroca.library.metrics.derived.IDerivedMeasure;
 public class MetricGroup {
 
   private final List<IMetric<?>> metrics = new ArrayList<>();
+  private final List<MetricGroup> subGroups = new ArrayList<>();
+  private boolean allowMetrics = true;
+
   private String name;
   private String measureNameFormat = "{0}";
 
@@ -42,16 +45,31 @@ public class MetricGroup {
     return metrics;
   }
 
-  public MetricGroup(final String name) {
-    this(name, "{0}");
+  public void loadMetrics(List<IMetric<?>> metricsList, boolean recursive) {
+    metricsList.addAll(metrics);
+    if (recursive) {
+      for (MetricGroup mg : subGroups) {
+        mg.loadMetrics(metricsList, true);
+      }
+    }
   }
 
-  public MetricGroup(final String name, final String measureNameFormat) {
+  public MetricGroup(MetricGroup parent, final String name) {
+    this(parent, name, "{0}");
+  }
+
+  public MetricGroup(MetricGroup parent, final String name, final String measureNameFormat) {
     this.name = name;
     this.measureNameFormat = measureNameFormat;
+    if (parent != null) parent.add(this);
+  }
+
+  public void add(final MetricGroup group) {
+    subGroups.add(group);
   }
 
   public Measure add(final Measure measure) {
+    if (!allowMetrics) throw new IllegalStateException("Metric not allowed!");
     metrics.add(measure);
     return measure;
   }
@@ -69,12 +87,18 @@ public class MetricGroup {
     return false;
   }
 
-  public IMetric<?> find(final String measureName, final boolean createIfMissing) {
+  public IMetric<?> find(final String measureName, final boolean createIfMissing, final boolean recursive) {
     IMetric<?> m = null;
     for (final IMetric<?> cur : metrics) {
       if (isNamed(cur, measureName)) {
         m = cur;
         break;
+      }
+    }
+    if ((m == null) && recursive && (subGroups.size() > 0)) {
+      for (MetricGroup mg : subGroups) {
+        m = mg.find(measureName, false, true);
+        if (m != null) break;
       }
     }
     if ((m == null) && createIfMissing) {
@@ -84,12 +108,12 @@ public class MetricGroup {
   }
 
   public void setValue(final String metricName, final double metricValue) {
-    final IMetric<?> m = find(metricName, true);
+    final IMetric<?> m = find(metricName, true, true);
     m.setValue(metricValue);
   }
 
   public void setValue(final String metricName, final String splitName, final String split, final double metricValue) {
-    final IMetric<?> m = find(metricName, true);
+    final IMetric<?> m = find(metricName, true, true);
     final IMetric<?> ms = m.getSplitting(splitName, split);
     ms.setValue(metricValue);
   }
@@ -138,7 +162,7 @@ public class MetricGroup {
     definition.setUnit(unit);
     definition.setRate(rate);
     m.metadata = definition;
-    return null;
+    return add(m);
   }
 
   public Measure createMeasure(final String name) {
@@ -172,6 +196,18 @@ public class MetricGroup {
     definition.setUnit(unit);
     definition.setCalcDelta(calcDelta);
     return add(new Measure(definition));
+  }
+
+  public boolean allowsMetrics() {
+    return allowMetrics;
+  }
+
+  public void setAllowMetrics(boolean allowMetrics) {
+    this.allowMetrics = allowMetrics;
+  }
+
+  public List<MetricGroup> getGroups() {
+    return subGroups;
   }
 
 }

@@ -19,22 +19,15 @@ package net.eiroca.library.diagnostics.monitors;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.List;
 import org.json.JSONObject;
 import net.eiroca.ext.library.http.utils.URLFetcherConfig;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.diagnostics.util.ReturnObject;
-import net.eiroca.library.metrics.MetricGroup;
 
 public class RESTServerMonitor extends GenericHTTPMonitor {
 
   public RESTServerMonitor() {
     super();
-  }
-
-  @Override
-  public void loadMetricGroup(final List<MetricGroup> groups) {
-    super.loadMetricGroup(groups);
   }
 
   @Override

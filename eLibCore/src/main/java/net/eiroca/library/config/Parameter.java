@@ -28,6 +28,10 @@ public abstract class Parameter<T extends Object> {
   protected boolean nullable;
   private T defValue;
 
+  protected String label;
+
+  protected String description;
+
   public Parameter(final Parameters owner, final String paramName) {
     this(owner, paramName, null, true, false);
   }
@@ -112,6 +116,24 @@ public abstract class Parameter<T extends Object> {
     final T v = get();
     sb.append(v == null ? "_NULL_" : v);
     return sb.toString();
+  }
+
+  public String getLabel() {
+    return label;
+  }
+
+  public Parameter<T> setLabel(String label) {
+    this.label = label;
+    return this;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public Parameter<T> setDescription(String description) {
+    this.description = description;
+    return this;
   }
 
 }

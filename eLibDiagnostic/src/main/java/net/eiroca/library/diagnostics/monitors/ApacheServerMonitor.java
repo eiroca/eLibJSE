@@ -18,7 +18,6 @@ package net.eiroca.library.diagnostics.monitors;
 
 import java.net.InetAddress;
 import java.net.URL;
-import java.util.List;
 import java.util.StringTokenizer;
 import net.eiroca.ext.library.http.utils.URLFetcherConfig;
 import net.eiroca.ext.library.http.utils.URLFetcherException;
@@ -32,7 +31,9 @@ public class ApacheServerMonitor extends GenericHTTPMonitor {
   private static final String CONFIG_MODSTATUSURL = "modStatusURL";
 
   // measurement variables
-  protected final MetricGroup mgApachePerformance = new MetricGroup("Apache Performance", "Apache - {0}");
+  protected final MetricGroup mgApache = new MetricGroup(mgMonitor, "Apache Statistics", "Apache - {0}");
+  //
+  protected final MetricGroup mgApachePerformance = new MetricGroup(mgApache, "Apache Performance", "Apache - {0}");
   protected final Measure totalAccesses = mgApachePerformance.createMeasure("TotalAccesses", "Total count of requests to the Apache server", "counter");
   protected final Measure totalkBytes = mgApachePerformance.createMeasure("TotalBytes", "Total amount of megabytes served by the Apache server", "megabytes");
   protected final Measure cpuLoad = mgApachePerformance.createMeasure("CPULoad", "Current CPU load of the Apache server", "percent");
@@ -43,8 +44,8 @@ public class ApacheServerMonitor extends GenericHTTPMonitor {
   protected final Measure busyWorkers = mgApachePerformance.createMeasure("BusyWorkers", "The number of worker serving requests", "number");
   protected final Measure idleWorkers = mgApachePerformance.createMeasure("IdleWorkers", "The number of idle worker", "number");
   protected final Measure workersUtilization = mgApachePerformance.createMeasure("WorkersUtilization", "Shows how utilized the server is, consider increasing the workers thread pool. If this reaches 100% no more connections are accepted by Apache", "number");
-
-  protected final MetricGroup mgApacheScoreboard = new MetricGroup("Apache Scoreboard", "Apache - Scoreboard - {0}");
+  //
+  protected final MetricGroup mgApacheScoreboard = new MetricGroup(mgApache, "Apache Scoreboard", "Apache - Scoreboard - {0}");
   protected final Measure sbClosingConnection = mgApacheScoreboard.createMeasure("Closing connection", "Closing connection", "number");
   protected final Measure sbDnsLookup = mgApacheScoreboard.createMeasure("DNS Lookup", "DNS lookup", "number");
   protected final Measure sbGracefullyFinishing = mgApacheScoreboard.createMeasure("Gracefully finishing", "Gracefully finishing", "number");
@@ -120,13 +121,6 @@ public class ApacheServerMonitor extends GenericHTTPMonitor {
       CommandException.Invalid("Parsing mod_status response failed");
     }
     return true;
-  }
-
-  @Override
-  public void loadMetricGroup(final List<MetricGroup> groups) {
-    super.loadMetricGroup(groups);
-    groups.add(mgApachePerformance);
-    groups.add(mgApacheScoreboard);
   }
 
   public void parseModStatus(final String theData) {

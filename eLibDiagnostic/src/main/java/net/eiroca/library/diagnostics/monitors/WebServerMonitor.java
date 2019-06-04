@@ -17,7 +17,6 @@
 package net.eiroca.library.diagnostics.monitors;
 
 import java.net.InetAddress;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONArray;
@@ -51,27 +50,20 @@ public class WebServerMonitor extends GenericHTTPMonitor {
   private String config_probeType;
   private Pattern config_probeRegEx;
 
-  MetricGroup mgHTTPMonitor = new MetricGroup("HTTP Monitor", "WebServer - {0}");
+  MetricGroup mgHTTPMonitor = new MetricGroup(mgMonitor, "HTTP Statistics", "WebServer - {0}");
   Measure smHeaderSize = mgHTTPMonitor.createMeasure("HeaderSize", "Size of HTTP headers", "bytes");
   Measure smResponseSize = mgHTTPMonitor.createMeasure("Response Size", "Response Size", "bytes");
   Measure smResponseThroughput = mgHTTPMonitor.createMeasure("Throughput", "Throughput", "kilobytes", "s");
   Measure smHTTPStatusCode = mgHTTPMonitor.createMeasure("HttpStatusCode", "HTTP status code", "number");
   Measure smConnCloseDelay = mgHTTPMonitor.createMeasure("ConnectionCloseDelay", "Connection close delay", "ms");
 
-  MetricGroup mgProbe = new MetricGroup("Probe Monitor", "Probe - {0}");
+  MetricGroup mgProbe = new MetricGroup(mgMonitor, "Probe Statistics", "Probe - {0}");
   Measure smProbeResult = mgProbe.createMeasure("Result", "Probe result", "number");
   Measure smProbeStatus = mgProbe.createMeasure("Status", "Probe status", "number");
-  Measure smProbeRows = mgProbe.createMeasure("Rows", "Probe number of rows returned ", "number");
+  Measure smProbeRows = mgProbe.createMeasure("Rows", "Probe number of rows returned", "number");
 
   protected boolean defaultHasProbe = true;
   protected boolean urlCheck;
-
-  @Override
-  public void loadMetricGroup(final List<MetricGroup> groups) {
-    super.loadMetricGroup(groups);
-    groups.add(mgHTTPMonitor);
-    groups.add(mgProbe);
-  }
 
   @Override
   public ReturnObject fetchResponse() throws CommandException {
