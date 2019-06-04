@@ -29,6 +29,16 @@ public class MetricGroup {
   private String name;
   private String measureNameFormat = "{0}";
 
+  public MetricGroup(MetricGroup parent, final String name) {
+    this(parent, name, "{0}");
+  }
+
+  public MetricGroup(MetricGroup parent, final String name, final String measureNameFormat) {
+    this.name = name;
+    this.measureNameFormat = measureNameFormat;
+    if (parent != null) parent.add(this);
+  }
+
   public String getMeasureNameFormat() {
     return measureNameFormat;
   }
@@ -52,16 +62,6 @@ public class MetricGroup {
         mg.loadMetrics(metricsList, true);
       }
     }
-  }
-
-  public MetricGroup(MetricGroup parent, final String name) {
-    this(parent, name, "{0}");
-  }
-
-  public MetricGroup(MetricGroup parent, final String name, final String measureNameFormat) {
-    this.name = name;
-    this.measureNameFormat = measureNameFormat;
-    if (parent != null) parent.add(this);
   }
 
   public void add(final MetricGroup group) {
