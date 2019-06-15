@@ -22,6 +22,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.MessageFormat;
+import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.system.IConfig;
 import net.eiroca.library.system.IContext;
@@ -87,7 +88,7 @@ public class DBQuery {
   public void setColumns(final String columns) {
     this.columns = columns;
     if (columns != null) {
-      readColName = net.eiroca.library.core.Helper.split(columns, true);
+      readColName = Helper.split(columns, true);
     }
     else {
       readColName = null;
@@ -107,7 +108,7 @@ public class DBQuery {
       }
       catch (final SQLException e) {
         succed = false;
-        errorDesc = net.eiroca.library.core.Helper.getExceptionAsString(e, true);
+        errorDesc = Helper.getExceptionAsString(e, true);
         log.error(errorDesc);
       }
     }
@@ -165,7 +166,7 @@ public class DBQuery {
       EOF = false;
     }
     catch (final Exception e) {
-      net.eiroca.library.core.Helper.close(rs, stmt);
+      Helper.close(rs, stmt);
       succed = false;
       errorDesc = MessageFormat.format("{0}: {1}", e.getClass().getName(), e.getMessage());
       log.error(errorDesc);
@@ -178,7 +179,7 @@ public class DBQuery {
   }
 
   public void close() {
-    net.eiroca.library.core.Helper.close(rs, stmt);
+    Helper.close(rs, stmt);
     rs = null;
     stmt = null;
     EOF = true;
@@ -223,24 +224,33 @@ public class DBQuery {
   }
 
   public double getDouble(final String columnName, final double defVal) {
-    return net.eiroca.library.core.Helper.getDouble(getString(columnName, null), defVal);
+    return Helper.getDouble(getString(columnName, null), defVal);
   }
 
   public double getDouble(final int colNum, final double defVal) {
-    return net.eiroca.library.core.Helper.getDouble(getString(colNum, null), defVal);
+    return Helper.getDouble(getString(colNum, null), defVal);
   }
 
   public String getString(final String columnName, final String defVal) {
-    int colNum = 0;
+    if (LibStr.isEmptyOrNull(columnName)) return defVal;
+    int colNum = -1;
+    try {
+      colNum = rs.findColumn(columnName);
+    }
+    catch (SQLException e1) {
+      colNum = Helper.getInt(columnName, -1);
+    }
+    if (colNum < 0) {
+      errorDesc = "Invalid column: " + columnName;
+      log.error(errorDesc);
+      return defVal;
+    }
     String colVal = null;
     try {
-      if (!LibStr.isEmptyOrNull(columnName)) {
-        colNum = rs.findColumn(columnName);
-      }
       colVal = rs.getString(colNum);
     }
     catch (final SQLException e) {
-      errorDesc = "Error: " + e.getMessage();
+      errorDesc = columnName + " -> error: " + e.getMessage();
       log.error(errorDesc);
     }
     return colVal == null ? defVal : colVal;
@@ -252,7 +262,13 @@ public class DBQuery {
       colVal = rs.getString(colNum);
     }
     catch (final SQLException e) {
-      errorDesc = "Error: " + e.getMessage();
+      int n = -1;
+      try {
+        n = rs.getMetaData().getColumnCount();
+      }
+      catch (SQLException e1) {
+      }
+      errorDesc = colNum + " / " + n + " -> error: " + e.getMessage();
       log.error(errorDesc);
     }
     return colVal == null ? defVal : colVal;

@@ -49,9 +49,7 @@ public class Datum implements IDatum {
 
   @Override
   public String toString() {
-    final StringBuilder sb = new StringBuilder();
-    sb.append(value);
-    return sb.toString();
+    return (timeStamp == 0) ? "?" : String.valueOf(value);
   }
 
   @Override

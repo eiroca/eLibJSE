@@ -21,8 +21,8 @@ import net.eiroca.library.diagnostics.actions.LocalCommandAction;
 import net.eiroca.library.diagnostics.actions.SSHCommandAction;
 import net.eiroca.library.diagnostics.actions.WebServiceAction;
 import net.eiroca.library.diagnostics.monitors.ApacheServerMonitor;
+import net.eiroca.library.diagnostics.monitors.DataPowerMonitor;
 import net.eiroca.library.diagnostics.monitors.DatabaseMonitor;
-import net.eiroca.library.diagnostics.monitors.DatapowerMonitor;
 import net.eiroca.library.diagnostics.monitors.ElasticSearchMonitor;
 import net.eiroca.library.diagnostics.monitors.FLUMEServerMonitor;
 import net.eiroca.library.diagnostics.monitors.GraphiteMonitor;
@@ -52,7 +52,7 @@ public class ServerMonitors {
     ServerMonitors.registry.addEntry("SSH command", SSHCommandAction.class.getName());
     ServerMonitors.registry.addEntry("Local command", LocalCommandAction.class.getName());
     ServerMonitors.registry.addEntry("Graphite Server", GraphiteMonitor.class.getName());
-    ServerMonitors.registry.addEntry("DataPower Server", DatapowerMonitor.class.getName());
+    ServerMonitors.registry.addEntry("DataPower Server", DataPowerMonitor.class.getName());
   }
 
   public static IServerMonitor build(final String name) throws Exception {

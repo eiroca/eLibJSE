@@ -70,16 +70,28 @@ public class DBConfig {
   String sqlclass;
   boolean prepared = false;
 
-  private static HashMap<String, String> drivers = new HashMap<>();
+  final static class DriverInfo {
+
+    String className;
+    boolean legacy;
+
+    public DriverInfo(String className, boolean legacy) {
+      super();
+      this.className = className;
+      this.legacy = legacy;
+    }
+  }
+
+  private static HashMap<String, DriverInfo> drivers = new HashMap<>();
   private static HashMap<String, String> urlTemplate = new HashMap<>();
   static {
-    DBConfig.drivers.put(DBConfig.TYPE_SQLSERVER, "com.microsoft.sqlserver.jdbc.SQLServerDriver");
-    DBConfig.drivers.put(DBConfig.TYPE_ORACLE, "oracle.jdbc.driver.OracleDriver");
-    DBConfig.drivers.put(DBConfig.TYPE_DB2, "com.ibm.db2.jcc.DB2Driver");
-    DBConfig.drivers.put(DBConfig.TYPE_INGRES, "com.ingres.jdbc.IngresDriver");
-    DBConfig.drivers.put(DBConfig.TYPE_POSTGRES, "org.postgresql.Driver");
-    DBConfig.drivers.put(DBConfig.TYPE_MYSQL, "com.mysql.jdbc.Driver");
-    DBConfig.drivers.put(DBConfig.TYPE_IBMNETEZZA, "org.netezza.Driver");
+    DBConfig.drivers.put(DBConfig.TYPE_SQLSERVER, new DriverInfo("com.microsoft.sqlserver.jdbc.SQLServerDriver", true));
+    DBConfig.drivers.put(DBConfig.TYPE_ORACLE, new DriverInfo("oracle.jdbc.driver.OracleDriver", true));
+    DBConfig.drivers.put(DBConfig.TYPE_DB2, new DriverInfo("com.ibm.db2.jcc.DB2Driver", true));
+    DBConfig.drivers.put(DBConfig.TYPE_INGRES, new DriverInfo("com.ingres.jdbc.IngresDriver", false));
+    DBConfig.drivers.put(DBConfig.TYPE_POSTGRES, new DriverInfo("org.postgresql.Driver", true));
+    DBConfig.drivers.put(DBConfig.TYPE_MYSQL, new DriverInfo("com.mysql.jdbc.Driver", true));
+    DBConfig.drivers.put(DBConfig.TYPE_IBMNETEZZA, new DriverInfo("org.netezza.Driver", true));
     //
     DBConfig.urlTemplate.put(DBConfig.TYPE_SQLSERVER, null);
     DBConfig.urlTemplate.put(DBConfig.TYPE_ORACLE, null);
@@ -139,17 +151,20 @@ public class DBConfig {
      */
     lastError = null;
     connectionUrl = null;
-    sqlclass = DBConfig.drivers.get(SQLType);
-    if (sqlclass == null) {
+    DriverInfo info = DBConfig.drivers.get(SQLType);
+    if (info == null) {
       lastError = new Exception("Unknown SQLType: " + SQLType);
       return false;
     }
-    try {
-      Class.forName(sqlclass);
-    }
-    catch (final ClassNotFoundException e) {
-      lastError = new Exception("Invalid JDBC driver: " + sqlclass);
-      return false;
+    sqlclass = info.className;
+    if (info.legacy) {
+      try {
+        Class.forName(sqlclass);
+      }
+      catch (final ClassNotFoundException e) {
+        lastError = new Exception("Invalid JDBC driver: " + sqlclass);
+        return false;
+      }
     }
     String template;
     if (LibStr.isNotEmptyOrNull(URL)) {

@@ -33,7 +33,7 @@ public class ApacheServerMonitor extends GenericHTTPMonitor {
   // measurement variables
   protected final MetricGroup mgApache = new MetricGroup(mgMonitor, "Apache Statistics", "Apache - {0}");
   //
-  protected final MetricGroup mgApachePerformance = new MetricGroup(mgApache, "Apache Performance", "Apache - {0}");
+  protected final MetricGroup mgApachePerformance = new MetricGroup(mgApache, "Apache Performance", "Performance - {0}");
   protected final Measure totalAccesses = mgApachePerformance.createMeasure("TotalAccesses", "Total count of requests to the Apache server", "counter");
   protected final Measure totalkBytes = mgApachePerformance.createMeasure("TotalBytes", "Total amount of megabytes served by the Apache server", "megabytes");
   protected final Measure cpuLoad = mgApachePerformance.createMeasure("CPULoad", "Current CPU load of the Apache server", "percent");
@@ -43,9 +43,9 @@ public class ApacheServerMonitor extends GenericHTTPMonitor {
   protected final Measure bytesPerReq = mgApachePerformance.createMeasure("BytesPerReq", "Bytes sent per request", "bytes", "request");
   protected final Measure busyWorkers = mgApachePerformance.createMeasure("BusyWorkers", "The number of worker serving requests", "number");
   protected final Measure idleWorkers = mgApachePerformance.createMeasure("IdleWorkers", "The number of idle worker", "number");
-  protected final Measure workersUtilization = mgApachePerformance.createMeasure("WorkersUtilization", "Shows how utilized the server is, consider increasing the workers thread pool. If this reaches 100% no more connections are accepted by Apache", "number");
+  protected final Measure workersUtilization = mgApachePerformance.createMeasure("WorkersUtilization", "Shows how utilized the server is, consider increasing the workers thread pool. If this reaches 100% no more connections are accepted by Apache", "percent");
   //
-  protected final MetricGroup mgApacheScoreboard = new MetricGroup(mgApache, "Apache Scoreboard", "Apache - Scoreboard - {0}");
+  protected final MetricGroup mgApacheScoreboard = new MetricGroup(mgApache, "Apache Scoreboard", "Scoreboard - {0}");
   protected final Measure sbClosingConnection = mgApacheScoreboard.createMeasure("Closing connection", "Closing connection", "number");
   protected final Measure sbDnsLookup = mgApacheScoreboard.createMeasure("DNS Lookup", "DNS lookup", "number");
   protected final Measure sbGracefullyFinishing = mgApacheScoreboard.createMeasure("Gracefully finishing", "Gracefully finishing", "number");

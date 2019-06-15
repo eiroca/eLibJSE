@@ -56,7 +56,7 @@ public abstract class BaseAction implements IAction<ActionData, ReturnObject>, I
   // measurement variables
   public MetricGroup mgAction = new MetricGroup(null, "Action Metrics");
   //
-  public MetricGroup mgResult = new MetricGroup(mgAction, "Action Statistis");
+  public MetricGroup mgResult = new MetricGroup(mgAction, "Action Statistics");
   protected Measure mStatus = mgResult.createMeasure("Status", "Exection status (0 OK)", "boolean");
   protected Measure mResult = mgResult.createMeasure("Result", "Output result", "number");
   protected Measure mVerified = mgResult.createMeasure("ContentVerified", "1 if result is validated and valid", "boolean");
@@ -184,6 +184,7 @@ public abstract class BaseAction implements IAction<ActionData, ReturnObject>, I
     pParameter.set(param);
   }
 
+  @Override
   public MetricGroup getMetricGroup() {
     return mgAction;
   }

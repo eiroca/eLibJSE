@@ -67,12 +67,6 @@ public class SSHCommandAction extends CommandAction {
       if (pPassword.get() == null) {
         CommandException.ConfigurationError(SSHCommandAction.PASSWORD_IS_NULL);
       }
-      try {
-        setup(pHost.get(), pPort.get(), pUsername.get(), pPassword.get());
-      }
-      catch (final Exception e) {
-        CommandException.InfrastructureError(Helper.getExceptionAsString(e));
-      }
     }
     else {
       if (LibStr.isEmptyOrNull(pKeyFile.get())) {
@@ -80,12 +74,6 @@ public class SSHCommandAction extends CommandAction {
       }
       if (pPassphrase.get() == null) {
         CommandException.ConfigurationError(SSHCommandAction.PASSPHRASE_IS_NULL);
-      }
-      try {
-        setup(pHost.get(), pPort.get(), pUsername.get(), pPassphrase.get(), pKeyFile.get());
-      }
-      catch (final Exception e) {
-        CommandException.InfrastructureError(Helper.getExceptionAsString(e));
       }
     }
   }
@@ -95,11 +83,28 @@ public class SSHCommandAction extends CommandAction {
     ReturnObject result;
     if (action == null) {
       action = new ActionData();
+      action.set(ActionData.HOST, pHost.get());
     }
     action.set(ActionData.PARAM, getParameter());
     action.set(ActionData.USER, pUsername.get());
     action.set(ActionData.PORT, String.valueOf(pPort.get()));
-    action.set(ActionData.HOST, pHost.get());
+    final String host = action.get(ActionData.HOST);
+    if ("Password".equals(pAuthMethod.get())) {
+      try {
+        openConnection(host, pPort.get(), pUsername.get(), pPassword.get());
+      }
+      catch (final Exception e) {
+        CommandException.InfrastructureError(Helper.getExceptionAsString(e));
+      }
+    }
+    else {
+      try {
+        openConnection(host, pPort.get(), pUsername.get(), pPassphrase.get(), pKeyFile.get());
+      }
+      catch (final Exception e) {
+        CommandException.InfrastructureError(Helper.getExceptionAsString(e));
+      }
+    }
     final Map<String, String> data = action.getData(converter);
     final StringSubstitutor substitutor = new StringSubstitutor(data);
     String command = getCommand(substitutor);
@@ -108,7 +113,7 @@ public class SSHCommandAction extends CommandAction {
     }
     data.put(ActionData.COMAMND, converter.convert(command));
     data.put(Messages.RAWPREFIX + ActionData.COMAMND, command);
-    context.info(action.toString());
+    context.info("action=" + action.toString());
     command = substitutor.replace(command);
     try {
       context.info("Execute command: '" + command + "'");
@@ -153,8 +158,8 @@ public class SSHCommandAction extends CommandAction {
     return obj;
   }
 
-  public void setup(final String host, final int port, final String user, final String pass) throws Exception {
-    context.debug("setup host=", host, " port=", "" + port, "user=", user, "pwd=", LibStr.isNotEmptyOrNull(pass) ? "YES" : "NO");
+  public void openConnection(final String host, final int port, final String user, final String pass) throws Exception {
+    context.debug("connect host=", host, " port=", "" + port, " user=", user, " pwd=", LibStr.isNotEmptyOrNull(pass) ? "YES" : "NO");
     try {
       if (conn != null) {
         conn.close();
@@ -173,7 +178,8 @@ public class SSHCommandAction extends CommandAction {
     }
   }
 
-  public void setup(final String host, final int port, final String user, final String pass, final String keyFile) throws Exception {
+  public void openConnection(final String host, final int port, final String user, final String pass, final String keyFile) throws Exception {
+    context.debug("connect host=", host, " port=", "" + port, " keyfile=", keyFile, " user=", user, " pwd=", LibStr.isNotEmptyOrNull(pass) ? "YES" : "NO");
     try {
       if (conn != null) {
         conn.close();

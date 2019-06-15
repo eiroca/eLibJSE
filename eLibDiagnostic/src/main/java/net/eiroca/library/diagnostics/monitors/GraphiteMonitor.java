@@ -25,6 +25,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import net.eiroca.ext.library.http.HttpClientHelper;
 import net.eiroca.ext.library.http.utils.URLFetcherConfig;
+import net.eiroca.ext.library.json.JsonHelper;
 import net.eiroca.library.config.parameter.BooleanParameter;
 import net.eiroca.library.config.parameter.IntegerParameter;
 import net.eiroca.library.config.parameter.StringParameter;
@@ -42,10 +43,12 @@ import net.eiroca.library.system.LibFile;
 
 public class GraphiteMonitor extends GenericHTTPMonitor {
 
-  // measurement variables
-  protected final MetricGroup mgGraphite = new MetricGroup(mgMonitor, "Graphite Statistics", "Graphite - {0}");
   //
-  protected final MetricGroup mgGraphiteAgents = new MetricGroup(mgGraphite, "Graphite Agents", "Graphite - Agents - {0}");
+  // Metrics
+  //
+  protected final MetricGroup mgGraphite = new MetricGroup(mgMonitor, "Graphite Statistics");
+  //
+  protected final MetricGroup mgGraphiteAgents = new MetricGroup(mgGraphite, "Graphite Agents", "Agents - {0}");
   protected final Measure mAgents_activeConnections = mgGraphiteAgents.createMeasure("activeConnections", "Agents - activeConnections", "num");
   protected final Measure mAgents_avgUpdateTime = mgGraphiteAgents.createMeasure("avgUpdateTime", "Agents - avgUpdateTime", "ms");
   protected final Measure mAgents_blacklistMatches = mgGraphiteAgents.createMeasure("blacklistMatches", "Agents - blacklistMatches", "num");
@@ -65,7 +68,7 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   protected final Measure mAgents_updateOperations = mgGraphiteAgents.createMeasure("updateOperations", "Agents - updateOperations", "num");
   protected final Measure mAgents_whitelistRejects = mgGraphiteAgents.createMeasure("whitelistRejects", "Agents - whitelistRejects", "num");
   //
-  protected final MetricGroup mgGraphiteAggregator = new MetricGroup(mgGraphite, "Graphite Aggregator", "Graphite - Aggregator - {0}");
+  protected final MetricGroup mgGraphiteAggregator = new MetricGroup(mgGraphite, "Graphite Aggregator", "Aggregator - {0}");
   protected final Measure mAggregator_activeConnections = mgGraphiteAggregator.createMeasure("activeConnections", "Aggregator - activeConnections", "num");
   protected final Measure mAggregator_aggregateDatapointsSent = mgGraphiteAggregator.createMeasure("aggregateDatapointsSent", "Aggregator - aggregateDatapointsSent", "num");
   protected final Measure mAggregator_allocatedBuffers = mgGraphiteAggregator.createMeasure("allocatedBuffers", "Aggregator - allocatedBuffers", "num");
@@ -80,7 +83,7 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   protected final Measure mAggregator_metricsReceived = mgGraphiteAggregator.createMeasure("metricsReceived", "Aggregator - metricsReceived", "num");
   protected final Measure mAggregator_whitelistRejects = mgGraphiteAggregator.createMeasure("whitelistRejects", "Aggregator - whitelistRejects", "num");
   //
-  protected final MetricGroup mgGraphiteStats = new MetricGroup(mgGraphite, "Graphite Stats", "Graphite - Stats - {0}");
+  protected final MetricGroup mgGraphiteStats = new MetricGroup(mgGraphite, "Graphite Stats", "Stats - {0}");
   protected final Measure mStats_deamon_calculationtime = mgGraphiteStats.createMeasure("deamon.calculationtime", "Stats - deamom - calculationtime", "num");
   protected final Measure mStats_deamon_flush_length = mgGraphiteStats.createMeasure("deamon.flush_length", "Stats - deamom - flush_length", "num");
   protected final Measure mStats_deamon_flush_time = mgGraphiteStats.createMeasure("deamon.flush_time", "Stats - deamom - flush_time", "num");
@@ -118,7 +121,9 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   protected final Measure mStats_timers_upper_90 = mgGraphiteStats.createMeasure("timers.upper_90", "Stats - timers - upper_90", "ms");
   protected final Measure mStats_timers_upper_ps = mgGraphiteStats.createMeasure("timers.upper_ps", "Stats - timers - upper_ps", "ms");
   protected final Measure mStats_Others = mgGraphiteStats.createMeasure("Others", "Others - Stats", "num");
+  //
   // Configuration
+  //
   protected static StringParameter _graphiteURL = new StringParameter(ServerMonitor.params, "graphiteURL", "http://{host}");
   protected static BooleanParameter _allMetrics = new BooleanParameter(ServerMonitor.params, "allMetrics", false);
   protected static BooleanParameter _systemMetrics = new BooleanParameter(ServerMonitor.params, "systemMetrics", true);
@@ -129,7 +134,8 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   protected static StringParameter _until = new StringParameter(ServerMonitor.params, "until", null);
   protected static IntegerParameter _groupLevel = new IntegerParameter(ServerMonitor.params, "groupLevel", -1);
   protected static StringParameter _tagPrefix = new StringParameter(ServerMonitor.params, "tagPrefix", "graphite.");
-  static { // Configuration metadata
+  // Configuration metadata
+  static {
     GraphiteMonitor._graphiteURL.setLabel("Graphite URL").setDescription("Enter the URL to Graphite service. {host} will be replaced with target host. Example: 'http://{host}:8888'.");
     GraphiteMonitor._allMetrics.setLabel("All metrics extraction").setDescription("All metrics extraction");
     GraphiteMonitor._systemMetrics.setLabel("System metrics extraction").setDescription("System metrics extraction");
@@ -141,7 +147,7 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
     GraphiteMonitor._groupLevel.setLabel("Group level").setDescription("Group level");
     GraphiteMonitor._tagPrefix.setLabel("Tag prefix").setDescription("Tag prefix");
   }
-  //
+  // Configuration attributes
   protected String config_graphiteURL;
   protected boolean config_allMetrics;
   protected boolean config_systemMetrics;
@@ -152,9 +158,8 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   protected String config_until;
   protected int config_groupLevel;
   protected String config_tagPrefix;
-  //
-  protected String baseURL;
 
+  //
   private final class RuleEntry {
 
     Pattern regex;
@@ -168,6 +173,8 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
 
   private final List<RuleEntry> systemRules = new ArrayList<>();
   private final List<RuleEntry> customRules = new ArrayList<>();
+
+  private String baseURL;
 
   public GraphiteMonitor() throws CommandException {
     super();
@@ -308,7 +315,7 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
   private List<String> getIndex() {
     fetcher.setURL(baseURL + "/metrics/index.json");
     final ReturnObject response = httpCall(fetcher);
-    if (response.getRetCode() < 400) { return GraphiteMonitor.toList(new JSONArray(response.getOutput())); }
+    if (response.getRetCode() < 400) { return JsonHelper.toList(new JSONArray(response.getOutput())); }
     return null;
   }
 
@@ -403,15 +410,6 @@ public class GraphiteMonitor extends GenericHTTPMonitor {
       }
     }
     return null;
-  }
-
-  public static List<String> toList(final JSONArray data) {
-    if (data == null) { return null; }
-    final List<String> result = new ArrayList<>();
-    for (int i = 0; i < data.length(); i++) {
-      result.add(data.getString(i));
-    }
-    return result;
   }
 
 }

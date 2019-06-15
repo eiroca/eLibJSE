@@ -139,15 +139,9 @@ public abstract class ServerMonitor implements IServerMonitor {
     }
   }
 
-  private void loadMetricGroup(final List<MetricGroup> groups, final MetricGroup mg) {
-    groups.add(mg);
-    for (final MetricGroup child : mg.getGroups()) {
-      loadMetricGroup(groups, child);
-    }
-  }
-
+  @Override
   final public void loadMetricGroup(final List<MetricGroup> groups) {
-    loadMetricGroup(groups, mgMonitor);
+    mgMonitor.loadGroups(groups, true);
   }
 
   @Override
@@ -174,6 +168,7 @@ public abstract class ServerMonitor implements IServerMonitor {
   public void close() throws Exception {
   }
 
+  @Override
   public MetricGroup getMetricGroup() {
     return mgMonitor;
   }

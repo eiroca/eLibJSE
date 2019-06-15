@@ -44,7 +44,7 @@ public class ElasticSearchMonitor extends GenericHTTPMonitor {
 
   protected static final String CONFIG_ELASTICURL = "elasticURL";
 
-  protected final MetricGroup mgElasticSearch = new MetricGroup(mgMonitor, "ElasticSearch Statistics", "ElasticSearch - {0}");
+  protected final MetricGroup mgElasticSearch = new MetricGroup(mgMonitor, "ElasticSearch Statistics");
   protected final Measure mActivePrimaryShards = mgElasticSearch.createMeasure("ActivePrimaryShards", "The number of primary shards that are used across the cluster", "number");
   protected final Measure mActiveShards = mgElasticSearch.createMeasure("ActiveShards", "The number of shards (primary and replica) that are used across the cluster", "number");
   protected final Measure mActiveShardsPercent = mgElasticSearch.createMeasure("ActiveShardsPercent", "Percentage of shards that are active, a green cluster should have 100% here", "percent");

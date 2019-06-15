@@ -33,7 +33,7 @@ public class RedisMonitor extends TCPServerMonitor {
   public static final String CONFIG_PORT = "port";
   public static final String CONFIG_AUTH = "redisAuth";
 
-  protected MetricGroup mgRedisInfo = new MetricGroup(mgMonitor, "Redis Statistics", "Redis - {0}");
+  protected MetricGroup mgRedisInfo = new MetricGroup(mgMonitor, "Redis Statistics");
   protected Measure mRedisClientsConn = mgRedisInfo.createMeasure("Clients - connected clients", "Connected clients", "number");
   protected Measure mRedisKeyspaceKeys = mgRedisInfo.createMeasure("Keyspace - keys", "Keyspace - keys", "number");
   protected Measure mRedisMemoryOverhead = mgRedisInfo.createMeasure("Memory - used memory overhead", "Memory - used memory overhead", "bytes");

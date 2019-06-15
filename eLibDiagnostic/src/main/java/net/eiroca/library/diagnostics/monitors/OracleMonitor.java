@@ -30,7 +30,7 @@ public class OracleMonitor extends DatabaseMonitor {
   //
   protected final MetricGroup mgOracle = new MetricGroup(mgMonitor, "Oracle Statistics", "Oracle - {0}");
   //
-  protected final MetricGroup mgOracleStats = new MetricGroup(mgOracle, "Oracle Stats", "Oracle - {0}");
+  protected final MetricGroup mgOracleStats = new MetricGroup(mgOracle, "Oracle Stats");
   protected final Measure mInfoSystemdate = mgOracleStats.createMeasure("Info - System date", "Info - System date", "number");
   protected final Measure mSGAFreeBufferWaits = mgOracleStats.createMeasure("SGA - Free Buffer Waits", "SGA - Free Buffer Waits", "number");
   protected final Measure mSGAWriteCompleteWaits = mgOracleStats.createMeasure("SGA - Write Complete Waits", "SGA - Write Complete Waits", "number");
@@ -72,25 +72,25 @@ public class OracleMonitor extends DatabaseMonitor {
   protected final Measure mTableContentionChainedFetchRatio = mgOracleStats.createMeasure("Table Contention - Chained Fetch Ratio", "Table Contention - Chained Fetch Ratio", "percent");
   protected final Measure mTableContentionFreeListContention = mgOracleStats.createMeasure("Table Contention - Free List Contention", "Table Contention - Free List Contention", "number");
   //
-  protected final MetricGroup mgOracleTablespace = new MetricGroup(mgOracle, "Oracle Tablespaces", "Oracle - Tablespace - {0}");
+  protected final MetricGroup mgOracleTablespace = new MetricGroup(mgOracle, "Oracle Tablespaces", "Tablespace - {0}");
   protected final Measure mTablespaceTotal = mgOracleTablespace.createMeasure("Total", "Tablespace - Total Space (MB)", "megabytes");
   protected final Measure mTablespaceUsed = mgOracleTablespace.createMeasure("Used", "Tablespace - Used Space (MB)", "megabytes");
   protected final Measure mTablespaceFree = mgOracleTablespace.createMeasure("Free", "Tablespace - Free Space (MB)", "megabytes");
   protected final Measure mTablespaceUsedPercent = mgOracleTablespace.createMeasure("Used %", "Tablespace - Used Space (%)", "percent");
   protected final Measure mTablespaceFreePercent = mgOracleTablespace.createMeasure("Free %", "Tablespace - Total Space (%)", "percent");
   //
-  protected final MetricGroup mgOracleWaiter = new MetricGroup(mgOracle, "Oracle Waiters", "Oracle - Waiter - {0}");
+  protected final MetricGroup mgOracleWaiter = new MetricGroup(mgOracle, "Oracle Waiters", "Waiter - {0}");
   protected final Measure mWaiterTotalWaits = mgOracleWaiter.createMeasure("Total Waits", "Waiter - Total Waits", "number");
   protected final Measure mWaiterTotalTimeouts = mgOracleWaiter.createMeasure("Total Timeouts", "Waiter - Total Timeouts", "number");
   protected final Measure mWaiterTimeWaited = mgOracleWaiter.createMeasure("Time Waited", "Waiter - Time Waited", "s");
   protected final Measure mWaiterAverageWaittime = mgOracleWaiter.createMeasure("Average Wait time", "Waiter - Average Wait time", "s");
   //
-  protected final MetricGroup mgOracleLock = new MetricGroup(mgOracle, "Oracle Locks", "Oracle - Lock - {0}");
+  protected final MetricGroup mgOracleLock = new MetricGroup(mgOracle, "Oracle Locks", "Lock - {0}");
   protected final Measure mLockLockMode = mgOracleLock.createMeasure("Lock Mode", "Lock - Lock Mode", "number");
   protected final Measure mLockLockStatus = mgOracleLock.createMeasure("Lock Status", "Lock - Lock Status", "number");
   protected final Measure mLockLocks = mgOracleLock.createMeasure("Locks", "Lock count", "number");
   //
-  protected final MetricGroup mgOracleTopSQL = new MetricGroup(mgOracle, "Oracle TopSQLs", "Oracle - TopSQL - {0}");
+  protected final MetricGroup mgOracleTopSQL = new MetricGroup(mgOracle, "Oracle TopSQLs", "TopSQL - {0}");
   protected final Measure mTopSQLElapsedTime = mgOracleTopSQL.createMeasure("Elapsed Time", "Elapsed Time", "number");
   protected final Measure mTopSQLCPUTime = mgOracleTopSQL.createMeasure("CPU Time", "CPU Time", "number");
   protected final Measure mTopSQLDiskReads = mgOracleTopSQL.createMeasure("Disk Reads", "Disk Reads", "number");

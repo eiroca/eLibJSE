@@ -58,16 +58,20 @@ public class DatabaseMonitor extends TCPServerMonitor {
   }
 
   private static final String CONFIG_RESULTCOLUMN = "ResultColumn";
+  private static final String CONFIG_DEF_RESULTCOLUMN = "1";
+
   private static final String CONFIG_VALIDATECOLUMN = "ValidateColumn";
+  private static final String CONFIG_DEF_VALIDATECOLUMN = "1";
 
   private static final String CONFIG_SPLITTINGNAME = "SplittingName";
   private static final String CONFIG_SPLITTINGNAME_DEFAULT = "metrics";
 
   private static final String CONFIG_RUNSQL = "runSQL";
 
-  protected final MetricGroup mgDBMonitor = new MetricGroup(mgMonitor, "Database Statistics", "Database - {0}");
+  protected final MetricGroup mgDBMonitor = new MetricGroup(mgMonitor, "Database Statistics");
   protected final Measure mDBQueryTime = mgDBMonitor.createMeasure("Query Time", "Tikem taken by the query", "ms");
   protected final Measure mDBQueryRows = mgDBMonitor.createMeasure("Query Rows", "Rows returned by the query", "number");
+  protected final Measure mDBQueryCols = mgDBMonitor.createMeasure("Query Columns", "Columns returned by the query", "number");
 
   protected GenericValidator validator;
   protected DBConfig config;
@@ -85,6 +89,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
 
   protected double queryResult = 0.0;
   protected int rowcount = 0;
+  protected int colcount = 0;
   protected boolean succed = false;
 
   protected long startTime = 0;
@@ -111,13 +116,16 @@ public class DatabaseMonitor extends TCPServerMonitor {
     dbSQL.setup(context);
     runSQL = context.getConfigBoolean(DatabaseMonitor.CONFIG_RUNSQL, true);
     metricGroup = context.getConfigString(DatabaseMonitor.CONFIG_SPLITTINGNAME, DatabaseMonitor.CONFIG_SPLITTINGNAME_DEFAULT);
-    resultColumn = context.getConfigString(DatabaseMonitor.CONFIG_RESULTCOLUMN, null);
+    resultColumn = context.getConfigString(DatabaseMonitor.CONFIG_RESULTCOLUMN, DatabaseMonitor.CONFIG_DEF_RESULTCOLUMN);
+    if (LibStr.isEmptyOrNull(resultColumn)) {
+      resultColumn = null;
+    }
     final String modeStr = context.getConfigString(DatabaseMonitor.CFG_CAPTUREMODE, DatabaseMonitor.DEF_CAPTUREMODE);
     captureMode = (modeStr != null) ? DatabaseMonitor.CONFIG_CAPTUREMODE_VAL.get(modeStr) : null;
     if (captureMode == null) {
       CommandException.ConfigurationError("Invalid capture mode:" + modeStr);
     }
-    validateColumn = context.getConfigString(DatabaseMonitor.CONFIG_VALIDATECOLUMN, null);
+    validateColumn = context.getConfigString(DatabaseMonitor.CONFIG_VALIDATECOLUMN, DatabaseMonitor.CONFIG_DEF_VALIDATECOLUMN);
     context.debug("DB config: " + config);
   }
 
@@ -135,6 +143,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
     config.setServer(targetHost.getHostString());
     queryResult = 0.0;
     rowcount = 0;
+    colcount = 0;
     succed = false;
     startTime = 0;
     endTime = 0;
@@ -142,13 +151,15 @@ public class DatabaseMonitor extends TCPServerMonitor {
     connectEndTime = 0;
     queryStartTime = 0;
     queryEndTime = 0;
-
     startTime = System.nanoTime();
     // connect to the database
+    context.debug("Prepare database connection");
     if (!config.prepareConnection()) {
+      context.info("Connection URL: ", config.getConnectionUrl());
       CommandException.ConfigurationError("Unable to create DB connection URL. " + config.getLastError().getMessage());
     }
     connectStartTime = System.nanoTime();
+    context.debug("get connection: ", config.getConnectionUrl());
     con = config.getConnection();
     final Exception lastError = config.getLastError();
     if (con == null) {
@@ -156,6 +167,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
     }
     connectEndTime = System.nanoTime();
     // Update server metrics
+    context.debug("Database connected");
     mServerReachable.setValue(1.0);
     mServerLatency.setValue(Helper.elapsed(connectStartTime, connectEndTime));
     mServerSocketTimeout.setValue(0.0);
@@ -181,6 +193,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
     mServerResult.setValue(queryResult);
     mServerStatus.setValue(!succed);
     mDBQueryRows.setValue(rowcount);
+    mDBQueryCols.setValue(colcount);
     return true;
   }
 
@@ -201,8 +214,9 @@ public class DatabaseMonitor extends TCPServerMonitor {
     }
     // Reading data
     rowcount = 0;
+    colcount = dbSQL.recordSize();
     queryResult = 0.0;
-    final String[] data = new String[dbSQL.recordSize()];
+    final String[] data = new String[colcount];
     while (true) {
       ok = dbSQL.next();
       if (dbSQL.isEOF()) {
@@ -219,7 +233,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
         context.info("Validating column: ", validateColumn, " -> ", validResult);
       }
       if (captureMode == CaputeMode.SINGLE) {
-        if (resultColumn != null) {
+        if (LibStr.isNotEmptyOrNull(resultColumn)) {
           queryResult = dbSQL.getDouble(resultColumn, 0.0);
         }
         else {

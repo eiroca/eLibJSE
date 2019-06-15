@@ -81,6 +81,10 @@ public class ActionData {
     }
   }
 
+  public String get(final String name) {
+    return data.get(name);
+  }
+
   public void set(final String name, final String value) {
     data.put(name, LibStr.isNotEmptyOrNull(value) ? value : null);
   }

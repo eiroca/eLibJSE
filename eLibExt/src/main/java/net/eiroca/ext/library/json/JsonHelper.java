@@ -16,6 +16,8 @@
  **/
 package net.eiroca.ext.library.json;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -63,4 +65,13 @@ public class JsonHelper {
     }
   }
 
+  public static List<String> toList(final JSONArray data) {
+    if (data == null) { return null; }
+    final List<String> result = new ArrayList<>();
+    for (int i = 0; i < data.length(); i++) {
+      result.add(data.getString(i));
+    }
+    return result;
+  }
+  
 }

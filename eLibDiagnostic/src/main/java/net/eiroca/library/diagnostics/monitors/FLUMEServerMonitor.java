@@ -62,7 +62,7 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
   private static final String CONFIG_PORT = "port";
 
   // measurement variables
-  protected final MetricGroup mgFLUME = new MetricGroup(mgMonitor, "FLUME Statistics", "FLUME - {0}");
+  protected final MetricGroup mgFLUME = new MetricGroup(mgMonitor, "FLUME Statistics");
   protected final Measure mAppendAcceptedCount = mgFLUME.createMeasure("Append Accepted", "Append Accepted Count", "number");
   protected final Measure mAppendBatchAcceptedCount = mgFLUME.createMeasure("Append Batch Accepted", "Append batch accepted count", "number");
   protected final Measure mAppendBatchReceivedCount = mgFLUME.createMeasure("Append Batch Received", "Append batch received count", "number");

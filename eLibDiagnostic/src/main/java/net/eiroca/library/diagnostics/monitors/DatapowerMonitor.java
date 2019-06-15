@@ -40,7 +40,7 @@ import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.metrics.Measure;
 import net.eiroca.library.metrics.MetricGroup;
 
-public class DatapowerMonitor extends GenericHTTPMonitor {
+public class DataPowerMonitor extends GenericHTTPMonitor {
 
   protected final static String CONFIG_DATAPOWERURL = "datapowerURL";
   protected final static String CONFIG_DATAPOWERTEMPLATE = "datapowerTemplate";
@@ -50,27 +50,27 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
 
   protected final MetricGroup mgDatapower = new MetricGroup(mgMonitor, "DataPower Statistics", "DataPower - {0}");
 
-  protected final MetricGroup mgDatapowerAccepted = new MetricGroup(mgDatapower, "DataPower Accepted", "DataPower - Accepted - {0}");
+  protected final MetricGroup mgDatapowerAccepted = new MetricGroup(mgDatapower, "DataPower Accepted", "Accepted - {0}");
   protected final Measure mConnectionsAccepted_oneDay = mgDatapowerAccepted.createMeasure("oneDay", "ConnectionsAccepted_oneDay", "counter");
   protected final Measure mConnectionsAccepted_oneHour = mgDatapowerAccepted.createMeasure("oneHour", "ConnectionsAccepted_oneHour", "counter");
   protected final Measure mConnectionsAccepted_oneMinute = mgDatapowerAccepted.createMeasure("oneMinute", "ConnectionsAccepted_oneMinute", "counter");
   protected final Measure mConnectionsAccepted_tenMinutes = mgDatapowerAccepted.createMeasure("tenMinutes", "ConnectionsAccepted_tenMinutes", "counter");
   protected final Measure mConnectionsAccepted_tenSeconds = mgDatapowerAccepted.createMeasure("tenSeconds", "ConnectionsAccepted_tenSeconds", "counter");
   //
-  protected final MetricGroup mgCPUUsage = new MetricGroup(mgDatapower, "DataPower CPU Usage", "DataPower - CPU Usage - {0}");
+  protected final MetricGroup mgCPUUsage = new MetricGroup(mgDatapower, "DataPower CPU Usage", "CPU Usage - {0}");
   protected final Measure mCPUUsage_oneDay = mgCPUUsage.createMeasure("oneDay", "CPUUsage_oneDay", "percent");
   protected final Measure mCPUUsage_oneHour = mgCPUUsage.createMeasure("oneHour", "CPUUsage_oneHour", "percent");
   protected final Measure mCPUUsage_oneMinute = mgCPUUsage.createMeasure("oneMinute", "CPUUsage_oneMinute", "percent");
   protected final Measure mCPUUsage_tenMinutes = mgCPUUsage.createMeasure("tenMinutes", "CPUUsage_tenMinutes", "percent");
   protected final Measure mCPUUsage_tenSeconds = mgCPUUsage.createMeasure("tenSeconds", "CPUUsage_tenSeconds", "percent");
   //
-  protected final MetricGroup mgDocumentCachingSummary = new MetricGroup(mgDatapower, "DataPower Document Caching", "DataPower - Document Caching - {0}");
+  protected final MetricGroup mgDocumentCachingSummary = new MetricGroup(mgDatapower, "DataPower Document Caching", "Document Caching - {0}");
   protected final Measure mDocumentCachingSummary_CacheCount = mgDocumentCachingSummary.createMeasure("CacheCount", "DocumentCachingSummary_CacheCount", "counter");
   protected final Measure mDocumentCachingSummary_DocCount = mgDocumentCachingSummary.createMeasure("DocCount", "DocumentCachingSummary_DocCount", "counter");
   protected final Measure mDocumentCachingSummary_CacheSize = mgDocumentCachingSummary.createMeasure("CacheSize", "DocumentCachingSummary_CacheSize", "bytes");
   protected final Measure mDocumentCachingSummary_ByteCount = mgDocumentCachingSummary.createMeasure("ByteCount", "DocumentCachingSummary_ByteCount", "bytes");
   //
-  protected final MetricGroup mgStylesheetCachingSummary = new MetricGroup(mgDatapower, "DataPower Stylesheet Caching", "DataPower - Stylesheet Caching - {0}");
+  protected final MetricGroup mgStylesheetCachingSummary = new MetricGroup(mgDatapower, "DataPower Stylesheet Caching", "Stylesheet Caching - {0}");
   protected final Measure mStylesheetCachingSummary_CacheCount = mgStylesheetCachingSummary.createMeasure("CacheCount", "StylesheetCachingSummary_CacheCount", "counter");
   protected final Measure mStylesheetCachingSummary_ReadyCount = mgStylesheetCachingSummary.createMeasure("StylesheetCachingSummary_ReadyCount", "StylesheetCachingSummary_ReadyCount", "counter");
   protected final Measure mStylesheetCachingSummary_CacheSize = mgStylesheetCachingSummary.createMeasure("StylesheetCachingSummary_CacheSize", "StylesheetCachingSummary_CacheSize", "bytes");
@@ -79,7 +79,7 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
   protected final Measure mStylesheetCachingSummary_DupCount = mgStylesheetCachingSummary.createMeasure("StylesheetCachingSummary_DupCount", "StylesheetCachingSummary_DupCount", "counter");
   protected final Measure mStylesheetCachingSummary_CacheKBCount = mgStylesheetCachingSummary.createMeasure("StylesheetCachingSummary_CacheKBCount", "StylesheetCachingSummary_CacheKBCount", "counter");
   //
-  protected final MetricGroup mgEnvironmentalSensors = new MetricGroup(mgDatapower, "DataPower Environmental Sensors", "DataPower - Environmental Sensors - {0}");
+  protected final MetricGroup mgEnvironmentalSensors = new MetricGroup(mgDatapower, "DataPower Environmental Sensors", "Environmental Sensors - {0}");
   protected final Measure mEnvironmentalSensors_SystemTemp = mgEnvironmentalSensors.createMeasure("SystemTemp", "EnvironmentalSensors_systemTemp", "unit");
   protected final Measure mEnvironmentalSensors_CPU1Temp = mgEnvironmentalSensors.createMeasure("CPU1Temp", "EnvironmentalSensors_CPU1Temp", "unit");
   protected final Measure mEnvironmentalSensors_CPU2Temp = mgEnvironmentalSensors.createMeasure("CPU2Temp", "EnvironmentalSensors_CPU2Temp", "unit");
@@ -94,7 +94,7 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
   protected final Measure mEnvironmentalSensors_Volt12 = mgEnvironmentalSensors.createMeasure("Volt12", "EnvironmentalSensors_Volt12", "unit");
   protected final Measure mEnvironmentalSensors_PowerSupplyOK = mgEnvironmentalSensors.createMeasure("PowerSupplyOk", "EnvironmentalSensors_PowerSupplyOk", "unit");
   //
-  protected final MetricGroup mgHTTPConnections = new MetricGroup(mgDatapower, "DataPower HTTP Connections", "DataPower - HTTP Connections - {0}");
+  protected final MetricGroup mgHTTPConnections = new MetricGroup(mgDatapower, "DataPower HTTP Connections", "HTTP Connections - {0}");
   protected final Measure mHTTPConnections_ReqTenSec = mgHTTPConnections.createMeasure("ReqTenSec", "HTTPConnections_ReqTenSec", "unit");
   protected final Measure mHTTPConnections_ReqSec = mgHTTPConnections.createMeasure("ReqSec", "HTTPConnections_ReqSec", "unit");
   protected final Measure mHTTPConnections_ReqOneMin = mgHTTPConnections.createMeasure("ReqOneMin", "HTTPConnections_ReqOneMin", "unit");
@@ -132,7 +132,7 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
   protected final Measure mHTTPConnections_DestroyOneHour = mgHTTPConnections.createMeasure("DestroyOneHour", "HTTPConnections_DestroyOneHour", "unit");
   protected final Measure mHTTPConnections_DestroyOneDay = mgHTTPConnections.createMeasure("DestroyOneDay", "HTTPConnections_DestroyOneDay", "unit");
   //
-  protected final MetricGroup mgMemoryStatus = new MetricGroup(mgDatapower, "DataPower Memory Status", "DataPower - Memory Status - {0}");
+  protected final MetricGroup mgMemoryStatus = new MetricGroup(mgDatapower, "DataPower Memory Status", "Memory Status - {0}");
   protected final Measure mMemoryStatus_FreeMemory = mgMemoryStatus.createMeasure("FreeMemory", "MemoryStatus_FreeMemory", "kilobytes");
   protected final Measure mMemoryStatus_HoldMemory = mgMemoryStatus.createMeasure("HoldMemory", "MemoryStatus_HoldMemory", "kilobytes");
   protected final Measure mMemoryStatus_ReqMemory = mgMemoryStatus.createMeasure("ReqMemory", "MemoryStatus_ReqMemory", "kilobytes");
@@ -140,7 +140,7 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
   protected final Measure mMemoryStatus_UsedMemory = mgMemoryStatus.createMeasure("UsedMemory", "MemoryStatus_UsedMemory", "kilobytes");
   protected final Measure mMemoryStatus_Usage = mgMemoryStatus.createMeasure("Usage", "MemoryStatus_Usage", "unit");
   //
-  protected final MetricGroup mgFileSystemStatus = new MetricGroup(mgDatapower, "DataPower FileSystem Status", "DataPower - FileSystem Status - {0}");
+  protected final MetricGroup mgFileSystemStatus = new MetricGroup(mgDatapower, "DataPower FileSystem Status", "FileSystem Status - {0}");
   protected final Measure mFileSystemStatus_FreeEncrypted = mgFileSystemStatus.createMeasure("FreeEncrypted", "FileSystemStatus_FreeEncrypted", "unit");
   protected final Measure mFileSystemStatus_TotalEncrypted = mgFileSystemStatus.createMeasure("TotalEncrypted", "FileSystemStatus_TotalEncrypted", "unit");
   protected final Measure mFileSystemStatus_FreeTemporary = mgFileSystemStatus.createMeasure("FreeTemporary", "FileSystemStatus_FreeTemporary", "unit");
@@ -148,12 +148,12 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
   protected final Measure mFileSystemStatus_FreeInternal = mgFileSystemStatus.createMeasure("FreeInternal", "FileSystemStatus_FreeInternal", "unit");
   protected final Measure mFileSystemStatus_TotalInternal = mgFileSystemStatus.createMeasure("TotalInternal", "FileSystemStatus_TotalInternal", "unit");
   //
-  protected final MetricGroup mgSystemUsage = new MetricGroup(mgDatapower, "DataPower System Usage", "DataPower - System Usage - {0}");
+  protected final MetricGroup mgSystemUsage = new MetricGroup(mgDatapower, "DataPower System Usage", "System Usage - {0}");
   protected final Measure mSystemUsage_Interval = mgSystemUsage.createMeasure("Interval", "SystemUsage_Interval", "unit");
   protected final Measure mSystemUsage_Load = mgSystemUsage.createMeasure("Load", "SystemUsage_Load", "unit");
   protected final Measure mSystemUsage_WorkList = mgSystemUsage.createMeasure("WorkList", "SystemUsage_WorkList", "unit");
   //
-  protected final MetricGroup mgTCPSummary = new MetricGroup(mgDatapower, "DataPower TCP Summary", "DataPower - TCP Summary - {0}");
+  protected final MetricGroup mgTCPSummary = new MetricGroup(mgDatapower, "DataPower TCP Summary", "TCP Summary - {0}");
   protected final Measure mTCPSummary_Established = mgTCPSummary.createMeasure("Established", "TCPSummary_Established", "unit");
   protected final Measure mTCPSummary_Syn_Sent = mgTCPSummary.createMeasure("Syn_Sent", "TCPSummary_Syn_Sent", "unit");
   protected final Measure mTCPSummary_Syn_Received = mgTCPSummary.createMeasure("Syn_Received", "TCPSummary_Syn_Received", "unit");
@@ -166,7 +166,7 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
   protected final Measure mTCPSummary_Listen = mgTCPSummary.createMeasure("Listen", "TCPSummary_Listen", "unit");
   protected final Measure mTCPSummary_Closing = mgTCPSummary.createMeasure("Closing", "TCPSummary_Closing", "unit");
   //
-  protected final MetricGroup mgEthernetInterfaceStatus = new MetricGroup(mgDatapower, "DataPower - Ethernet Interface Status", "DataPower - Interface Status - {0}");
+  protected final MetricGroup mgEthernetInterfaceStatus = new MetricGroup(mgDatapower, "Ethernet Interface Status", "Interface Status - {0}");
   protected final Measure mEthernetInterfaceStatus_Status = mgEthernetInterfaceStatus.createMeasure("Status", "EthernetInterfaceStatus_Status", "unit");
   protected final Measure mEthernetInterfaceStatus_Collisions = mgEthernetInterfaceStatus.createMeasure("Collisions", "EthernetInterfaceStatus_Collisions", "unit");
   protected final Measure mEthernetInterfaceStatus_Collisions2 = mgEthernetInterfaceStatus.createMeasure("Collisions2", "EthernetInterfaceStatus_Collisions2", "unit");
@@ -187,39 +187,39 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
   protected final Measure mEthernetInterfaceStatus_TxDrops = mgEthernetInterfaceStatus.createMeasure("TxDrops", "EthernetInterfaceStatus_TxDrops", "unit");
   protected final Measure mEthernetInterfaceStatus_TxDrops2 = mgEthernetInterfaceStatus.createMeasure("TxDrops2", "EthernetInterfaceStatus_TxDrops2", "unit");
   //
-  protected final MetricGroup mgObjectStatus = new MetricGroup(mgDatapower, "DataPower Object Status", "DataPower - Object Status - {0}");
+  protected final MetricGroup mgObjectStatus = new MetricGroup(mgDatapower, "DataPower Object Status", "Object Status - {0}");
   protected final Measure mObjectStatus_OpState = mgObjectStatus.createMeasure("OpState", "ObjectStatus_OpState", "unit");
   protected final Measure mObjectStatus_AdminState = mgObjectStatus.createMeasure("AdminState", "ObjectStatus_AdminState", "unit");
   //
-  protected final MetricGroup mgStylesheetExecutions = new MetricGroup(mgDatapower, "DataPower Stylesheet Executions", "DataPower - Stylesheet Executions - {0}");
+  protected final MetricGroup mgStylesheetExecutions = new MetricGroup(mgDatapower, "DataPower Stylesheet Executions", "Stylesheet Executions - {0}");
   protected final Measure mStylesheetExecutions_TenSeconds = mgStylesheetExecutions.createMeasure("TenSeconds", "StylesheetExecutions_TenSeconds", "unit");
   protected final Measure mStylesheetExecutions_OneMinute = mgStylesheetExecutions.createMeasure("OneMinute", "StylesheetExecutions_OneMinute", "unit");
   protected final Measure mStylesheetExecutions_TenMinutes = mgStylesheetExecutions.createMeasure("TenMinutes", "StylesheetExecutions_TenMinutes", "unit");
   protected final Measure mStylesheetExecutions_OneHour = mgStylesheetExecutions.createMeasure("OneHour", "StylesheetExecutions_OneHour", "unit");
   protected final Measure mStylesheetExecutions_OneDay = mgStylesheetExecutions.createMeasure("OneDay", "StylesheetExecutions_OneDay", "unit");
   //
-  protected final MetricGroup mgDomainStatus = new MetricGroup(mgDatapower, "DataPower Domain Status", "DataPower - Domain Status - {0}");
+  protected final MetricGroup mgDomainStatus = new MetricGroup(mgDatapower, "DataPower Domain Status", "Domain Status - {0}");
   protected final Measure mDomainStatus_SaveNeeded = mgDomainStatus.createMeasure("SaveNeeded", "DomainStatus_SaveNeeded", "unit");
   protected final Measure mDomainStatus_TraceEnabled = mgDomainStatus.createMeasure("TraceEnabled", "DomainStatus_TraceEnabled", "unit");
   protected final Measure mDomainStatus_DebugEnabled = mgDomainStatus.createMeasure("DebugEnabled", "DomainStatus_DebugEnabled", "unit");
   protected final Measure mDomainStatus_ProbeEnabled = mgDomainStatus.createMeasure("ProbeEnabled", "DomainStatus_ProbeEnabled", "unit");
   protected final Measure mDomainStatus_DiagEnabled = mgDomainStatus.createMeasure("DiagEnabled", "DomainStatus_DiagEnabled", "unit");
   //
-  protected final MetricGroup mgHTTPTransactions = new MetricGroup(mgDatapower, "DataPower HTTP Transactions", "DataPower - HTTP Transactions - {0}");
+  protected final MetricGroup mgHTTPTransactions = new MetricGroup(mgDatapower, "DataPower HTTP Transactions", "HTTP Transactions - {0}");
   protected final Measure mHTTPTransactions_TenSeconds = mgHTTPTransactions.createMeasure("TenSeconds", "HTTPTransactions_TenSeconds", "unit");
   protected final Measure mHTTPTransactions_OneMinute = mgHTTPTransactions.createMeasure("OneMinute", "HTTPTransactions_OneMinute", "unit");
   protected final Measure mHTTPTransactions_TenMinutes = mgHTTPTransactions.createMeasure("TenMinutes", "HTTPTransactions_TenMinutes", "unit");
   protected final Measure mHTTPTransactions_OneHour = mgHTTPTransactions.createMeasure("OneHour", "HTTPTransactions_OneHour", "unit");
   protected final Measure mHTTPTransactions_OneDay = mgHTTPTransactions.createMeasure("OneDay", "HTTPTransactions_OneDay", "unit");
   //
-  protected final MetricGroup mgHTTPMeanTransactionTime = new MetricGroup(mgDatapower, "DataPower HTTP Mean Transaction Time", "DataPower - HTTP Mean Transaction Time - {0}");
+  protected final MetricGroup mgHTTPMeanTransactionTime = new MetricGroup(mgDatapower, "DataPower HTTP Mean Transaction Time", "HTTP Mean Transaction Time - {0}");
   protected final Measure mHTTPMeanTransactionTime_TenSeconds = mgHTTPMeanTransactionTime.createMeasure("TenSeconds", "HTTPMeanTransactionTime_TenSeconds", "ms");
   protected final Measure mHTTPMeanTransactionTime_OneMinute = mgHTTPMeanTransactionTime.createMeasure("OneMinute", "HTTPMeanTransactionTime_OneMinute", "ms");
   protected final Measure mHTTPMeanTransactionTime_TenMinutes = mgHTTPMeanTransactionTime.createMeasure("TenMinutes", "HTTPMeanTransactionTime_TenMinutes", "ms");
   protected final Measure mHTTPMeanTransactionTime_OneHour = mgHTTPMeanTransactionTime.createMeasure("OneHour", "HTTPMeanTransactionTime_OneHour", "ms");
   protected final Measure mHTTPMeanTransactionTime_OneDay = mgHTTPMeanTransactionTime.createMeasure("OneDay", "HTTPMeanTransactionTime_OneDay", "ms");
   //
-  protected final MetricGroup mgWSOperationMetricsSimpleIndex = new MetricGroup(mgDatapower, "DataPower WS Operation Metrics", "DataPower - WS Operation Metrics - {0}");
+  protected final MetricGroup mgWSOperationMetricsSimpleIndex = new MetricGroup(mgDatapower, "DataPower WS Operation Metrics", "WS Operation Metrics - {0}");
   protected final Measure mWSOperationMetricsSimpleIndex_NumberOfRequests = mgWSOperationMetricsSimpleIndex.createMeasure("NumberOfRequests", "WSOperationMetricsSimpleIndex_NumberOfRequests", "unit");
   protected final Measure mWSOperationMetricsSimpleIndex_NumberOfFailedRequests = mgWSOperationMetricsSimpleIndex.createMeasure("NumberOfFailedRequests", "WSOperationMetricsSimpleIndex_NumberOfFailedRequests", "unit");
   protected final Measure mWSOperationMetricsSimpleIndex_NumberOfSuccessfulRequests = mgWSOperationMetricsSimpleIndex.createMeasure("NumberOfSuccessfulRequests", "WSOperationMetricsSimpleIndex_NumberOfSuccessfulRequests", "unit");
@@ -289,11 +289,11 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
 
   private static Map<String, Double> ALIAS = new HashMap<>();
   static {
-    DatapowerMonitor.ALIAS.put("yes", 1.0);
-    DatapowerMonitor.ALIAS.put("ok", 1.0);
-    DatapowerMonitor.ALIAS.put("on", 1.0);
-    DatapowerMonitor.ALIAS.put("up", 1.0);
-    DatapowerMonitor.ALIAS.put("enabled", 1.0);
+    DataPowerMonitor.ALIAS.put("yes", 1.0);
+    DataPowerMonitor.ALIAS.put("ok", 1.0);
+    DataPowerMonitor.ALIAS.put("on", 1.0);
+    DataPowerMonitor.ALIAS.put("up", 1.0);
+    DataPowerMonitor.ALIAS.put("enabled", 1.0);
   }
 
   private final List<MetricDef> connectionsAcceptedMetrics = new ArrayList<>();
@@ -314,7 +314,7 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
   private final List<MetricDef> httpMeanTransactionTime = new ArrayList<>();
   private final List<MetricDef> wsOperationMetricsSimpleIndex = new ArrayList<>();
 
-  public DatapowerMonitor() {
+  public DataPowerMonitor() {
     super();
     connectionsAcceptedMetrics.add(new MetricDef(mConnectionsAccepted_tenSeconds, "tenSeconds"));
     connectionsAcceptedMetrics.add(new MetricDef(mConnectionsAccepted_oneMinute, "oneMinute"));
@@ -330,8 +330,8 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
     //
     documentCachingSummary.add(new MetricDef(mDocumentCachingSummary_CacheCount, "CacheCount").split("XMLManager", "XMLManager"));
     documentCachingSummary.add(new MetricDef(mDocumentCachingSummary_DocCount, "DocCount").split("XMLManager", "XMLManager"));
-    documentCachingSummary.add(new MetricDef(mDocumentCachingSummary_CacheSize, "CacheSizeKiB").minAPIversion(7).scale(DatapowerMonitor.ONE_KIB).split("XMLManager", "XMLManager"));
-    documentCachingSummary.add(new MetricDef(mDocumentCachingSummary_ByteCount, "KiByteCount").minAPIversion(7).scale(DatapowerMonitor.ONE_KIB).split("XMLManager", "XMLManager"));
+    documentCachingSummary.add(new MetricDef(mDocumentCachingSummary_CacheSize, "CacheSizeKiB").minAPIversion(7).scale(DataPowerMonitor.ONE_KIB).split("XMLManager", "XMLManager"));
+    documentCachingSummary.add(new MetricDef(mDocumentCachingSummary_ByteCount, "KiByteCount").minAPIversion(7).scale(DataPowerMonitor.ONE_KIB).split("XMLManager", "XMLManager"));
     documentCachingSummary.add(new MetricDef(mDocumentCachingSummary_CacheSize, "CacheSize").maxAPIversion(6).split("XMLManager", "XMLManager"));
     documentCachingSummary.add(new MetricDef(mDocumentCachingSummary_ByteCount, "ByteCount").maxAPIversion(6).split("XMLManager", "XMLManager"));
     //
@@ -489,15 +489,15 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
   @Override
   public void readConf() throws CommandException {
     super.readConf();
-    datapowerTemplate = context.getConfigString(DatapowerMonitor.CONFIG_DATAPOWERTEMPLATE, null);
-    datapowerVersion = context.getConfigInt(DatapowerMonitor.CONFIG_DATAPOWERVERSION, 7);
+    datapowerTemplate = context.getConfigString(DataPowerMonitor.CONFIG_DATAPOWERTEMPLATE, null);
+    datapowerVersion = context.getConfigInt(DataPowerMonitor.CONFIG_DATAPOWERVERSION, 7);
   }
 
   @Override
   public boolean preCheck(final InetAddress host) throws CommandException {
     final boolean ok = super.preCheck(host);
     if (ok) {
-      final URL baseURL = getURL(DatapowerMonitor.CONFIG_DATAPOWERURL, host.getHostName());
+      final URL baseURL = getURL(DataPowerMonitor.CONFIG_DATAPOWERURL, host.getHostName());
       context.info("Datapower URL: " + baseURL);
       fetcher.setURL(baseURL);
       fetcher.setMethod(URLFetcherConfig.METHOD_POST, null);
@@ -629,6 +629,7 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
     final String mergedSOAPEnvelope = datapowerTemplate.replaceAll("@SOMAMONITORCLASS@", SOMAMethod);
     // connect
     try {
+      context.debug("SOMA URL: " + fetcher.getURL());
       context.debug("SOMA data: " + mergedSOAPEnvelope);
       fetcher.setPostData(mergedSOAPEnvelope);
       response = fetcher.execute();
@@ -654,13 +655,13 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
   private boolean somaCall(final String method, final List<MetricDef> metrics) throws CommandException {
     String response = callDPSOMAMethod(method);
     if (response == null) {
-      context.warn("Invalid SOMA response " + method + "-->" + fetcher.httpStatusCode);
+      context.warn("Invalid SOMA response " + method + " RC=" + fetcher.httpStatusCode);
       return false;
     }
     if (metrics == null) {
       response = response.replace('\n', ' ');
       response = response.replace('\r', ' ');
-      context.info("SOMA " + method + "-->" + response);
+      context.info("SOMA " + method + " -> " + response);
     }
     else {
       final DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -734,7 +735,7 @@ public class DatapowerMonitor extends GenericHTTPMonitor {
       d = Double.parseDouble(value);
     }
     catch (final NumberFormatException e) {
-      final Double v = DatapowerMonitor.ALIAS.get(value);
+      final Double v = DataPowerMonitor.ALIAS.get(value);
       if (v != null) {
         d = v;
       }

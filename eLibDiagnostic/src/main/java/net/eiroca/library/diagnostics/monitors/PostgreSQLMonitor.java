@@ -28,7 +28,7 @@ public class PostgreSQLMonitor extends DatabaseMonitor {
   //
   protected final MetricGroup mgPostgreSQL = new MetricGroup(mgMonitor, "PostgreSQL Statistics", "PostgreSQL - {0}");
   //
-  protected final MetricGroup mgPostgreSQLStats = new MetricGroup(mgPostgreSQL, "PostgreSQL Stats", "PostgreSQL - {0}");
+  protected final MetricGroup mgPostgreSQLStats = new MetricGroup(mgPostgreSQL, "PostgreSQL Stats");
   protected final Measure mblk_read_time = mgPostgreSQLStats.createMeasure("blk_read_time", "blk_read_time", "number");
   protected final Measure mblk_write_time = mgPostgreSQLStats.createMeasure("blk_write_time", "blk_write_time", "number");
   protected final Measure mblks_hit = mgPostgreSQLStats.createMeasure("blks_hit", "blks_hit", "number");
@@ -52,39 +52,39 @@ public class PostgreSQLMonitor extends DatabaseMonitor {
   protected final Measure mxact_commit = mgPostgreSQLStats.createMeasure("xact_commit", "xact_commit", "number");
   protected final Measure mxact_rollback = mgPostgreSQLStats.createMeasure("xact_rollback", "xact_rollback", "number");
   //
-  protected final MetricGroup mgPostgreSQLTables = new MetricGroup(mgPostgreSQL, "PostgreSQL Tables", "PostgreSQL - Tables - {0}");
-  protected final Measure mTables_analyze_count = mgPostgreSQLTables.createMeasure("Tables - analyze_count", "Tables - analyze_count", "number");
-  protected final Measure mTables_autoanalyze_count = mgPostgreSQLTables.createMeasure("Tables - autoanalyze_count", "Tables - autoanalyze_count", "number");
-  protected final Measure mTables_autovacuum_count = mgPostgreSQLTables.createMeasure("Tables - autovacuum_count", "Tables - autovacuum_count", "number");
-  protected final Measure mTables_coalesce = mgPostgreSQLTables.createMeasure("Tables - coalesce", "Tables - coalesce", "number");
-  protected final Measure mTables_heap_blks_hit = mgPostgreSQLTables.createMeasure("Tables - heap_blks_hit", "Tables - heap_blks_hit", "number");
-  protected final Measure mTables_heap_blks_read = mgPostgreSQLTables.createMeasure("Tables - heap_blks_read", "Tables - heap_blks_read", "number");
-  protected final Measure mTables_idx_blks_hit = mgPostgreSQLTables.createMeasure("Tables - idx_blks_hit", "Tables - idx_blks_hit", "number");
-  protected final Measure mTables_idx_blks_read = mgPostgreSQLTables.createMeasure("Tables - idx_blks_read", "Tables - idx_blks_read", "number");
-  protected final Measure mTables_n_dead_tup = mgPostgreSQLTables.createMeasure("Tables - n_dead_tup", "Tables - n_dead_tup", "number");
-  protected final Measure mTables_n_live_tup = mgPostgreSQLTables.createMeasure("Tables - n_live_tup", "Tables - n_live_tup", "number");
-  protected final Measure mTables_n_tup_del = mgPostgreSQLTables.createMeasure("Tables - n_tup_del", "Tables - n_tup_del", "number");
-  protected final Measure mTables_n_tup_hot_upd = mgPostgreSQLTables.createMeasure("Tables - n_tup_hot_upd", "Tables - n_tup_hot_upd", "number");
-  protected final Measure mTables_n_tup_ins = mgPostgreSQLTables.createMeasure("Tables - n_tup_ins", "Tables - n_tup_ins", "number");
-  protected final Measure mTables_n_tup_upd = mgPostgreSQLTables.createMeasure("Tables - n_tup_upd", "Tables - n_tup_upd", "number");
-  protected final Measure mTables_percent_of_times_index_used = mgPostgreSQLTables.createMeasure("Tables - percent_of_times_index_used", "Tables - percent_of_times_index_used", "number");
-  protected final Measure mTables_rows_in_table = mgPostgreSQLTables.createMeasure("Tables - rows_in_table", "Tables - rows_in_table", "number");
-  protected final Measure mTables_seq_scan = mgPostgreSQLTables.createMeasure("Tables - seq_scan", "Tables - seq_scan", "number");
-  protected final Measure mTables_seq_tup_read = mgPostgreSQLTables.createMeasure("Tables - seq_tup_read", "Tables - seq_tup_read", "number");
-  protected final Measure mTables_tidx_blks_hit = mgPostgreSQLTables.createMeasure("Tables - tidx_blks_hit", "Tables - tidx_blks_hit", "number");
-  protected final Measure mTables_tidx_blks_read = mgPostgreSQLTables.createMeasure("Tables - tidx_blks_read", "Tables - tidx_blks_read", "number");
-  protected final Measure mTables_toast_blks_hit = mgPostgreSQLTables.createMeasure("Tables - toast_blks_hit", "Tables - toast_blks_hit", "number");
-  protected final Measure mTables_toast_blks_read = mgPostgreSQLTables.createMeasure("Tables - toast_blks_read", "Tables - toast_blks_read", "number");
-  protected final Measure mTables_vacuum_count = mgPostgreSQLTables.createMeasure("Tables - vacuum_count", "Tables - vacuum_count", "number");
+  protected final MetricGroup mgPostgreSQLTables = new MetricGroup(mgPostgreSQL, "PostgreSQL Tables", "Tables - {0}");
+  protected final Measure mTables_analyze_count = mgPostgreSQLTables.createMeasure("analyze_count", "Tables - analyze_count", "number");
+  protected final Measure mTables_autoanalyze_count = mgPostgreSQLTables.createMeasure("autoanalyze_count", "Tables - autoanalyze_count", "number");
+  protected final Measure mTables_autovacuum_count = mgPostgreSQLTables.createMeasure("autovacuum_count", "Tables - autovacuum_count", "number");
+  protected final Measure mTables_coalesce = mgPostgreSQLTables.createMeasure("coalesce", "Tables - coalesce", "number");
+  protected final Measure mTables_heap_blks_hit = mgPostgreSQLTables.createMeasure("heap_blks_hit", "Tables - heap_blks_hit", "number");
+  protected final Measure mTables_heap_blks_read = mgPostgreSQLTables.createMeasure("heap_blks_read", "Tables - heap_blks_read", "number");
+  protected final Measure mTables_idx_blks_hit = mgPostgreSQLTables.createMeasure("idx_blks_hit", "Tables - idx_blks_hit", "number");
+  protected final Measure mTables_idx_blks_read = mgPostgreSQLTables.createMeasure("idx_blks_read", "Tables - idx_blks_read", "number");
+  protected final Measure mTables_n_dead_tup = mgPostgreSQLTables.createMeasure("n_dead_tup", "Tables - n_dead_tup", "number");
+  protected final Measure mTables_n_live_tup = mgPostgreSQLTables.createMeasure("n_live_tup", "Tables - n_live_tup", "number");
+  protected final Measure mTables_n_tup_del = mgPostgreSQLTables.createMeasure("n_tup_del", "Tables - n_tup_del", "number");
+  protected final Measure mTables_n_tup_hot_upd = mgPostgreSQLTables.createMeasure("n_tup_hot_upd", "Tables - n_tup_hot_upd", "number");
+  protected final Measure mTables_n_tup_ins = mgPostgreSQLTables.createMeasure("n_tup_ins", "Tables - n_tup_ins", "number");
+  protected final Measure mTables_n_tup_upd = mgPostgreSQLTables.createMeasure("n_tup_upd", "Tables - n_tup_upd", "number");
+  protected final Measure mTables_percent_of_times_index_used = mgPostgreSQLTables.createMeasure("percent_of_times_index_used", "Tables - percent_of_times_index_used", "number");
+  protected final Measure mTables_rows_in_table = mgPostgreSQLTables.createMeasure("rows_in_table", "Tables - rows_in_table", "number");
+  protected final Measure mTables_seq_scan = mgPostgreSQLTables.createMeasure("seq_scan", "Tables - seq_scan", "number");
+  protected final Measure mTables_seq_tup_read = mgPostgreSQLTables.createMeasure("seq_tup_read", "Tables - seq_tup_read", "number");
+  protected final Measure mTables_tidx_blks_hit = mgPostgreSQLTables.createMeasure("tidx_blks_hit", "Tables - tidx_blks_hit", "number");
+  protected final Measure mTables_tidx_blks_read = mgPostgreSQLTables.createMeasure("tidx_blks_read", "Tables - tidx_blks_read", "number");
+  protected final Measure mTables_toast_blks_hit = mgPostgreSQLTables.createMeasure("toast_blks_hit", "Tables - toast_blks_hit", "number");
+  protected final Measure mTables_toast_blks_read = mgPostgreSQLTables.createMeasure("toast_blks_read", "Tables - toast_blks_read", "number");
+  protected final Measure mTables_vacuum_count = mgPostgreSQLTables.createMeasure("vacuum_count", "Tables - vacuum_count", "number");
   //
-  protected final MetricGroup mgPostgreSQLIndexes = new MetricGroup(mgPostgreSQL, "PostgreSQL Indexes", "PostgreSQL - Indexes - {0}");
+  protected final MetricGroup mgPostgreSQLIndexes = new MetricGroup(mgPostgreSQL, "PostgreSQL Indexes", "Indexes - {0}");
   protected final Measure mIndexes_idx_blks_hit = mgPostgreSQLIndexes.createMeasure("idx_blks_hit", "Indexes - idx_blks_hit", "number");
   protected final Measure mIndexes_idx_blks_read = mgPostgreSQLIndexes.createMeasure("idx_blks_read", "Indexes - idx_blks_read", "number");
   protected final Measure mIndexes_idx_scan = mgPostgreSQLIndexes.createMeasure("idx_scan", "Indexes - idx_scan", "number");
   protected final Measure mIndexes_idx_tup_fetch = mgPostgreSQLIndexes.createMeasure("idx_tup_fetch", "Indexes - idx_tup_fetch", "number");
   protected final Measure mIndexes_idx_tup_read = mgPostgreSQLIndexes.createMeasure("idx_tup_read", "Indexes - idx_tup_read", "number");
   //
-  protected final MetricGroup mgPostgreSQLSequences = new MetricGroup(mgPostgreSQL, "PostgreSQL Sequences", "PostgreSQL - Sequences - {0}");
+  protected final MetricGroup mgPostgreSQLSequences = new MetricGroup(mgPostgreSQL, "PostgreSQL Sequences", "Sequences - {0}");
   protected final Measure mSequences_blks_read = mgPostgreSQLSequences.createMeasure("blks_read", "blks_read", "number");
   protected final Measure mSequences_blks_hit = mgPostgreSQLSequences.createMeasure("blks_hit", "blks_hit", "number");
 

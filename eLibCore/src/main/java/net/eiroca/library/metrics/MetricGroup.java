@@ -64,6 +64,18 @@ public class MetricGroup {
     }
   }
 
+  public void loadGroups(List<MetricGroup> metricGroupsList, boolean recursive) {
+    if (recursive) {
+      for (MetricGroup mg : subGroups) {
+        metricGroupsList.add(mg);
+        mg.loadGroups(metricGroupsList, true);
+      }
+    }
+    else {
+      metricGroupsList.addAll(subGroups);
+    }
+  }
+
   public void add(final MetricGroup group) {
     subGroups.add(group);
   }
@@ -143,9 +155,18 @@ public class MetricGroup {
   }
 
   public void refresh() {
+    refresh(false);
+  }
+
+  public void refresh(boolean recursive) {
     for (final IMetric<?> m : metrics) {
       if (m instanceof IDerivedMeasure) {
         ((IDerivedMeasure)m).refresh();
+      }
+    }
+    if (recursive && (subGroups.size() > 0)) {
+      for (MetricGroup mg : subGroups) {
+        mg.refresh(true);
       }
     }
   }
@@ -208,6 +229,10 @@ public class MetricGroup {
 
   public List<MetricGroup> getGroups() {
     return subGroups;
+  }
+
+  public int metricCount() {
+    return metrics.size();
   }
 
 }

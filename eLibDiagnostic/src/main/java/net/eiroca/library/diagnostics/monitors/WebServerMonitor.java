@@ -50,7 +50,7 @@ public class WebServerMonitor extends GenericHTTPMonitor {
   private String config_probeType;
   private Pattern config_probeRegEx;
 
-  MetricGroup mgHTTPMonitor = new MetricGroup(mgMonitor, "HTTP Statistics", "WebServer - {0}");
+  MetricGroup mgHTTPMonitor = new MetricGroup(mgMonitor, "WebServer Statistics", "WebServer - {0}");
   Measure smHeaderSize = mgHTTPMonitor.createMeasure("HeaderSize", "Size of HTTP headers", "bytes");
   Measure smResponseSize = mgHTTPMonitor.createMeasure("Response Size", "Response Size", "bytes");
   Measure smResponseThroughput = mgHTTPMonitor.createMeasure("Throughput", "Throughput", "kilobytes", "s");
