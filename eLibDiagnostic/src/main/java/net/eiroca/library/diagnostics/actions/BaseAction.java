@@ -38,6 +38,7 @@ import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.diagnostics.validators.GenericValidator;
 import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
+import net.eiroca.library.metrics.MetricAggregation;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
@@ -57,9 +58,9 @@ public abstract class BaseAction implements IAction<ActionData, ReturnObject>, I
   public MetricGroup mgAction = new MetricGroup(null, "Action Metrics");
   //
   public MetricGroup mgResult = new MetricGroup(mgAction, "Action Statistics");
-  protected Measure mStatus = mgResult.createMeasure("Status", "Exection status (0 OK)", "boolean");
-  protected Measure mResult = mgResult.createMeasure("Result", "Output result", "number");
-  protected Measure mVerified = mgResult.createMeasure("ContentVerified", "1 if result is validated and valid", "boolean");
+  protected Measure mStatus = mgResult.createMeasure("Status", MetricAggregation.zero, "Exection status (0 OK)", "boolean");
+  protected Measure mResult = mgResult.createMeasure("Result", MetricAggregation.zero, "Output result", "number");
+  protected Measure mVerified = mgResult.createMeasure("ContentVerified", MetricAggregation.zero, "1 if result is validated and valid", "boolean");
 
   public static final String SPLIT_GROUP = "Values";
 

@@ -29,6 +29,7 @@ import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
+import net.eiroca.library.metrics.MetricAggregation;
 import net.eiroca.library.metrics.MetricGroup;
 
 public class WebServerMonitor extends GenericHTTPMonitor {
@@ -51,16 +52,16 @@ public class WebServerMonitor extends GenericHTTPMonitor {
   private Pattern config_probeRegEx;
 
   MetricGroup mgHTTPMonitor = new MetricGroup(mgMonitor, "WebServer Statistics", "WebServer - {0}");
-  Measure smHeaderSize = mgHTTPMonitor.createMeasure("HeaderSize", "Size of HTTP headers", "bytes");
-  Measure smResponseSize = mgHTTPMonitor.createMeasure("Response Size", "Response Size", "bytes");
-  Measure smResponseThroughput = mgHTTPMonitor.createMeasure("Throughput", "Throughput", "kilobytes", "s");
-  Measure smHTTPStatusCode = mgHTTPMonitor.createMeasure("HttpStatusCode", "HTTP status code", "number");
-  Measure smConnCloseDelay = mgHTTPMonitor.createMeasure("ConnectionCloseDelay", "Connection close delay", "ms");
+  Measure smHeaderSize = mgHTTPMonitor.createMeasure("HeaderSize", MetricAggregation.zero, "Size of HTTP headers", "bytes");
+  Measure smResponseSize = mgHTTPMonitor.createMeasure("Response Size", MetricAggregation.zero, "Response Size", "bytes");
+  Measure smResponseThroughput = mgHTTPMonitor.createMeasure("Throughput", MetricAggregation.zero, "Throughput", "kilobytes", "s");
+  Measure smHTTPStatusCode = mgHTTPMonitor.createMeasure("HttpStatusCode", MetricAggregation.zero, "HTTP status code", "number");
+  Measure smConnCloseDelay = mgHTTPMonitor.createMeasure("ConnectionCloseDelay", MetricAggregation.zero, "Connection close delay", "ms");
 
   MetricGroup mgProbe = new MetricGroup(mgMonitor, "Probe Statistics", "Probe - {0}");
-  Measure smProbeResult = mgProbe.createMeasure("Result", "Probe result", "number");
-  Measure smProbeStatus = mgProbe.createMeasure("Status", "Probe status", "number");
-  Measure smProbeRows = mgProbe.createMeasure("Rows", "Probe number of rows returned", "number");
+  Measure smProbeResult = mgProbe.createMeasure("Result", MetricAggregation.zero, "Probe result", "number");
+  Measure smProbeStatus = mgProbe.createMeasure("Status", MetricAggregation.zero, "Probe status", "number");
+  Measure smProbeRows = mgProbe.createMeasure("Rows", MetricAggregation.zero, "Probe number of rows returned", "number");
 
   protected boolean defaultHasProbe = true;
   protected boolean urlCheck;

@@ -26,6 +26,7 @@ import net.eiroca.library.diagnostics.IServerMonitor;
 import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.diagnostics.validators.GenericValidator;
 import net.eiroca.library.metrics.Measure;
+import net.eiroca.library.metrics.MetricAggregation;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
@@ -40,14 +41,14 @@ public abstract class ServerMonitor implements IServerMonitor {
 
   // measure constants
   protected MetricGroup mgServerInfo = new MetricGroup(mgMonitor, "Server Statistics");
-  protected Measure mServerConnectionTimeout = mgServerInfo.createMeasure("ConnectionTimedOut", "1 if connection timed out", "boolean");
-  protected Measure mServerLatency = mgServerInfo.createMeasure("ServerLatency", "Server latency", "ms");
-  protected Measure mServerReachable = mgServerInfo.createMeasure("HostReachable", "1 if host is reachable", "boolean");
-  protected Measure mServerResponseTime = mgServerInfo.createMeasure("Response Time", "Complete response time (e.g. connection + query + read)", "ms");
-  protected Measure mServerResult = mgServerInfo.createMeasure("Result", "Server Response (e.g. query data)", "number");
-  protected Measure mServerSocketTimeout = mgServerInfo.createMeasure("SocketTimedOut", "1 if socket had timed out", "boolean");
-  protected Measure mServerStatus = mgServerInfo.createMeasure("Status", "Response status (0 OK)", "boolean");
-  protected Measure mServerVerified = mgServerInfo.createMeasure("ContentVerified", "1 if result is validated and valid", "boolean");
+  protected Measure mServerConnectionTimeout = mgServerInfo.createMeasure("ConnectionTimedOut", MetricAggregation.zero, "1 if connection timed out", "boolean");
+  protected Measure mServerLatency = mgServerInfo.createMeasure("ServerLatency", MetricAggregation.zero, "Server latency", "ms");
+  protected Measure mServerReachable = mgServerInfo.createMeasure("HostReachable", MetricAggregation.zero, "1 if host is reachable", "boolean");
+  protected Measure mServerResponseTime = mgServerInfo.createMeasure("Response Time", MetricAggregation.zero, "Complete response time (e.g. connection + query + read)", "ms");
+  protected Measure mServerResult = mgServerInfo.createMeasure("Result", MetricAggregation.zero, "Server Response (e.g. query data)", "number");
+  protected Measure mServerSocketTimeout = mgServerInfo.createMeasure("SocketTimedOut", MetricAggregation.zero, "1 if socket had timed out", "boolean");
+  protected Measure mServerStatus = mgServerInfo.createMeasure("Status", MetricAggregation.zero, "Response status (0 OK)", "boolean");
+  protected Measure mServerVerified = mgServerInfo.createMeasure("ContentVerified", MetricAggregation.zero, "1 if result is validated and valid", "boolean");
 
   protected IContext context;
 

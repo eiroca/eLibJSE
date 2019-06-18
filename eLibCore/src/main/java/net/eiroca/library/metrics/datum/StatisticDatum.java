@@ -86,8 +86,11 @@ public class StatisticDatum implements IDatum {
   }
 
   public double getValue(final MetricAggregation aggregation) {
-    double val = 0;
+    double val = 0.0;
     switch (aggregation) {
+      case zero:
+        val = 0.0;
+        break;
       case min:
         val = min;
         break;

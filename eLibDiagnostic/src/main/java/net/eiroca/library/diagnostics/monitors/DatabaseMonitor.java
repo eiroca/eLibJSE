@@ -34,6 +34,7 @@ import net.eiroca.library.diagnostics.util.SQLchecks;
 import net.eiroca.library.diagnostics.validators.GenericValidator;
 import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
+import net.eiroca.library.metrics.MetricAggregation;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.IContext;
 import net.eiroca.library.system.ILog.LogLevel;
@@ -69,9 +70,9 @@ public class DatabaseMonitor extends TCPServerMonitor {
   private static final String CONFIG_RUNSQL = "runSQL";
 
   protected final MetricGroup mgDBMonitor = new MetricGroup(mgMonitor, "Database Statistics");
-  protected final Measure mDBQueryTime = mgDBMonitor.createMeasure("Query Time", "Tikem taken by the query", "ms");
-  protected final Measure mDBQueryRows = mgDBMonitor.createMeasure("Query Rows", "Rows returned by the query", "number");
-  protected final Measure mDBQueryCols = mgDBMonitor.createMeasure("Query Columns", "Columns returned by the query", "number");
+  protected final Measure mDBQueryTime = mgDBMonitor.createMeasure("Query Time", MetricAggregation.zero, "Tikem taken by the query", "ms");
+  protected final Measure mDBQueryRows = mgDBMonitor.createMeasure("Query Rows", MetricAggregation.zero, "Rows returned by the query", "number");
+  protected final Measure mDBQueryCols = mgDBMonitor.createMeasure("Query Columns", MetricAggregation.zero, "Columns returned by the query", "number");
 
   protected GenericValidator validator;
   protected DBConfig config;

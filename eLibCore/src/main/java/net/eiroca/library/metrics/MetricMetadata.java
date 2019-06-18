@@ -30,6 +30,7 @@ public class MetricMetadata {
   private String noagg;
   //
   private boolean calcDelta;
+  private MetricAggregation aggregation = MetricAggregation.zero;
 
   public MetricMetadata(final String name) {
     this.name = name;
@@ -50,64 +51,81 @@ public class MetricMetadata {
     return MessageFormat.format(displayFormat, name);
   }
 
-  public void setName(final String name) {
-    this.name = name;
-  }
-
   public double getDefValue() {
     return defValue;
-  }
-
-  public void setDefValue(final double defValue) {
-    this.defValue = defValue;
   }
 
   public String getDisplayFormat() {
     return displayFormat;
   }
 
-  public void setDisplayFormat(final String displayFormat) {
-    this.displayFormat = displayFormat;
-  }
-
   public String getDescription() {
     return description;
-  }
-
-  public void setDescription(final String description) {
-    this.description = description;
   }
 
   public String getUnit() {
     return unit;
   }
 
-  public void setUnit(final String unit) {
-    this.unit = unit;
-  }
-
   public String getRate() {
     return rate;
-  }
-
-  public void setRate(final String rate) {
-    this.rate = rate;
   }
 
   public String getNoagg() {
     return noagg;
   }
 
-  public void setNoagg(final String noagg) {
-    this.noagg = noagg;
-  }
-
   public boolean getCalcDelta() {
     return calcDelta;
   }
 
-  public void setCalcDelta(final boolean calcDelta) {
+  public MetricAggregation getAggregation() {
+    return aggregation;
+  }
+
+  public MetricMetadata setName(final String name) {
+    this.name = name;
+    return this;
+  }
+
+  public MetricMetadata setDefValue(final double defValue) {
+    this.defValue = defValue;
+    return this;
+  }
+
+  public MetricMetadata setDisplayFormat(final String displayFormat) {
+    this.displayFormat = displayFormat;
+    return this;
+  }
+
+  public MetricMetadata setDescription(final String description) {
+    this.description = description;
+    return this;
+  }
+
+  public MetricMetadata setUnit(final String unit) {
+    this.unit = unit;
+    return this;
+  }
+
+  public MetricMetadata setRate(final String rate) {
+    this.rate = rate;
+    return this;
+  }
+
+  public MetricMetadata setNoagg(final String noagg) {
+    this.noagg = noagg;
+    return this;
+  }
+
+  public MetricMetadata setCalcDelta(final boolean calcDelta) {
     this.calcDelta = calcDelta;
+    return this;
+  }
+
+  public MetricMetadata setAggregation(final MetricAggregation aggregation) {
+    this.aggregation = aggregation;
+    return this;
   }
 
 }

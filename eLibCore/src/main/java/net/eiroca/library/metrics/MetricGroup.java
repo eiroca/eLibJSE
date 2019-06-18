@@ -177,8 +177,9 @@ public class MetricGroup {
     return add(m);
   }
 
-  public Measure define(final String name, final Measure m, final String description, final String unit, final String rate) {
+  public Measure define(final String name, final Measure m, final MetricAggregation aggregation, final String description, final String unit, final String rate) {
     final MetricMetadata definition = new MetricMetadata(name, measureNameFormat, 0);
+    definition.setAggregation(aggregation);
     definition.setDescription(description);
     definition.setUnit(unit);
     definition.setRate(rate);
@@ -196,23 +197,26 @@ public class MetricGroup {
     return add(new Measure(definition));
   }
 
-  public Measure createMeasure(final String name, final String description, final String unit) {
+  public Measure createMeasure(final String name, final MetricAggregation aggregation, final String description, final String unit) {
     final MetricMetadata definition = new MetricMetadata(name, measureNameFormat, 0);
+    definition.setAggregation(aggregation);
     definition.setDescription(description);
     definition.setUnit(unit);
     return add(new Measure(definition));
   }
 
-  public Measure createMeasure(final String name, final String description, final String unit, final String rate) {
+  public Measure createMeasure(final String name, final MetricAggregation aggregation, final String description, final String unit, final String rate) {
     final MetricMetadata definition = new MetricMetadata(name, measureNameFormat, 0);
+    definition.setAggregation(aggregation);
     definition.setDescription(description);
     definition.setUnit(unit);
     definition.setRate(rate);
     return add(new Measure(definition));
   }
 
-  public Measure createMeasure(final String name, final String description, final String unit, final boolean calcDelta) {
+  public Measure createMeasure(final String name, final MetricAggregation aggregation, final String description, final String unit, final boolean calcDelta) {
     final MetricMetadata definition = new MetricMetadata(name, measureNameFormat, 0);
+    definition.setAggregation(aggregation);
     definition.setDescription(description);
     definition.setUnit(unit);
     definition.setCalcDelta(calcDelta);

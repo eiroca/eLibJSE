@@ -16,6 +16,7 @@
  **/
 package net.eiroca.library.diagnostics.monitors;
 
+import static net.eiroca.library.metrics.MetricAggregation.zero;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -23,6 +24,7 @@ import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.diagnostics.CommandException;
 import net.eiroca.library.metrics.Measure;
+import net.eiroca.library.metrics.MetricAggregation;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.metrics.derived.HitMissRatioMeasure;
 import net.eiroca.library.metrics.derived.RateMeasure;
@@ -34,25 +36,25 @@ public class RedisMonitor extends TCPServerMonitor {
   public static final String CONFIG_AUTH = "redisAuth";
 
   protected MetricGroup mgRedisInfo = new MetricGroup(mgMonitor, "Redis Statistics");
-  protected Measure mRedisClientsConn = mgRedisInfo.createMeasure("Clients - connected clients", "Connected clients", "number");
-  protected Measure mRedisKeyspaceKeys = mgRedisInfo.createMeasure("Keyspace - keys", "Keyspace - keys", "number");
-  protected Measure mRedisMemoryOverhead = mgRedisInfo.createMeasure("Memory - used memory overhead", "Memory - used memory overhead", "bytes");
-  protected Measure mRedisMemoryPeak = mgRedisInfo.createMeasure("Memory - used memory peak", "Memory - used memory peak", "bytes");
-  protected Measure mRedisMemoryUsed = mgRedisInfo.createMeasure("Memory - used memory", "Memory - used memory", "bytes");
-  protected Measure mRedisRDBBkgSave = mgRedisInfo.createMeasure("Persistence - rdb bgsave in progress", "Persistence - rdb bgsave in progress", "number");
-  protected Measure mRedisRDBChanges = mgRedisInfo.createMeasure("Persistence - rdb changes since last save", "Persistence - rdb changes since last save", "number");
-  protected Measure mRedisRDBLstSave = mgRedisInfo.createMeasure("Persistence - rdb last bgsave time sec", "Persistence - rdb last bgsave time sec", "s");
-  protected Measure mRedisReplicationLastIO = mgRedisInfo.createMeasure("Replication - master last io seconds ago", "Replication - master last io seconds ago", "s");
-  protected Measure mRedisReplicationSlaves = mgRedisInfo.createMeasure("Replication - connected slaves", "Replication - connected slaves", "number");
-  protected Measure mRedisReplicationSyncIn = mgRedisInfo.createMeasure("Replication - master sync in progress", "Replication - master sync in progress", "number");
-  protected Measure mRedisServerUptime = mgRedisInfo.createMeasure("Server - uptime", "Server uptime", "s");
-  protected Measure mRedisStatsCmds = mgRedisInfo.createMeasure("Stats - total commands processed", "Total commands processed", "number");
-  protected Measure mRedisStatsHits = mgRedisInfo.createMeasure("Stats - keyspace hits", "Keyspace hits", "number");
-  protected Measure mRedisStatsMiss = mgRedisInfo.createMeasure("Stats - keyspace misses", "Keyspace misses", "number");
-  protected Measure mRedisStatsOps = mgRedisInfo.createMeasure("Stats - instantaneous ops per sec", "Instantaneous operations per second", "number", "s");
-  protected Measure mRedisHitRatio = mgRedisInfo.define("Keyspace Hit Ratio", new HitMissRatioMeasure(mRedisStatsHits, mRedisStatsMiss), "Keyspace Hit Ratio", "percent", (String)null);
-  protected Measure mRedisHitsPerSec = mgRedisInfo.define("Keyspace Hit Rate", new RateMeasure(mRedisStatsHits, TimeUnit.SECONDS, 0.0), "Keyspace Hit Rate", "number", "s");
-  protected Measure mRedisMissPerSec = mgRedisInfo.define("Keyspace Miss Rate", new RateMeasure(mRedisStatsMiss, TimeUnit.SECONDS, 0.0), "Keyspace Miss Rate", "number", "s");
+  protected Measure mRedisClientsConn = mgRedisInfo.createMeasure("Clients - connected clients", MetricAggregation.zero, "Connected clients", "number");
+  protected Measure mRedisKeyspaceKeys = mgRedisInfo.createMeasure("Keyspace - keys", MetricAggregation.zero, "Keyspace - keys", "number");
+  protected Measure mRedisMemoryOverhead = mgRedisInfo.createMeasure("Memory - used memory overhead", MetricAggregation.zero, "Memory - used memory overhead", "bytes");
+  protected Measure mRedisMemoryPeak = mgRedisInfo.createMeasure("Memory - used memory peak", MetricAggregation.zero, "Memory - used memory peak", "bytes");
+  protected Measure mRedisMemoryUsed = mgRedisInfo.createMeasure("Memory - used memory", MetricAggregation.zero, "Memory - used memory", "bytes");
+  protected Measure mRedisRDBBkgSave = mgRedisInfo.createMeasure("Persistence - rdb bgsave in progress", MetricAggregation.zero, "Persistence - rdb bgsave in progress", "number");
+  protected Measure mRedisRDBChanges = mgRedisInfo.createMeasure("Persistence - rdb changes since last save", MetricAggregation.zero, "Persistence - rdb changes since last save", "number");
+  protected Measure mRedisRDBLstSave = mgRedisInfo.createMeasure("Persistence - rdb last bgsave time sec", MetricAggregation.zero, "Persistence - rdb last bgsave time sec", "s");
+  protected Measure mRedisReplicationLastIO = mgRedisInfo.createMeasure("Replication - master last io seconds ago", MetricAggregation.zero, "Replication - master last io seconds ago", "s");
+  protected Measure mRedisReplicationSlaves = mgRedisInfo.createMeasure("Replication - connected slaves", MetricAggregation.zero, "Replication - connected slaves", "number");
+  protected Measure mRedisReplicationSyncIn = mgRedisInfo.createMeasure("Replication - master sync in progress", MetricAggregation.zero, "Replication - master sync in progress", "number");
+  protected Measure mRedisServerUptime = mgRedisInfo.createMeasure("Server - uptime", MetricAggregation.zero, "Server uptime", "s");
+  protected Measure mRedisStatsCmds = mgRedisInfo.createMeasure("Stats - total commands processed", MetricAggregation.zero, "Total commands processed", "number");
+  protected Measure mRedisStatsHits = mgRedisInfo.createMeasure("Stats - keyspace hits", MetricAggregation.zero, "Keyspace hits", "number");
+  protected Measure mRedisStatsMiss = mgRedisInfo.createMeasure("Stats - keyspace misses", MetricAggregation.zero, "Keyspace misses", "number");
+  protected Measure mRedisStatsOps = mgRedisInfo.createMeasure("Stats - instantaneous ops per sec", MetricAggregation.zero, "Instantaneous operations per second", "number", "s");
+  protected Measure mRedisHitRatio = mgRedisInfo.define("Keyspace Hit Ratio", new HitMissRatioMeasure(mRedisStatsHits, mRedisStatsMiss), MetricAggregation.zero, "Keyspace Hit Ratio", "percent", (String)null);
+  protected Measure mRedisHitsPerSec = mgRedisInfo.define("Keyspace Hit Rate", new RateMeasure(mRedisStatsHits, TimeUnit.SECONDS, 0.0), MetricAggregation.zero, "Keyspace Hit Rate", "number", "s");
+  protected Measure mRedisMissPerSec = mgRedisInfo.define("Keyspace Miss Rate", new RateMeasure(mRedisStatsMiss, TimeUnit.SECONDS, 0.0), zero, "Keyspace Miss Rate", "number", "s");
 
   protected Map<String, Measure> mapping = new HashMap<>();
 

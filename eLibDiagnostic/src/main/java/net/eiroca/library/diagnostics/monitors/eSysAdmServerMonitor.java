@@ -41,10 +41,10 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
 
   // measurement variables
   protected final MetricGroup mgeSysAdm = new MetricGroup(mgMonitor, "eSysAdm Statistics", "eSysAdm - {0}");
-  protected final Measure mMetrics = mgeSysAdm.createMeasure("Metrics", "Metrics collected by eSysAdm server", "number");
-  protected final Measure mAlerts = mgeSysAdm.createMeasure("Alerts", "Alerts collected by eSysAdm server", "number");
-  protected final Measure mKPIs = mgeSysAdm.createMeasure("KPIs", "KPIs (%) collected by eSysAdm server", "percent");
-  protected final Measure mTimings = mgeSysAdm.createMeasure("Timings", "Timings (ms) collected by eSysAdm server", "ms");
+  protected final Measure mMetrics = mgeSysAdm.createMeasure("Metrics", MetricAggregation.zero, "Metrics collected by eSysAdm server", "number");
+  protected final Measure mAlerts = mgeSysAdm.createMeasure("Alerts", MetricAggregation.zero, "Alerts collected by eSysAdm server", "number");
+  protected final Measure mKPIs = mgeSysAdm.createMeasure("KPIs", MetricAggregation.zero, "KPIs (%) collected by eSysAdm server", "percent");
+  protected final Measure mTimings = mgeSysAdm.createMeasure("Timings", MetricAggregation.zero, "Timings (ms) collected by eSysAdm server", "ms");
 
   private String namespace;
 
@@ -67,6 +67,8 @@ public class eSysAdmServerMonitor extends RESTServerMonitor {
     boolean ok = true;
     try {
       switch (aggregation) {
+        case zero:
+          val = 0.0;
         case min:
           val = data.getDouble("min");
           break;

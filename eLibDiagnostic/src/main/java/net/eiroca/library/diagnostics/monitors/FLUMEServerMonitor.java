@@ -25,6 +25,7 @@ import java.util.Map;
 import org.json.JSONObject;
 import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.Measure;
+import net.eiroca.library.metrics.MetricAggregation;
 import net.eiroca.library.metrics.MetricGroup;
 import net.eiroca.library.system.ILog;
 
@@ -63,30 +64,30 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
 
   // measurement variables
   protected final MetricGroup mgFLUME = new MetricGroup(mgMonitor, "FLUME Statistics");
-  protected final Measure mAppendAcceptedCount = mgFLUME.createMeasure("Append Accepted", "Append Accepted Count", "number");
-  protected final Measure mAppendBatchAcceptedCount = mgFLUME.createMeasure("Append Batch Accepted", "Append batch accepted count", "number");
-  protected final Measure mAppendBatchReceivedCount = mgFLUME.createMeasure("Append Batch Received", "Append batch received count", "number");
-  protected final Measure mAppendReceivedCount = mgFLUME.createMeasure("Append Received", "Append received count", "number");
-  protected final Measure mBatchCompleteCount = mgFLUME.createMeasure("Batch Complete", "Batch complete count", "number");
-  protected final Measure mBatchEmptyCount = mgFLUME.createMeasure("Batch Empty", "Batch empty count", "number");
-  protected final Measure mBatchUnderflowCount = mgFLUME.createMeasure("Batch Underflow", "Batch underflow count", "number");
-  protected final Measure mChannelCapacity = mgFLUME.createMeasure("Channel Capacity", "Channel capacity", "number");
-  protected final Measure mChannelFillPercentage = mgFLUME.createMeasure("Channel Fill", "Channel fill (%)", "percent");
-  protected final Measure mChannelSize = mgFLUME.createMeasure("Channel Size", "Channel size", "number");
-  protected final Measure mConnectionClosedCount = mgFLUME.createMeasure("Connection closed", "Connection Closed count", "number");
-  protected final Measure mConnectionCreatedCount = mgFLUME.createMeasure("Connection created", "Connection Created count", "number");
-  protected final Measure mConnectionFailedCount = mgFLUME.createMeasure("Connection failed", "Connection failed count", "number");
-  protected final Measure mEventAcceptedCount = mgFLUME.createMeasure("Event Accepted", "Event accepted count", "number");
-  protected final Measure mEventDrainAttemptCount = mgFLUME.createMeasure("Event Drain Attempt", "Event drain attempt count", "number");
-  protected final Measure mEventDrainSuccessCount = mgFLUME.createMeasure("Event Drain Success", "Event drain success count", "number");
-  protected final Measure mEventPutAttemptCount = mgFLUME.createMeasure("Event Put Attempt", "Event put attempt count", "number");
-  protected final Measure mEventPutSuccessCount = mgFLUME.createMeasure("Event Put Success", "Event put success count", "number");
-  protected final Measure mEventReceivedCount = mgFLUME.createMeasure("Event Received", "Event received count", "number");
-  protected final Measure mEventTakeAttemptCount = mgFLUME.createMeasure("Event Take Attempt", "Event Take attempt count", "number");
-  protected final Measure mEventTakeSuccessCount = mgFLUME.createMeasure("Event Take Success", "Event Take success count", "number");
-  protected final Measure mOpenConnectionCount = mgFLUME.createMeasure("Open Connection", "Open connection count", "number");
-  protected final Measure mStartTime = mgFLUME.createMeasure("Start Time", "Start time", "number");
-  protected final Measure mStopTime = mgFLUME.createMeasure("Stop Time", "Stop time", "number");
+  protected final Measure mAppendAcceptedCount = mgFLUME.createMeasure("Append Accepted", MetricAggregation.zero, "Append Accepted Count", "number");
+  protected final Measure mAppendBatchAcceptedCount = mgFLUME.createMeasure("Append Batch Accepted", MetricAggregation.zero, "Append batch accepted count", "number");
+  protected final Measure mAppendBatchReceivedCount = mgFLUME.createMeasure("Append Batch Received", MetricAggregation.zero, "Append batch received count", "number");
+  protected final Measure mAppendReceivedCount = mgFLUME.createMeasure("Append Received", MetricAggregation.zero, "Append received count", "number");
+  protected final Measure mBatchCompleteCount = mgFLUME.createMeasure("Batch Complete", MetricAggregation.zero, "Batch complete count", "number");
+  protected final Measure mBatchEmptyCount = mgFLUME.createMeasure("Batch Empty", MetricAggregation.zero, "Batch empty count", "number");
+  protected final Measure mBatchUnderflowCount = mgFLUME.createMeasure("Batch Underflow", MetricAggregation.zero, "Batch underflow count", "number");
+  protected final Measure mChannelCapacity = mgFLUME.createMeasure("Channel Capacity", MetricAggregation.zero, "Channel capacity", "number");
+  protected final Measure mChannelFillPercentage = mgFLUME.createMeasure("Channel Fill", MetricAggregation.zero, "Channel fill (%)", "percent");
+  protected final Measure mChannelSize = mgFLUME.createMeasure("Channel Size", MetricAggregation.zero, "Channel size", "number");
+  protected final Measure mConnectionClosedCount = mgFLUME.createMeasure("Connection closed", MetricAggregation.zero, "Connection Closed count", "number");
+  protected final Measure mConnectionCreatedCount = mgFLUME.createMeasure("Connection created", MetricAggregation.zero, "Connection Created count", "number");
+  protected final Measure mConnectionFailedCount = mgFLUME.createMeasure("Connection failed", MetricAggregation.zero, "Connection failed count", "number");
+  protected final Measure mEventAcceptedCount = mgFLUME.createMeasure("Event Accepted", MetricAggregation.zero, "Event accepted count", "number");
+  protected final Measure mEventDrainAttemptCount = mgFLUME.createMeasure("Event Drain Attempt", MetricAggregation.zero, "Event drain attempt count", "number");
+  protected final Measure mEventDrainSuccessCount = mgFLUME.createMeasure("Event Drain Success", MetricAggregation.zero, "Event drain success count", "number");
+  protected final Measure mEventPutAttemptCount = mgFLUME.createMeasure("Event Put Attempt", MetricAggregation.zero, "Event put attempt count", "number");
+  protected final Measure mEventPutSuccessCount = mgFLUME.createMeasure("Event Put Success", MetricAggregation.zero, "Event put success count", "number");
+  protected final Measure mEventReceivedCount = mgFLUME.createMeasure("Event Received", MetricAggregation.zero, "Event received count", "number");
+  protected final Measure mEventTakeAttemptCount = mgFLUME.createMeasure("Event Take Attempt", MetricAggregation.zero, "Event Take attempt count", "number");
+  protected final Measure mEventTakeSuccessCount = mgFLUME.createMeasure("Event Take Success", MetricAggregation.zero, "Event Take success count", "number");
+  protected final Measure mOpenConnectionCount = mgFLUME.createMeasure("Open Connection", MetricAggregation.zero, "Open connection count", "number");
+  protected final Measure mStartTime = mgFLUME.createMeasure("Start Time", MetricAggregation.zero, "Start time", "number");
+  protected final Measure mStopTime = mgFLUME.createMeasure("Stop Time", MetricAggregation.zero, "Stop time", "number");
 
   public Map<String, JSONMapping> mappigns = new HashMap<>();
 
