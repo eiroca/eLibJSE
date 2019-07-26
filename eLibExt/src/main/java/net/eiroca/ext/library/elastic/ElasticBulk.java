@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2001-2019 eIrOcA (eNrIcO Croce & sImOnA Burzio) - AGPL >= 3.0
+ * Copyright (C) 1999-2019 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -220,7 +220,7 @@ public class ElasticBulk {
       final long now = System.currentTimeMillis();
       if (now > lastOverload) {
         lastOverload = now + discardTime;
-        logger.info("Elastic overload {} until {}", now, lastOverload);
+        ElasticBulk.logger.info("Elastic overload {} until {}", now, lastOverload);
       }
     }
   }

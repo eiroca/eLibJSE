@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2001-2019 eIrOcA (eNrIcO Croce & sImOnA Burzio) - AGPL >= 3.0
+ * Copyright (C) 1999-2019 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -122,7 +122,7 @@ public abstract class Parameter<T extends Object> {
     return label;
   }
 
-  public Parameter<T> setLabel(String label) {
+  public Parameter<T> setLabel(final String label) {
     this.label = label;
     return this;
   }
@@ -131,7 +131,7 @@ public abstract class Parameter<T extends Object> {
     return description;
   }
 
-  public Parameter<T> setDescription(String description) {
+  public Parameter<T> setDescription(final String description) {
     this.description = description;
     return this;
   }

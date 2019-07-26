@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2001-2019 eIrOcA (eNrIcO Croce & sImOnA Burzio) - AGPL >= 3.0
+ * Copyright (C) 1999-2019 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -232,12 +232,12 @@ public class DBQuery {
   }
 
   public String getString(final String columnName, final String defVal) {
-    if (LibStr.isEmptyOrNull(columnName)) return defVal;
+    if (LibStr.isEmptyOrNull(columnName)) { return defVal; }
     int colNum = -1;
     try {
       colNum = rs.findColumn(columnName);
     }
-    catch (SQLException e1) {
+    catch (final SQLException e1) {
       colNum = Helper.getInt(columnName, -1);
     }
     if (colNum < 0) {
@@ -266,7 +266,7 @@ public class DBQuery {
       try {
         n = rs.getMetaData().getColumnCount();
       }
-      catch (SQLException e1) {
+      catch (final SQLException e1) {
       }
       errorDesc = colNum + " / " + n + " -> error: " + e.getMessage();
       log.error(errorDesc);

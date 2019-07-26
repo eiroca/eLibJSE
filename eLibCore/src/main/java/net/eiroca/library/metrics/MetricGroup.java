@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 2001-2019 eIrOcA (eNrIcO Croce & sImOnA Burzio) - AGPL >= 3.0
+ * Copyright (C) 1999-2019 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -29,14 +29,16 @@ public class MetricGroup {
   private String name;
   private String measureNameFormat = "{0}";
 
-  public MetricGroup(MetricGroup parent, final String name) {
+  public MetricGroup(final MetricGroup parent, final String name) {
     this(parent, name, "{0}");
   }
 
-  public MetricGroup(MetricGroup parent, final String name, final String measureNameFormat) {
+  public MetricGroup(final MetricGroup parent, final String name, final String measureNameFormat) {
     this.name = name;
     this.measureNameFormat = measureNameFormat;
-    if (parent != null) parent.add(this);
+    if (parent != null) {
+      parent.add(this);
+    }
   }
 
   public String getMeasureNameFormat() {
@@ -55,18 +57,18 @@ public class MetricGroup {
     return metrics;
   }
 
-  public void loadMetrics(List<IMetric<?>> metricsList, boolean recursive) {
+  public void loadMetrics(final List<IMetric<?>> metricsList, final boolean recursive) {
     metricsList.addAll(metrics);
     if (recursive) {
-      for (MetricGroup mg : subGroups) {
+      for (final MetricGroup mg : subGroups) {
         mg.loadMetrics(metricsList, true);
       }
     }
   }
 
-  public void loadGroups(List<MetricGroup> metricGroupsList, boolean recursive) {
+  public void loadGroups(final List<MetricGroup> metricGroupsList, final boolean recursive) {
     if (recursive) {
-      for (MetricGroup mg : subGroups) {
+      for (final MetricGroup mg : subGroups) {
         metricGroupsList.add(mg);
         mg.loadGroups(metricGroupsList, true);
       }
@@ -81,7 +83,7 @@ public class MetricGroup {
   }
 
   public Measure add(final Measure measure) {
-    if (!allowMetrics) throw new IllegalStateException("Metric not allowed!");
+    if (!allowMetrics) { throw new IllegalStateException("Metric not allowed!"); }
     metrics.add(measure);
     return measure;
   }
@@ -108,9 +110,11 @@ public class MetricGroup {
       }
     }
     if ((m == null) && recursive && (subGroups.size() > 0)) {
-      for (MetricGroup mg : subGroups) {
+      for (final MetricGroup mg : subGroups) {
         m = mg.find(measureName, false, true);
-        if (m != null) break;
+        if (m != null) {
+          break;
+        }
       }
     }
     if ((m == null) && createIfMissing) {
@@ -158,14 +162,14 @@ public class MetricGroup {
     refresh(false);
   }
 
-  public void refresh(boolean recursive) {
+  public void refresh(final boolean recursive) {
     for (final IMetric<?> m : metrics) {
       if (m instanceof IDerivedMeasure) {
         ((IDerivedMeasure)m).refresh();
       }
     }
     if (recursive && (subGroups.size() > 0)) {
-      for (MetricGroup mg : subGroups) {
+      for (final MetricGroup mg : subGroups) {
         mg.refresh(true);
       }
     }
@@ -227,7 +231,7 @@ public class MetricGroup {
     return allowMetrics;
   }
 
-  public void setAllowMetrics(boolean allowMetrics) {
+  public void setAllowMetrics(final boolean allowMetrics) {
     this.allowMetrics = allowMetrics;
   }
 
