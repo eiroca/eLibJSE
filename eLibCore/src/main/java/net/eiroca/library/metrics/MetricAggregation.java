@@ -17,7 +17,8 @@
 package net.eiroca.library.metrics;
 
 public enum MetricAggregation {
-  zero, average, //
+  zero, //
+  average, //
   stddev, //
   min, //
   max, //

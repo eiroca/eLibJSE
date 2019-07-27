@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.util.HashMap;
 import java.util.List;
 
 final public class LibStr {
@@ -30,6 +31,9 @@ final public class LibStr {
   private static final String UTF8 = "UTF-8";
   final public static String DEFAULT_ENCODING = System.getProperty("file.encoding", LibStr.UTF8);
   final public static String NL = System.getProperty("line.separator");
+
+  final public static String VALUE_SEP = "=";
+  final public static String LIST_SEP = ",";
 
   final public static String EMPTY_STRING = "";
   final public static String[] EMPTY_STRINGS = new String[0];
@@ -319,6 +323,23 @@ final public class LibStr {
           }
       }
     }
+  }
+
+  public static HashMap<String, Integer> parseMapping(final String mapping) throws Exception {
+    return parseMapping(mapping, LIST_SEP, VALUE_SEP);
+  }
+
+  public static HashMap<String, Integer> parseMapping(final String mapping, final String listSep, final String valueSep) throws Exception {
+    final HashMap<String, Integer> map = new HashMap<>();
+    for (final String mapEntry : mapping.split(listSep)) {
+      final String[] valPair = mapEntry.split(valueSep);
+      if (valPair.length == 2) {
+        final String name = valPair[0].toLowerCase();
+        final int val = Integer.parseInt(valPair[1]);
+        map.put(name, val);
+      }
+    }
+    return map;
   }
 
 }
