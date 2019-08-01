@@ -17,49 +17,47 @@
 package net.eiroca.library.sysadm.monitoring.sdk.exporter;
 
 import org.slf4j.Logger;
-import net.eiroca.ext.library.gson.SimpleGson;
-import net.eiroca.library.config.parameter.StringParameter;
-import net.eiroca.library.core.LibStr;
 import net.eiroca.library.sysadm.monitoring.api.Event;
+import net.eiroca.library.sysadm.monitoring.api.IExporter;
+import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 import net.eiroca.library.system.Logs;
 
-public class LoggerExporter extends GenericExporter {
+public abstract class GenericExporter implements IExporter {
 
-  public static String ID = "logger";
-  //
-  public static StringParameter _logger = new StringParameter(LoggerExporter.config, "logger", "Metrics");
-  // Dynamic mapped to parameters
-  protected String config_logger;
-  //
-  protected Logger metricLog = null;
+  protected static Logger logger = Logs.getLogger();
+  protected static ContextParameters config = new ContextParameters();
 
-  public LoggerExporter() {
+  protected static String CONFIG_PREFIX = null;
+
+  protected IContext context = null;
+
+  public GenericExporter() {
     super();
   }
 
   @Override
   public void setup(final IContext context) throws Exception {
-    super.setup(context);
-    GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
-    metricLog = LibStr.isNotEmptyOrNull(config_logger) ? Logs.getLogger(config_logger) : null;
+    context.info(getId(), " setup");
+    this.context = context;
   }
 
   @Override
-  public void process(final Event event) {
-    final SimpleGson json = event.getData();
-    final String _doc = json.toString();
-    metricLog.info(_doc);
+  public void teardown() throws Exception {
+    context.info(getId(), " teardown");
   }
 
   @Override
   public boolean beginBulk() {
-    return (metricLog != null);
+    return true;
   }
 
   @Override
-  public String getId() {
-    return LoggerExporter.ID;
+  public void endBulk() {
+  }
+
+  @Override
+  public void process(final Event event) {
   }
 
 }

@@ -46,13 +46,14 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   private static final String ARRAY_SUFFIX = "[]";
   private static final SimpleDateFormat ISO8601_FULL = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-  private static final String FLD_DATETIME = "@timestamp";
-  private static final String FLD_VALUE = "value";
-  private static final String FLD_STATUS = "status";
-  private static final String STATUS_OK = "OK";
-  private static final String FLD_STATUS_DESC = "violation";
-  private static final String FLD_STATUS_MINVAL = "minval";
-  private static final String FLD_STATUS_MAXVAL = "maxval";
+  public static final String FLD_DATETIME = "@timestamp";
+  public static final String FLD_VALUE = "value";
+  public static final String FLD_STATUS = "status";
+  public static final String FLD_STATUS_DESC = "violation";
+  public static final String FLD_STATUS_MINVAL = "minval";
+  public static final String FLD_STATUS_MAXVAL = "maxval";
+
+  public static final String STATUS_OK = "OK";
 
   public static ContextParameters config = new ContextParameters();
   public static StringParameter _timezone = new StringParameter(GenericConsumer.config, "timezone", null);
@@ -96,9 +97,9 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     }
   }
 
-  public void addMeasure(final EventRule rule, final long timeStamp, final SimpleGson data) {
+  public void addMeasure(final EventRule rule, final long timeStamp, final SimpleGson data, double value) {
     if (data == null) { return; }
-    final Event e = new Event(timeStamp, data, rule);
+    final Event e = new Event(timeStamp, data, value, rule);
     synchronized (dataLock) {
       buffer.add(e);
     }
@@ -248,8 +249,9 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
         json.set(GenericConsumer.FLD_STATUS, GenericConsumer.STATUS_OK);
       }
     }
-    json.addProperty(GenericConsumer.FLD_VALUE, datum.getValue());
-    addMeasure(rule, timeStamp, data);
+    double value = datum.getValue();
+    json.addProperty(GenericConsumer.FLD_VALUE, value);
+    addMeasure(rule, timeStamp, data, value);
     return true;
   }
 

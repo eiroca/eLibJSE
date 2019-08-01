@@ -28,7 +28,7 @@ public class Messages {
   public static final String STRING_WARNING = "Warning";
   public static final String STRING_INFORMATIONAL = "Informational";
 
-  public static final String BaseIncidentFormatter_MEASURED_VALUE_WAS_HIGHER_THAN_THRESHOLD_EMAIL_TEXT = "Was {0} but should be higher than {1}.";
-  public static final String BaseIncidentFormatter_MEASURED_VALUE_WAS_LOWER_THAN_THRESHOLD_EMAIL_TEXT = "Was {0} but should be lower than {1}.";
+  public static final String FMT_MEASURED_VALUE_WAS_HIGHER_THAN_THRESHOLD_EMAIL_TEXT = "Was {0} but should be higher than {1}.";
+  public static final String FMT_MEASURED_VALUE_WAS_LOWER_THAN_THRESHOLD_EMAIL_TEXT = "Was {0} but should be lower than {1}.";
 
 }

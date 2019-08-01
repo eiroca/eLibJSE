@@ -24,8 +24,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import net.eiroca.library.metrics.datum.IDatum;
 import net.eiroca.library.sysadm.monitoring.api.DatumCheck.CheckViolation;
-import net.eiroca.library.sysadm.monitoring.sdk.exporter.ElasticExporter;
-import net.eiroca.library.sysadm.monitoring.sdk.exporter.LoggerExporter;
+import net.eiroca.library.sysadm.monitoring.sdk.exporter.Exporters;
 
 public class EventRule {
 
@@ -83,8 +82,7 @@ public class EventRule {
   public void connectors(final boolean enable) {
     enabledConnectors.clear();
     if (enable) {
-      enabledConnectors.add(ElasticExporter.ID);
-      enabledConnectors.add(LoggerExporter.ID);
+      enabledConnectors.addAll(Exporters.defExporters);
     }
   }
 

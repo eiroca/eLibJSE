@@ -26,16 +26,11 @@ import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.sysadm.monitoring.api.Event;
-import net.eiroca.library.sysadm.monitoring.api.IExporter;
-import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 
-public class ElasticExporter implements IExporter {
+public class ElasticExporter extends GenericExporter {
 
-  private static final String CONFIG_PREFIX = null;
-  public static final String ID = "elastic";
-  //
-  public static ContextParameters config = new ContextParameters();
+  public static String ID = "elastic";
   //
   public static StringParameter _elasticURL = new StringParameter(ElasticExporter.config, "elasticURL", "http://localhost:9200/_bulk");
   public static StringParameter _elasticIndex = new StringParameter(ElasticExporter.config, "elasticIndex", "metrics-");
@@ -51,33 +46,27 @@ public class ElasticExporter implements IExporter {
   protected String config_elasticType;
   protected String config_elasticPipeline;
   //
-  protected IContext context = null;
   protected ElasticBulk elasticServer = null;
   protected SimpleDateFormat indexDateFormat;
 
   public ElasticExporter() {
-  }
-
-  @Override
-  public String getId() {
-    return ElasticExporter.ID;
+    super();
   }
 
   @Override
   public void setup(final IContext context) throws Exception {
-    this.context = context;
-    ElasticExporter.config.convert(context, ElasticExporter.CONFIG_PREFIX, this, "config_");
+    super.setup(context);
+    GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
     indexDateFormat = new SimpleDateFormat(config_indexDateFormat);
     elasticServer = LibStr.isNotEmptyOrNull(config_elasticURL) ? new ElasticBulk(config_elasticURL) : null;
     if (elasticServer != null) {
       elasticServer.open();
     }
-    context.info(this.getClass().getName(), " setup done");
   }
 
   @Override
   public void teardown() throws Exception {
-    context.info(this.getClass().getName(), " teardown");
+    super.teardown();
     if (elasticServer != null) {
       elasticServer.close();
       elasticServer = null;
@@ -132,6 +121,11 @@ public class ElasticExporter implements IExporter {
 
   private String getEventID(final Event event) {
     return UUID.randomUUID().toString();
+  }
+
+  @Override
+  public String getId() {
+    return ElasticExporter.ID;
   }
 
 }

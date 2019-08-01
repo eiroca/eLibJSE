@@ -23,10 +23,12 @@ public class Event {
   private final long timestamp;
   private final SimpleGson data;
   private final EventRule rule;
+  private final double value;
 
-  public Event(final long timeStamp, final SimpleGson data, final EventRule rule) {
+  public Event(final long timeStamp, final SimpleGson data, double value, final EventRule rule) {
     timestamp = timeStamp;
     this.data = data;
+    this.value = value;
     this.rule = rule;
   }
 
@@ -36,6 +38,10 @@ public class Event {
 
   public SimpleGson getData() {
     return data;
+  }
+
+  public double getValue() {
+    return value;
   }
 
   public EventRule getRule() {

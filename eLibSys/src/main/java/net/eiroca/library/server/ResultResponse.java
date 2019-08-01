@@ -16,15 +16,15 @@
  **/
 package net.eiroca.library.server;
 
-public class ResultResponse extends ServerResponse {
+public class ResultResponse<T> extends ServerResponse {
 
-  private Object result;
+  private T result;
 
   public ResultResponse(final int status) {
     this(status, null, null);
   }
 
-  public ResultResponse(final int status, final String message, final Object result) {
+  public ResultResponse(final int status, final String message, final T result) {
     super(status, message);
     this.result = result;
   }
@@ -33,7 +33,7 @@ public class ResultResponse extends ServerResponse {
     return result;
   }
 
-  public void setResult(final Object result) {
+  public void setResult(final T result) {
     this.result = result;
   }
 }

@@ -19,7 +19,6 @@ package net.eiroca.library.sysadm.monitoring.sdk.exporter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.slf4j.Logger;
 import net.eiroca.ext.library.gson.GsonCursor;
 import net.eiroca.ext.library.gson.SimpleGson;
 import net.eiroca.ext.library.http.HttpClientHelper;
@@ -27,45 +26,27 @@ import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.sysadm.monitoring.api.Event;
 import net.eiroca.library.sysadm.monitoring.api.EventRule;
-import net.eiroca.library.sysadm.monitoring.api.IExporter;
-import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 
-public class NotifyExporter implements IExporter {
+public class NotifyExporter extends GenericExporter {
 
-  private static final String CONFIG_PREFIX = null;
-  public static final String ID = "notify";
-  //
-  public static ContextParameters config = new ContextParameters();
+  public static String ID = "notify";
   //
   public static StringParameter _notifyUrl = new StringParameter(NotifyExporter.config, "notifyUrl", null);
   // Dynamic mapped to parameters
   protected String config_notifyUrl;
   //
   private static final Pattern regExParams = Pattern.compile("\\$\\{(.+?)\\}");
-  //
-  protected IContext context = null;
-  protected Logger metricLog = null;
 
   public NotifyExporter() {
     super();
   }
 
   @Override
-  public String getId() {
-    return NotifyExporter.ID;
-  }
-
-  @Override
   public void setup(final IContext context) throws Exception {
-    this.context = context;
-    NotifyExporter.config.convert(context, NotifyExporter.CONFIG_PREFIX, this, "config_");
+    super.setup(context);
+    GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
     context.info(this.getClass().getName(), " setup done");
-  }
-
-  @Override
-  public void teardown() throws Exception {
-    context.info(this.getClass().getName(), " teardown");
   }
 
   private CloseableHttpClient client;
@@ -83,8 +64,7 @@ public class NotifyExporter implements IExporter {
     final EventRule rule = event.getRule();
     if (rule == null) { return; }
     final String url = expand(event, config_notifyUrl);
-    // String r = HttpClientHelper.GET(client, url);
-    final String r = "OK";
+    final String r = HttpClientHelper.GET(client, url);
     context.info(url + " --> " + r);
   }
 
@@ -110,6 +90,11 @@ public class NotifyExporter implements IExporter {
       result = result.replaceFirst(NotifyExporter.regExParams.pattern(), v);
     }
     return result;
+  }
+
+  @Override
+  public String getId() {
+    return NotifyExporter.ID;
   }
 
 }

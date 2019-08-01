@@ -16,6 +16,8 @@
  **/
 package net.eiroca.library.sysadm.monitoring.sdk.exporter;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.eiroca.library.core.Registry;
 import net.eiroca.library.sysadm.monitoring.api.IExporter;
 import net.eiroca.library.system.Logs;
@@ -24,9 +26,16 @@ public class Exporters {
 
   public static final Registry registry = new Registry();
 
+  public static final List<String> defExporters = new ArrayList<>();
+
   static {
-    Exporters.registry.addEntry(LoggerExporter.ID, LoggerExporter.class.getName());
+    Exporters.defExporters.add(ElasticExporter.ID);
+    Exporters.defExporters.add(LoggerExporter.ID);
+  }
+
+  static {
     Exporters.registry.addEntry(ElasticExporter.ID, ElasticExporter.class.getName());
+    Exporters.registry.addEntry(LoggerExporter.ID, LoggerExporter.class.getName());
     Exporters.registry.addEntry(NotifyExporter.ID, NotifyExporter.class.getName());
   }
 

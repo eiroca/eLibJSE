@@ -48,10 +48,11 @@ import net.eiroca.library.system.Logs;
 public class HttpClientHelper {
 
   public static Logger logger = Logs.getLogger();
+  
   public static final String APPLICATION_JSON = "application/json;charset=%s";
   public static final String APPLICATION_XML = "application/xml;charset=%s";
 
-  public final static CredentialsProvider credsProvider = new BasicCredentialsProvider();
+  public static final CredentialsProvider credsProvider = new BasicCredentialsProvider();
 
   static int requestTimeout = 90000;
   static int connectTimeout = 30000;
