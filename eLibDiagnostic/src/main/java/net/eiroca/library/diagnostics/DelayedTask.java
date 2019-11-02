@@ -15,10 +15,24 @@
  **/
 package net.eiroca.library.diagnostics;
 
+import java.io.IOException;
+import java.util.Properties;
+import org.slf4j.Logger;
+import net.eiroca.library.config.Parameters;
+import net.eiroca.library.core.Helper;
+import net.eiroca.library.system.Logs;
+
 public abstract class DelayedTask implements ITask {
+
+  final protected static transient Logger logger = Logs.getLogger();
+  final protected static transient Parameters params = new Parameters();
 
   protected long lastRun = 0;
   protected long delay;
+
+  public DelayedTask() {
+    this(0);
+  }
 
   public DelayedTask(final long delay) {
     super();
@@ -42,11 +56,24 @@ public abstract class DelayedTask implements ITask {
     final long now = System.currentTimeMillis();
     if ((now - lastRun) >= delay) {
       lastRun = now;
-      return internalExecute();
+      return run();
     }
     return true;
   }
 
-  public abstract boolean internalExecute() throws CommandException;
+  public void loadConf(final String path) {
+    Properties p;
+    try {
+      p = Helper.loadProperties(path, false);
+    }
+    catch (final IOException e) {
+      DelayedTask.logger.info("Unable to load config file: " + path);
+      p = new Properties();
+    }
+    DelayedTask.params.loadConfig(p, null);
+    DelayedTask.params.saveConfig(this, "config_", true, true);
+  }
+
+  public abstract boolean run() throws CommandException;
 
 }

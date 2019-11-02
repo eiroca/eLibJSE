@@ -167,7 +167,7 @@ public class DataPowerMonitor extends GenericHTTPMonitor {
   protected final Measure mTCPSummary_Listen = mgTCPSummary.createMeasure("Listen", MetricAggregation.zero, "TCPSummary_Listen", "unit");
   protected final Measure mTCPSummary_Closing = mgTCPSummary.createMeasure("Closing", MetricAggregation.zero, "TCPSummary_Closing", "unit");
   //
-  protected final MetricGroup mgEthernetInterfaceStatus = new MetricGroup(mgDatapower, "Ethernet Interface Status", "Interface Status - {0}");
+  protected final MetricGroup mgEthernetInterfaceStatus = new MetricGroup(mgDatapower, "DataPower Ethernet Interface Status", "Interface Status - {0}");
   protected final Measure mEthernetInterfaceStatus_Status = mgEthernetInterfaceStatus.createMeasure("Status", MetricAggregation.zero, "EthernetInterfaceStatus_Status", "unit");
   protected final Measure mEthernetInterfaceStatus_Collisions = mgEthernetInterfaceStatus.createMeasure("Collisions", MetricAggregation.zero, "EthernetInterfaceStatus_Collisions", "unit");
   protected final Measure mEthernetInterfaceStatus_Collisions2 = mgEthernetInterfaceStatus.createMeasure("Collisions2", MetricAggregation.zero, "EthernetInterfaceStatus_Collisions2", "unit");

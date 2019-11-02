@@ -46,50 +46,54 @@ public class ElasticSearchMonitor extends GenericHTTPMonitor {
   protected static final String CONFIG_ELASTICURL = "elasticURL";
 
   protected final MetricGroup mgElasticSearch = new MetricGroup(mgMonitor, "ElasticSearch Statistics");
+  //
   protected final Measure mActivePrimaryShards = mgElasticSearch.createMeasure("ActivePrimaryShards", MetricAggregation.zero, "The number of primary shards that are used across the cluster", "number");
   protected final Measure mActiveShards = mgElasticSearch.createMeasure("ActiveShards", MetricAggregation.zero, "The number of shards (primary and replica) that are used across the cluster", "number");
   protected final Measure mActiveShardsPercent = mgElasticSearch.createMeasure("ActiveShardsPercent", MetricAggregation.zero, "Percentage of shards that are active, a green cluster should have 100% here", "percent");
   protected final Measure mCompletionSize = mgElasticSearch.createMeasure("CompletionSize", MetricAggregation.zero, "Size of completion caches", "bytes");
   protected final Measure mDataNodeCount = mgElasticSearch.createMeasure("DataNodeCount", MetricAggregation.zero, "Number of active data nodes", "number");
   protected final Measure mDelayedUnassignedShards = mgElasticSearch.createMeasure("DelayedUnassignedShards", MetricAggregation.zero, "The number of shards that are in delayed state", "number");
-  protected final Measure mDeleteCurrent = mgElasticSearch.createMeasure("DeleteCurrent", MetricAggregation.zero, "Currently active delete operations per node", "number");
   protected final Measure mDeletedCount = mgElasticSearch.createMeasure("DeletedCount", MetricAggregation.zero, "Number of deleted documents", "number");
   protected final Measure mDocumentDeletedRate = mgElasticSearch.define("DeletedCountPerSecond", new RateMeasure(mDeletedCount, TimeUnit.SECONDS, 0.0), MetricAggregation.zero, "Derived measure which provides the number of documents deleted per second since the monitor was last run", "number", "s");
   protected final Measure mDocumentCount = mgElasticSearch.createMeasure("DocCount", MetricAggregation.zero, "Number of documents", "number");
   protected final Measure mDocumentRate = mgElasticSearch.define("DocCountPerSecond", new RateMeasure(mDocumentCount, TimeUnit.SECONDS, 0.0), MetricAggregation.zero, "Derived measure which provides the number of documents added per second since the monitor was last run", "number", "s");
-  protected final Measure mFetchCurrent = mgElasticSearch.createMeasure("FetchCurrent", MetricAggregation.zero, "Currently active fetch operations per node", "number");
   protected final Measure mFieldDataEvictions = mgElasticSearch.createMeasure("FieldDataEvictions", MetricAggregation.zero, "How often field data was evicted from the field data cache", "number");
-  protected final Measure mFiledDataSize = mgElasticSearch.createMeasure("FieldDataSize", MetricAggregation.zero, "Size of the field data per node", "bytes");
-  protected final Measure mFileDescLimitPerNode = mgElasticSearch.createMeasure("FileDescriptorLimit", MetricAggregation.zero, "File descriptor metrics split by different file descriptor measures", "number");
-  protected final Measure mFileDescriptorCount = mgElasticSearch.createMeasure("FileDescriptorCount", MetricAggregation.zero, "Allowed number of max file descriptor on the operating system split by node", "number");
-  protected final Measure mFileSystemSize = mgElasticSearch.createMeasure("FileSystemSize", MetricAggregation.zero, "File system metrics split by different file system measures", "bytes");
   protected final Measure mIndexCount = mgElasticSearch.createMeasure("IndexCount", MetricAggregation.zero, "The count of indexes", "number");
-  protected final Measure mIndexingCurrent = mgElasticSearch.createMeasure("IndexingCurrent", MetricAggregation.zero, "Currently active indexing operations per node", "number");
-  protected final Measure mIndexingThrottleTime = mgElasticSearch.createMeasure("IndexingThrottleTime", MetricAggregation.zero, "Time that indexing was throttled per node", "ms", true);
   protected final Measure mInitializingShards = mgElasticSearch.createMeasure("InitializingShards", MetricAggregation.zero, "The number of shards that are currently initializing", "number");
-  protected final Measure mMemInitHeap = mgElasticSearch.createMeasure("InitHeap", MetricAggregation.zero, "The number of bytes currently initialized on the heap per node", "bytes");
-  protected final Measure mMemInitNonHeap = mgElasticSearch.createMeasure("InitNonHeap", MetricAggregation.zero, "The number of bytes currently initialized off-heap per node", "bytes");
-  protected final Measure mMemMaxDirect = mgElasticSearch.createMeasure("MaxDirect", MetricAggregation.zero, "The number of bytes of direct memory that can be used per node", "bytes");
-  protected final Measure mMemMaxHeap = mgElasticSearch.createMeasure("MaxHeap", MetricAggregation.zero, "The number of bytes of heap-memory that can be used at max per node", "bytes");
-  protected final Measure mMemMaxNonHeap = mgElasticSearch.createMeasure("MaxNonHeap", MetricAggregation.zero, "The number of bytes of off-heap memory that can be used at max per node", "bytes");
   protected final Measure mNodeCount = mgElasticSearch.createMeasure("NodeCount", MetricAggregation.zero, "Number of active nodes", "number");
   protected final Measure mPercolateCount = mgElasticSearch.createMeasure("PercolateCount", MetricAggregation.zero, "Percolate metrics split by different percolate measures", "number");
-  protected final Measure mPercolateSize = mgElasticSearch.createMeasure("PercolateSize", MetricAggregation.zero, "Size used for percolation per node", "bytes");
-  protected final Measure mQueryCacheSize = mgElasticSearch.createMeasure("QueryCacheSize", MetricAggregation.zero, "Size of the query cache per node", "bytes");
-  protected final Measure mQueryCurrent = mgElasticSearch.createMeasure("QueryCurrent", MetricAggregation.zero, "Currently active query operations per node", "number");
-  protected final Measure mRecoveryAsSource = mgElasticSearch.createMeasure("RecoveryAsSource", MetricAggregation.zero, "Number of shards that are recovered from this node", "number");
-  protected final Measure mRecoveryAsTarget = mgElasticSearch.createMeasure("RecoveryAsTarget", MetricAggregation.zero, "Number of shards that are recovered to this node", "number");
-  protected final Measure mRecoveryThrottleTime = mgElasticSearch.createMeasure("RecoveryThrottleTime", MetricAggregation.zero, "Time that recovery was throttled per node", "ms", true);
   protected final Measure mRelocatingShards = mgElasticSearch.createMeasure("RelocatingShards", MetricAggregation.zero, "The number of shards that are currently relocated", "number");
-  protected final Measure mRequestCacheSize = mgElasticSearch.createMeasure("RequestCacheSize", MetricAggregation.zero, "Size of the request cache", "bytes");
-  protected final Measure mScrollCurrent = mgElasticSearch.createMeasure("ScrollCurrent", MetricAggregation.zero, "Currently active scroll operations per node", "number");
   protected final Measure mSegmentCount = mgElasticSearch.createMeasure("SegmentCount", MetricAggregation.zero, "Number of segments", "number");
-  protected final Measure mSegmentSize = mgElasticSearch.createMeasure("SegmentSize", MetricAggregation.zero, "Size of segments, split by different segment-measures", "bytes");
-  protected final Measure mShardCount = mgElasticSearch.createMeasure("ShardCount", MetricAggregation.zero, "The number of shards with dynamic splittings by state", "number");
-  protected final Measure mStoreSize = mgElasticSearch.createMeasure("StoreSize", MetricAggregation.zero, "Size of storage overall per node", "bytes");
-  protected final Measure mStoreThrottleTime = mgElasticSearch.createMeasure("StoreThrottleTime", MetricAggregation.zero, "Time that storing was throttled per node", "ms", true);
-  protected final Measure mTranslogSize = mgElasticSearch.createMeasure("TranslogSize", MetricAggregation.zero, "Size of the translog per node", "bytes");
   protected final Measure mUnassignedShards = mgElasticSearch.createMeasure("UnassignedShards", MetricAggregation.zero, "The number of shards that are currently uninitialized", "number");
+  //
+  protected final Measure mShardCount = mgElasticSearch.createMeasure("ShardCount", MetricAggregation.zero, "The number of shards with dynamic splittings by state", "number").dimensions(ElasticSearchMonitor.SPLIT_STATE);
+  //
+  protected final Measure mIndexingCurrent = mgElasticSearch.createMeasure("IndexingCurrent", MetricAggregation.zero, "Currently active indexing operations per node", "number").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mIndexingThrottleTime = mgElasticSearch.createMeasure("IndexingThrottleTime", MetricAggregation.zero, "Time that indexing was throttled per node", "ms", true).dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mMemInitHeap = mgElasticSearch.createMeasure("InitHeap", MetricAggregation.zero, "The number of bytes currently initialized on the heap per node", "bytes").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mMemInitNonHeap = mgElasticSearch.createMeasure("InitNonHeap", MetricAggregation.zero, "The number of bytes currently initialized off-heap per node", "bytes").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mMemMaxDirect = mgElasticSearch.createMeasure("MaxDirect", MetricAggregation.zero, "The number of bytes of direct memory that can be used per node", "bytes").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mMemMaxHeap = mgElasticSearch.createMeasure("MaxHeap", MetricAggregation.zero, "The number of bytes of heap-memory that can be used at max per node", "bytes").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mMemMaxNonHeap = mgElasticSearch.createMeasure("MaxNonHeap", MetricAggregation.zero, "The number of bytes of off-heap memory that can be used at max per node", "bytes").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mRecoveryAsSource = mgElasticSearch.createMeasure("RecoveryAsSource", MetricAggregation.zero, "Number of shards that are recovered from this node", "number").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mRecoveryAsTarget = mgElasticSearch.createMeasure("RecoveryAsTarget", MetricAggregation.zero, "Number of shards that are recovered to this node", "number").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mRecoveryThrottleTime = mgElasticSearch.createMeasure("RecoveryThrottleTime", MetricAggregation.zero, "Time that recovery was throttled per node", "ms", true).dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mFetchCurrent = mgElasticSearch.createMeasure("FetchCurrent", MetricAggregation.zero, "Currently active fetch operations per node", "number").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mQueryCurrent = mgElasticSearch.createMeasure("QueryCurrent", MetricAggregation.zero, "Currently active query operations per node", "number").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mScrollCurrent = mgElasticSearch.createMeasure("ScrollCurrent", MetricAggregation.zero, "Currently active scroll operations per node", "number").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mTranslogSize = mgElasticSearch.createMeasure("TranslogSize", MetricAggregation.zero, "Size of the translog per node", "bytes").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mStoreSize = mgElasticSearch.createMeasure("StoreSize", MetricAggregation.zero, "Size of storage overall per node", "bytes").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mStoreThrottleTime = mgElasticSearch.createMeasure("StoreThrottleTime", MetricAggregation.zero, "Time that storing was throttled per node", "ms", true).dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mRequestCacheSize = mgElasticSearch.createMeasure("RequestCacheSize", MetricAggregation.zero, "Size of the request cache", "bytes").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mFileDescLimitPerNode = mgElasticSearch.createMeasure("FileDescriptorLimit", MetricAggregation.zero, "File descriptor metrics split by different file descriptor measures", "number").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mFiledDataSize = mgElasticSearch.createMeasure("FieldDataSize", MetricAggregation.zero, "Size of the field data per node", "bytes").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mDeleteCurrent = mgElasticSearch.createMeasure("DeleteCurrent", MetricAggregation.zero, "Currently active delete operations per node", "number").dimensions(ElasticSearchMonitor.SPLIT_NODE);
+  //
+  protected final Measure mFileDescriptorCount = mgElasticSearch.createMeasure("FileDescriptorCount", MetricAggregation.zero, "Allowed number of max file descriptor on the operating system split by node", "number").dimensions(ElasticSearchMonitor.SPLIT_STAT);
+  protected final Measure mFileSystemSize = mgElasticSearch.createMeasure("FileSystemSize", MetricAggregation.zero, "File system metrics split by different file system measures", "bytes").dimensions(ElasticSearchMonitor.SPLIT_STAT);
+  protected final Measure mPercolateSize = mgElasticSearch.createMeasure("PercolateSize", MetricAggregation.zero, "Size used for percolation per node", "bytes").dimensions(ElasticSearchMonitor.SPLIT_STAT, ElasticSearchMonitor.SPLIT_NODE);
+  protected final Measure mQueryCacheSize = mgElasticSearch.createMeasure("QueryCacheSize", MetricAggregation.zero, "Size of the query cache per node", "bytes").dimensions(ElasticSearchMonitor.SPLIT_STAT);
+  protected final Measure mSegmentSize = mgElasticSearch.createMeasure("SegmentSize", MetricAggregation.zero, "Size of segments, split by different segment-measures", "bytes").dimensions(ElasticSearchMonitor.SPLIT_STAT);
 
   private String baseURL;
 
@@ -208,7 +212,7 @@ public class ElasticSearchMonitor extends GenericHTTPMonitor {
       final JSONObject process = nodes.optJSONObject("process");
       if (process != null) {
         final JSONObject fileDesc = process.optJSONObject("open_file_descriptors");
-        ElasticSearchMonitor.setValue(mFileDescriptorCount, fileDesc, "max");
+        ElasticSearchMonitor.addValue(mFileDescriptorCount, fileDesc, "max");
         ElasticSearchMonitor.addValue(mFileDescriptorCount, ElasticSearchMonitor.SPLIT_STAT, fileDesc, "min");
         ElasticSearchMonitor.addValue(mFileDescriptorCount, ElasticSearchMonitor.SPLIT_STAT, fileDesc, "max");
         ElasticSearchMonitor.addValue(mFileDescriptorCount, ElasticSearchMonitor.SPLIT_STAT, fileDesc, "avg");

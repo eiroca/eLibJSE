@@ -21,6 +21,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.system.IConfig;
 import net.eiroca.library.system.IContext;
@@ -200,6 +201,12 @@ public class DBConfig {
     connectionUrl = MessageFormat.format(template, server, Integer.toString(port), database, username, password, DB2schema);
     prepared = (connectionUrl != null);
     return prepared;
+  }
+
+  public void releaseConnection(Connection c) {
+    if (c != null) {
+      Helper.close(c);
+    }
   }
 
   public Connection getConnection() {

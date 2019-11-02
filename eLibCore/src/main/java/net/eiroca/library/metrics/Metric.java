@@ -30,11 +30,15 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
   private static final String HEADER_VALUE = "\"value\"";
   private static final String TAG_EMPTY = "null";
 
+  private static final double VALUE_TRUE = 1.0;
+  private static final double VALUE_FALSE = 0.0;
+
   transient protected MetricMetadata metadata = null;
   transient protected Tags tags = new Tags();
   protected UUID id = UUID.randomUUID();
   protected D datum = null;
   protected Map<String, IMetric<D>> splittings = null;
+  protected M parent = null;
 
   @Override
   public UUID getId() {
@@ -182,6 +186,10 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
     datum.setValue(value);
   }
 
+  public void setValue(final boolean value) {
+    datum.setValue(value ? VALUE_TRUE : VALUE_FALSE);
+  }
+
   @Override
   public void addValue(final double value) {
     datum.addValue(value);
@@ -195,6 +203,10 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
   @Override
   public Tags getTags() {
     return tags;
+  }
+
+  public M getParent() {
+    return parent;
   }
 
 }

@@ -44,14 +44,20 @@ final public class Helper {
   public static final String OS_NAME = System.getProperty("os.name", "Unknown");
   public static final String LISTSEPERATOR = System.getProperty("list.separator", ";");
 
-  private static final char LIST_SEPARATOR = ',';
-  private static final char LIST_END = ']';
-  private static final char LIST_BEGIN = '[';
-
   public static final String EMPTY_STRING = "";
   public static final String DOUBLE_QUOTE = "\"";
   public static final String NO_DATA = "-";
   public final static String MINUS = "-";
+
+  private static final String SPLIT_SEPARATOR = "(\n|\r)+";
+
+  private static final char LIST_SEPARATOR = ',';
+  private static final char LIST_END = ']';
+  private static final char LIST_BEGIN = '[';
+
+  private static final String STR_EXCEPTION_STACKTRACE = "'; Stacktrace is '";
+  private static final String STR_EXCEPTION_MESSAGE = " exception occurred. Message is '";
+  private static final String STR_EXCEPTION_END = "'";
 
   private static final String HOME_PREFIX = "~";
   private static final String USER_HOME_PROPERTY = "user.home";
@@ -273,7 +279,7 @@ final public class Helper {
   }
 
   final public static String[] split(final String str, final boolean skipEmpty) {
-    return Helper.split(str, "(\n|\r)+", skipEmpty);
+    return Helper.split(str, Helper.SPLIT_SEPARATOR, skipEmpty);
   }
 
   final public static String[] split(final String str, final String expr, final boolean skipEmpty) {
@@ -315,11 +321,11 @@ final public class Helper {
       msg = Helper.NO_DATA;
     }
     final StringBuilder sb = new StringBuilder(256);
-    sb.append(e.getClass().getCanonicalName()).append(" exception occurred. Message is '").append(msg);
+    sb.append(e.getClass().getCanonicalName()).append(Helper.STR_EXCEPTION_MESSAGE).append(msg);
     if (stacktrace) {
-      sb.append("'; Stacktrace is '").append(Helper.getStackTraceAsString(e));
+      sb.append(Helper.STR_EXCEPTION_STACKTRACE).append(Helper.getStackTraceAsString(e));
     }
-    sb.append("'");
+    sb.append(Helper.STR_EXCEPTION_END);
     return sb.toString();
   }
 

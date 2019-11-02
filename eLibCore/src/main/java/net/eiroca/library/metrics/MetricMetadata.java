@@ -17,6 +17,7 @@
 package net.eiroca.library.metrics;
 
 import java.text.MessageFormat;
+import net.eiroca.library.data.Tags;
 
 public class MetricMetadata {
 
@@ -30,7 +31,10 @@ public class MetricMetadata {
   private String noagg;
   //
   private boolean calcDelta;
+  //
   private MetricAggregation aggregation = MetricAggregation.zero;
+  //
+  private final Tags dimensions = new Tags();
 
   public MetricMetadata(final String name) {
     this.name = name;
@@ -126,6 +130,10 @@ public class MetricMetadata {
   public MetricMetadata setAggregation(final MetricAggregation aggregation) {
     this.aggregation = aggregation;
     return this;
+  }
+
+  public Tags dimensions() {
+    return dimensions;
   }
 
 }

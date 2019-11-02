@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import net.eiroca.library.core.LibFormat;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.sysadm.monitoring.api.DatumCheck;
+import net.eiroca.library.sysadm.monitoring.api.EventFilter;
 import net.eiroca.library.sysadm.monitoring.api.EventRule;
 import net.eiroca.library.system.Logs;
 
@@ -107,14 +108,20 @@ public class RuleEngine {
                 case "min":
                 case "minimum":
                 case "minvalue":
+                case ">":
+                case ">=":
                   chk = new DatumCheck(ruleType, w, vl, null);
                   break;
                 case "max":
                 case "maximum":
                 case "maxvalue":
+                case "<":
+                case "<=":
                   chk = new DatumCheck(ruleType, w, null, vl);
                   break;
                 case "equal":
+                case "=":
+                case "==":
                   chk = new DatumCheck(ruleType, w, vl - RuleEngine.ZERO, vl + RuleEngine.ZERO);
                   break;
               }
@@ -133,9 +140,11 @@ public class RuleEngine {
 
   public void addRule(final EventRule rule) {
     ruleSet.add(rule);
-    final Set<String> filters = rule.getFilters();
+    final List<EventFilter> filters = rule.getFilters();
     if (filters != null) {
-      hashKeys.addAll(filters);
+      for (final EventFilter filter : filters) {
+        hashKeys.add(filter.keyName);
+      }
     }
   }
 
@@ -154,7 +163,7 @@ public class RuleEngine {
         break;
       }
     }
-    RuleEngine.logger.debug("" + metadata + " -> " + result);
+    RuleEngine.logger.debug("findRule: " + metadata + " -> " + result);
     return result;
   }
 

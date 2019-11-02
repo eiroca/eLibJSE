@@ -16,10 +16,9 @@
  **/
 package net.eiroca.library.sysadm.monitoring.api;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import net.eiroca.library.metrics.datum.IDatum;
@@ -28,7 +27,7 @@ import net.eiroca.library.sysadm.monitoring.sdk.exporter.Exporters;
 
 public class EventRule {
 
-  private final Map<String, String> filter = new HashMap<>();
+  private final List<EventFilter> filters = new ArrayList<>();
   private final Set<String> enabledConnectors = new HashSet<>();
   private final Set<DatumCheck> checks = new HashSet<>();
 
@@ -37,29 +36,36 @@ public class EventRule {
   }
 
   public void addFilter(final String keyName, final String keyValue) {
-    filter.put(keyName, keyValue);
+    filters.add(new EventFilter(keyName, keyValue, EventFilter.Logic.OR));
   }
 
   public boolean apply(final SortedMap<String, Object> metadata) {
     boolean found = true;
-    if ((filter != null) && (filter.size() > 0)) {
-      for (final Entry<String, String> filter : filter.entrySet()) {
-        final String keyNam = filter.getKey();
+    if ((filters != null) && (filters.size() > 0)) {
+      for (final EventFilter filter : filters) {
         boolean negate = false;
-        String keyVal = filter.getValue();
+        final String keyNam = filter.keyName;
+        String keyVal = filter.keyValue;
+        final EventFilter.Logic logic = filter.logic;
         if (keyVal.startsWith("!")) {
           keyVal = keyVal.substring(1);
           negate = true;
         }
         final Object eventKeyVal = metadata.get(keyNam);
+        boolean check;
         if ((eventKeyVal == null) || (!String.valueOf(eventKeyVal).equals(keyVal))) {
-          found = negate;
+          check = negate;
         }
         else {
-          found = !negate;
+          check = !negate;
         }
-        if (!found) {
-          break;
+        switch (logic) {
+          case OR:
+            found |= check;
+            break;
+          case AND:
+            found &= check;
+            break;
         }
       }
     }
@@ -86,8 +92,8 @@ public class EventRule {
     }
   }
 
-  public Set<String> getFilters() {
-    return (filter != null) ? filter.keySet() : null;
+  public List<EventFilter> getFilters() {
+    return filters;
   }
 
   public void addCheck(final DatumCheck chk) {
@@ -111,7 +117,7 @@ public class EventRule {
 
   @Override
   public String toString() {
-    return "EventRule [filter=" + filter + ", enabledConnectors=" + enabledConnectors + ", checks=" + checks + "]";
+    return "EventRule [filters=" + filters + ", enabledConnectors=" + enabledConnectors + ", checks=" + checks + "]";
   }
 
 }

@@ -16,12 +16,10 @@
  **/
 package net.eiroca.library.metrics;
 
+import net.eiroca.library.data.Tags;
 import net.eiroca.library.metrics.datum.Datum;
 
 public class Measure extends Metric<Measure, Datum> {
-
-  private static final double VALUE_TRUE = 1.0;
-  private static final double VALUE_FALSE = 0.0;
 
   public Measure() {
     this((MetricMetadata)null);
@@ -43,16 +41,25 @@ public class Measure extends Metric<Measure, Datum> {
 
   @Override
   public Measure newSplit(final String name) {
-    return new Measure(metadata);
-  }
-
-  public void setValue(final boolean value) {
-    setValue(value ? Measure.VALUE_TRUE : Measure.VALUE_FALSE);
+    final Measure m = new Measure();
+    m.parent = this;
+    return m;
   }
 
   @Override
   public long getTimeStamp() {
     return datum.getTimeStamp();
+  }
+
+  public Measure dimensions(final String... splitNames) {
+    final Measure result = this;
+    if (metadata != null) {
+      Tags dimensions = metadata.dimensions();
+      for (final String splitName : splitNames) {
+        dimensions.add(splitName);
+      }
+    }
+    return result;
   }
 
 }

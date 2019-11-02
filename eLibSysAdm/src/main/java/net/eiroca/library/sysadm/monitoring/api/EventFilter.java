@@ -16,12 +16,20 @@
  **/
 package net.eiroca.library.sysadm.monitoring.api;
 
-import java.util.SortedMap;
-import net.eiroca.library.metrics.MetricMetadata;
-import net.eiroca.library.metrics.datum.IDatum;
+public class EventFilter {
 
-public interface IMeasureConsumer extends IContextEnabled {
+  enum Logic {
+    OR, AND
+  };
 
-  public boolean exportDatum(SortedMap<String, Object> metadata, MetricMetadata metricInfo, final IDatum datum);
+  public String keyName;
+  public String keyValue;
+  public Logic logic;
+
+  public EventFilter(final String keyName, final String keyValue, final Logic logic) {
+    this.keyName = keyName;
+    this.keyValue = keyValue;
+    this.logic = logic;
+  }
 
 }

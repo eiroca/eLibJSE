@@ -28,7 +28,8 @@ import java.util.List;
 
 final public class LibStr {
 
-  private static final String UTF8 = "UTF-8";
+  final private static String UTF8 = "UTF-8";
+
   final public static String DEFAULT_ENCODING = System.getProperty("file.encoding", LibStr.UTF8);
   final public static String NL = System.getProperty("line.separator");
 
@@ -326,7 +327,7 @@ final public class LibStr {
   }
 
   public static HashMap<String, Integer> parseMapping(final String mapping) throws Exception {
-    return parseMapping(mapping, LIST_SEP, VALUE_SEP);
+    return LibStr.parseMapping(mapping, LibStr.LIST_SEP, LibStr.VALUE_SEP);
   }
 
   public static HashMap<String, Integer> parseMapping(final String mapping, final String listSep, final String valueSep) throws Exception {

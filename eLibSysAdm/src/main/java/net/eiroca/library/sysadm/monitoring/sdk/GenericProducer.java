@@ -29,6 +29,7 @@ import net.eiroca.library.data.Tags;
 import net.eiroca.library.diagnostics.IServerMonitor;
 import net.eiroca.library.metrics.IMetric;
 import net.eiroca.library.metrics.MetricGroup;
+import net.eiroca.library.metrics.MetricMetadata;
 import net.eiroca.library.metrics.datum.Datum;
 import net.eiroca.library.metrics.datum.IDatum;
 import net.eiroca.library.sysadm.monitoring.api.IMeasureConsumer;
@@ -105,13 +106,37 @@ public class GenericProducer implements IMeasureProducer {
     context.info(name, " teardown");
   }
 
-  public static boolean exportData(final IMeasureConsumer consumer, final String group, final String metric, final String splitGroup, final String splitName, final SortedMap<String, Object> meta, final IDatum datum) {
-    meta.put(GenericProducer.FLD_GROUP, group);
-    meta.put(GenericProducer.FLD_METRIC, metric);
-    meta.put(GenericProducer.FLD_MASTER, (splitGroup != null));
-    meta.put(GenericProducer.FLD_SPLIT_GROUP, splitGroup);
-    meta.put(GenericProducer.FLD_SPLIT_NAME, splitName);
-    return consumer.exportDatum(meta, datum);
+  public Status execute() throws Exception {
+    monitor.setup(context);
+    int exported_measure = 0;
+    final List<MetricGroup> groups = new ArrayList<>();
+    monitor.loadMetricGroup(groups);
+    for (final String host : hosts) {
+      monitor.resetMetrics();
+      final boolean ok = monitor.check(host);
+      context.info(name, " ", host, " -> ", ok);
+      if (ok) {
+        final SortedMap<String, Object> meta = new TreeMap<>();
+        meta.put(GenericProducer.FLD_SOURCE, name);
+        meta.put(GenericProducer.FLD_HOST, host);
+        final Set<String> hostTags = (tagProvider != null) ? tagProvider.getTags(host) : null;
+        if ((hostTags != null) && (hostTags.size() > 0)) {
+          final List<String> _tags = new ArrayList<>();
+          _tags.addAll(hostTags);
+          if (tags != null) {
+            _tags.addAll(tags);
+          }
+          meta.put(GenericProducer.FLD_TAGS, _tags);
+        }
+        else {
+          if (tags != null) {
+            meta.put(GenericProducer.FLD_TAGS, tags);
+          }
+        }
+        exported_measure += exportMeasures(meta, groups);
+      }
+    }
+    return new Status(0, "Exported measures: " + exported_measure);
   }
 
   public int exportMeasures(final SortedMap<String, Object> meta, final List<MetricGroup> groups) {
@@ -121,16 +146,17 @@ public class GenericProducer implements IMeasureProducer {
         context.trace("processing group: ", g.getName());
         g.refresh();
         for (final IMetric<?> m : g.getMetrics()) {
-          result += exportMeasure(meta, g.getName(), m);
+          result += exportMeasure(meta, g, m);
         }
       }
     }
     return result;
   }
 
-  public int exportMeasure(final SortedMap<String, Object> meta, final String group, final IMetric<?> m) {
+  public int exportMeasure(final SortedMap<String, Object> meta, final MetricGroup mg, final IMetric<?> m) {
     int result = 0;
     final String metric = m.getMetadata().getInternalName();
+    final String group = mg.getName();
     final IDatum value = m.getDatum();
     context.trace("processing metric: ", metric);
     // Merge metric tags
@@ -164,7 +190,7 @@ public class GenericProducer implements IMeasureProducer {
       }
     }
     if (value.hasValue()) {
-      if (GenericProducer.exportData(consumer, group, metric, null, null, newMeta, value)) {
+      if (GenericProducer.exportData(consumer, m.getMetadata(), group, metric, null, null, newMeta, value)) {
         result++;
       }
     }
@@ -172,13 +198,13 @@ public class GenericProducer implements IMeasureProducer {
       for (final Entry<String, ?> s : m.getSplittings().entrySet()) {
         final String splitGroup = s.getKey();
         final IMetric<?> split = (IMetric<?>)s.getValue();
-        result += exportMesureSplittig(newMeta, group, metric, splitGroup, split);
+        result += exportMesureSplittig(m.getMetadata(), newMeta, group, metric, splitGroup, split);
       }
     }
     return result;
   }
 
-  private int exportMesureSplittig(final SortedMap<String, Object> meta, final String group, final String metric, final String splitGroup, final IMetric<?> split) {
+  private int exportMesureSplittig(final MetricMetadata metricInfo, final SortedMap<String, Object> meta, final String group, final String metric, final String splitGroup, final IMetric<?> split) {
     int result = 0;
     context.trace("processing metric splitting: ", splitGroup);
     final Datum sum = new Datum();
@@ -187,49 +213,25 @@ public class GenericProducer implements IMeasureProducer {
       final IMetric<?> splitValue = (IMetric<?>)sm.getValue();
       final IDatum val = splitValue.getDatum();
       sum.addValue(val.getValue());
-      if (GenericProducer.exportData(consumer, group, metric, splitGroup, splitName, meta, val)) {
+      if (GenericProducer.exportData(consumer, metricInfo, group, metric, splitGroup, splitName, meta, val)) {
         result++;
       }
     }
     if (!split.getDatum().hasValue()) {
-      if (GenericProducer.exportData(consumer, group, metric, splitGroup, null, meta, sum)) {
+      if (GenericProducer.exportData(consumer, metricInfo, group, metric, splitGroup, null, meta, sum)) {
         result++;
       }
     }
     return result;
   }
 
-  public Status execute() throws Exception {
-    monitor.setup(context);
-    int exported_measure = 0;
-    final List<MetricGroup> groups = new ArrayList<>();
-    monitor.loadMetricGroup(groups);
-    for (final String host : hosts) {
-      monitor.resetMetrics();
-      final boolean ok = monitor.check(host);
-      context.info(name, " ", host, " -> ", ok);
-      if (ok) {
-        final SortedMap<String, Object> meta = new TreeMap<>();
-        meta.put(GenericProducer.FLD_SOURCE, name);
-        meta.put(GenericProducer.FLD_HOST, host);
-        final Set<String> hostTags = (tagProvider != null) ? tagProvider.getTags(host) : null;
-        if ((hostTags != null) && (hostTags.size() > 0)) {
-          final List<String> _tags = new ArrayList<>();
-          _tags.addAll(hostTags);
-          if (tags != null) {
-            _tags.addAll(tags);
-          }
-          meta.put(GenericProducer.FLD_TAGS, _tags);
-        }
-        else {
-          if (tags != null) {
-            meta.put(GenericProducer.FLD_TAGS, tags);
-          }
-        }
-        exported_measure += exportMeasures(meta, groups);
-      }
-    }
-    return new Status(0, "Exported measures: " + exported_measure);
+  public static boolean exportData(final IMeasureConsumer consumer, final MetricMetadata metricInfo, final String group, final String metric, final String splitGroup, final String splitName, final SortedMap<String, Object> meta, final IDatum datum) {
+    meta.put(GenericProducer.FLD_GROUP, group);
+    meta.put(GenericProducer.FLD_METRIC, metric);
+    meta.put(GenericProducer.FLD_MASTER, (splitGroup != null));
+    meta.put(GenericProducer.FLD_SPLIT_GROUP, splitGroup);
+    meta.put(GenericProducer.FLD_SPLIT_NAME, splitName);
+    return consumer.exportDatum(meta, metricInfo, datum);
   }
 
   @Override

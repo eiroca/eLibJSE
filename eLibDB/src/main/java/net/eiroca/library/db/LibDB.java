@@ -87,4 +87,33 @@ public class LibDB {
     }
   }
 
+  public static void callSP(Connection conn, String spName, Object[] params) throws SQLException {
+    Statement statement = null;
+    final StringBuilder sb = new StringBuilder();
+    sb.append("CALL ").append(spName);
+    sb.append("(");
+    boolean first = true;
+    for (Object p : params) {
+      if (!first) sb.append(",");
+      sb.append("'");
+      sb.append(p != null ? String.valueOf(p) : "");
+      sb.append("'");
+      first = false;
+    }
+    sb.append(")");
+    try {
+      LibDB.logger.trace(sb.toString());
+      // execute insert SQL stetement
+      statement = conn.createStatement();
+      statement.executeUpdate(sb.toString());
+    }
+    catch (final SQLException e) {
+      LibDB.logger.warn(sb.toString());
+      throw e;
+    }
+    finally {
+      Helper.close(statement);
+    }
+  }
+
 }

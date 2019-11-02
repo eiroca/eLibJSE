@@ -17,16 +17,19 @@
 package net.eiroca.library.sysadm.monitoring.api;
 
 import net.eiroca.ext.library.gson.SimpleGson;
+import net.eiroca.library.metrics.MetricMetadata;
 
 public class Event {
 
   private final long timestamp;
+  private final MetricMetadata metricInfo;
   private final SimpleGson data;
   private final EventRule rule;
   private final double value;
 
-  public Event(final long timeStamp, final SimpleGson data, double value, final EventRule rule) {
+  public Event(final long timeStamp, final SimpleGson data, final MetricMetadata metricInfo, final double value, final EventRule rule) {
     timestamp = timeStamp;
+    this.metricInfo = metricInfo;
     this.data = data;
     this.value = value;
     this.rule = rule;
@@ -34,6 +37,10 @@ public class Event {
 
   public long getTimestamp() {
     return timestamp;
+  }
+
+  public MetricMetadata getMetricInfo() {
+    return metricInfo;
   }
 
   public SimpleGson getData() {

@@ -34,6 +34,8 @@ import net.eiroca.library.metrics.MetricGroup;
 
 public class WebServerMonitor extends GenericHTTPMonitor {
 
+  private static final String SPLIT_CHECK = "check";
+
   private static final String REGEX_VALUE_FIELD = "value";
   private static final String REGEX_KEY_FIELD = "key";
   private static final String PROBETYPE_JSON = "json";
@@ -59,7 +61,7 @@ public class WebServerMonitor extends GenericHTTPMonitor {
   Measure smConnCloseDelay = mgHTTPMonitor.createMeasure("ConnectionCloseDelay", MetricAggregation.zero, "Connection close delay", "ms");
 
   MetricGroup mgProbe = new MetricGroup(mgMonitor, "Probe Statistics", "Probe - {0}");
-  Measure smProbeResult = mgProbe.createMeasure("Result", MetricAggregation.zero, "Probe result", "number");
+  Measure smProbeResult = mgProbe.createMeasure("Result", MetricAggregation.zero, "Probe result", "number").dimensions(WebServerMonitor.SPLIT_CHECK);
   Measure smProbeStatus = mgProbe.createMeasure("Status", MetricAggregation.zero, "Probe status", "number");
   Measure smProbeRows = mgProbe.createMeasure("Rows", MetricAggregation.zero, "Probe number of rows returned", "number");
 
@@ -111,7 +113,7 @@ public class WebServerMonitor extends GenericHTTPMonitor {
     final Matcher m = config_probeRegEx.matcher(content);
     final int max = 0;
     int cnt = 0;
-    final IMetric<?> checkInfo = smProbeResult.getSplitting("check");
+    final IMetric<?> checkInfo = smProbeResult.getSplitting(WebServerMonitor.SPLIT_CHECK);
     while (m.find()) {
       cnt++;
       final String key = m.group(WebServerMonitor.REGEX_KEY_FIELD);
@@ -147,7 +149,7 @@ public class WebServerMonitor extends GenericHTTPMonitor {
     if (obj != null) {
       int max = 0;
       final JSONArray arr = obj.getJSONArray("infos");
-      final IMetric<?> checkInfo = smProbeResult.getSplitting("check");
+      final IMetric<?> checkInfo = smProbeResult.getSplitting(WebServerMonitor.SPLIT_CHECK);
       smProbeRows.setValue(arr.length());
       for (int i = 0; i < arr.length(); i++) {
         final JSONObject o = arr.getJSONObject(i);

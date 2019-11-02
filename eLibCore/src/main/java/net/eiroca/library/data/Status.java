@@ -19,6 +19,7 @@ package net.eiroca.library.data;
 public class Status {
 
   public static final Status OK = new Status(0, "OK");
+  public static final Status FAIL = new Status(1, "FAIL");
 
   private final int code;
   private final String message;

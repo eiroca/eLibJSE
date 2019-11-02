@@ -42,7 +42,9 @@ public class Statistic extends Metric<Statistic, StatisticDatum> {
 
   @Override
   public Statistic newSplit(final String name) {
-    return new Statistic();
+    final Statistic s = new Statistic();
+    s.parent = this;
+    return s;
   }
 
   public Collection<Statistic> getSplitMeasures() {

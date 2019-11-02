@@ -30,6 +30,7 @@ import net.eiroca.ext.library.gson.SimpleGson;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
+import net.eiroca.library.metrics.MetricMetadata;
 import net.eiroca.library.metrics.datum.IDatum;
 import net.eiroca.library.sysadm.monitoring.api.DatumCheck;
 import net.eiroca.library.sysadm.monitoring.api.Event;
@@ -97,9 +98,9 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     }
   }
 
-  public void addMeasure(final EventRule rule, final long timeStamp, final SimpleGson data, double value) {
+  public void addMeasure(final EventRule rule, final long timeStamp, final SimpleGson data, final MetricMetadata metricInfo, final double value) {
     if (data == null) { return; }
-    final Event e = new Event(timeStamp, data, value, rule);
+    final Event e = new Event(timeStamp, data, metricInfo, value, rule);
     synchronized (dataLock) {
       buffer.add(e);
     }
@@ -156,7 +157,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   }
 
   @Override
-  public boolean exportDatum(final SortedMap<String, Object> metadata, final IDatum datum) {
+  public boolean exportDatum(final SortedMap<String, Object> metadata, final MetricMetadata metricInfo, final IDatum datum) {
     context.debug("exportData ", datum);
     final EventRule rule = (ruleEngine != null) ? ruleEngine.ruleFor(metadata) : null;
     if (rule == null) { return false; }
@@ -249,9 +250,9 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
         json.set(GenericConsumer.FLD_STATUS, GenericConsumer.STATUS_OK);
       }
     }
-    double value = datum.getValue();
+    final double value = datum.getValue();
     json.addProperty(GenericConsumer.FLD_VALUE, value);
-    addMeasure(rule, timeStamp, data, value);
+    addMeasure(rule, timeStamp, data, metricInfo, value);
     return true;
   }
 
