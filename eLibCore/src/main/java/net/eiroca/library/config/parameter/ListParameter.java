@@ -72,4 +72,30 @@ public class ListParameter extends Parameter<String[]> {
     return value instanceof String[];
   }
 
+  @Override
+  public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    sb.append(name);
+    sb.append("=");
+    final String[] v = get();
+    if (v == null) {
+      sb.append("_NULL_");
+    }
+    else {
+      sb.append("[");
+      boolean first = true;
+      for (String s : v) {
+        if (!first) {
+          sb.append(",");
+        }
+        else {
+          first = false;
+        }
+        sb.append(s);
+      }
+      sb.append("]");
+    }
+    return sb.toString();
+  }
+
 }

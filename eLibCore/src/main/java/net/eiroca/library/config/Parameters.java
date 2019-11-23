@@ -27,10 +27,15 @@ import net.eiroca.library.core.LibStr;
 
 public class Parameters {
 
+  protected String name;
   protected List<Parameter<?>> params = new ArrayList<>();
   protected Map<Parameter<?>, Object> values = new HashMap<>();
 
   public Parameters() {
+  }
+
+  public Parameters(String name) {
+    this.name = name;
   }
 
   public void add(final Parameter<?> p) {
@@ -146,7 +151,10 @@ public class Parameters {
   @Override
   public String toString() {
     final StringBuilder sb = new StringBuilder(256);
-    sb.append("Parameters{");
+    if (name != null) {
+      sb.append(name).append('=');
+    }
+    sb.append("{");
     boolean first = true;
     for (final Parameter<?> p : params) {
       if (!first) {
@@ -159,6 +167,14 @@ public class Parameters {
     }
     sb.append("}");
     return sb.toString();
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
 }

@@ -20,6 +20,7 @@ import java.util.Date;
 
 public class LibDate {
 
+  public static final int ONE_HOUR = 3600 * 1000;
   public static final int ONE_DAY = 24 * 60 * 60 * 1000;
 
   /**

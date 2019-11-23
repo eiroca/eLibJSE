@@ -87,7 +87,7 @@ public class LibDB {
     }
   }
 
-  public static void callSP(Connection conn, String spName, Object[] params) throws SQLException {
+  public static void callSP(Connection conn, String spName, Object[] params, int timeout) throws SQLException {
     Statement statement = null;
     final StringBuilder sb = new StringBuilder();
     sb.append("CALL ").append(spName);
@@ -106,6 +106,7 @@ public class LibDB {
       // execute insert SQL stetement
       statement = conn.createStatement();
       statement.executeUpdate(sb.toString());
+      if (timeout > 0) statement.setQueryTimeout(timeout);
     }
     catch (final SQLException e) {
       LibDB.logger.warn(sb.toString());

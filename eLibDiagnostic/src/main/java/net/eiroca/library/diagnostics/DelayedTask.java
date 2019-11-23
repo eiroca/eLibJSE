@@ -25,7 +25,8 @@ import net.eiroca.library.system.Logs;
 public abstract class DelayedTask implements ITask {
 
   final protected static transient Logger logger = Logs.getLogger();
-  final protected static transient Parameters params = new Parameters();
+
+  final protected transient Parameters params = new Parameters();
 
   protected long lastRun = 0;
   protected long delay;
@@ -37,6 +38,7 @@ public abstract class DelayedTask implements ITask {
   public DelayedTask(final long delay) {
     super();
     this.delay = delay;
+    params.setName(getClass().getName());
   }
 
   public long getDelay() {
@@ -70,8 +72,9 @@ public abstract class DelayedTask implements ITask {
       DelayedTask.logger.info("Unable to load config file: " + path);
       p = new Properties();
     }
-    DelayedTask.params.loadConfig(p, null);
-    DelayedTask.params.saveConfig(this, "config_", true, true);
+    params.loadConfig(p, null);
+    params.saveConfig(this, "config_", true, true);
+    DelayedTask.logger.info(params.toString());
   }
 
   public abstract boolean run() throws CommandException;

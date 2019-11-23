@@ -114,7 +114,12 @@ public abstract class Parameter<T extends Object> {
     sb.append(name);
     sb.append("=");
     final T v = get();
-    sb.append(v == null ? "_NULL_" : v);
+    if (v == null) {
+      sb.append("_NULL_");
+    }
+    else {
+      sb.append(v);
+    }
     return sb.toString();
   }
 
