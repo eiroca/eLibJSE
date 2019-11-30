@@ -63,22 +63,52 @@ public class LibMap {
     return sb.toString();
   }
 
-  public static Map<String, String> buildMap(final List<String> names, final List<String> values) {
+  public static Map<String, String> buildMapFrom(final List<String> values) {
+    int siz = values.size();
+    Map<String, String> result = new HashMap<>(siz * 2);
+    for (int i = 0; i < siz; i++) {
+      final String key = String.valueOf(i);
+      final String val = values.get(i);
+      result.put(key, val);
+    }
+    return result;
+  }
+
+  @SafeVarargs
+  public static Map<String, String> buildMapFromAlt(final List<String> values, final List<String>... namesOptions) {
     Map<String, String> result = null;
-    if ((names != null) && (values != null)) {
-      result = new HashMap<>(names.size() * 2);
-      for (int i = 0; i < names.size(); i++) {
-        final String key = names.get(i);
-        final String val = values.get(i);
-        result.put(key, val);
+    if (values != null) {
+      int valSize = values.size();
+      for (List<String> names : namesOptions) {
+        if (names != null) {
+          int nameSize = names.size();
+          if (valSize == nameSize) {
+            result = new HashMap<>(nameSize * 2);
+            for (int i = 0; i < nameSize; i++) {
+              final String key = names.get(i);
+              final String val = values.get(i);
+              result.put(key, val);
+            }
+            return result;
+          }
+        }
       }
     }
-    else if (values != null) {
-      result = new HashMap<>(values.size() * 2);
-      for (int i = 0; i < values.size(); i++) {
-        final String key = String.valueOf(i);
-        final String val = values.get(i);
-        result.put(key, val);
+    return result;
+  }
+
+  public static Map<String, String> buildMapFrom(final List<String> names, final List<String> values) {
+    Map<String, String> result = null;
+    if ((values != null) && (names != null)) {
+      int valSize = values.size();
+      int nameSize = names.size();
+      if (valSize == nameSize) {
+        result = new HashMap<>(nameSize * 2);
+        for (int i = 0; i < nameSize; i++) {
+          final String key = names.get(i);
+          final String val = values.get(i);
+          result.put(key, val);
+        }
       }
     }
     return result;
