@@ -26,17 +26,17 @@ public class IndexEntry {
   public IndexEntry() {
   }
 
-  public IndexEntry(final String index, final String type, final String id, final String pipeline, final String document) {
+  public IndexEntry(final String index, final String type, final String id, final String pipeline, final String document, int version) {
     super();
     _id = id;
-    meta = getMetadata(index, type, id, pipeline);
+    meta = getMetadata(index, type, id, pipeline, version);
     data = document;
   }
 
-  private String getMetadata(final String index, final String type, final String id, final String pipeline) {
+  private String getMetadata(final String index, final String type, final String id, final String pipeline, int version) {
     final StringBuilder sb = new StringBuilder();
     sb.append("{\"index\":{\"_index\":\"").append(index).append("\"");
-    if (type != null) {
+    if ((type != null) && (version < 7)) {
       sb.append(",\"_type\":\"").append(type).append("\"");
     }
     if (id != null) {

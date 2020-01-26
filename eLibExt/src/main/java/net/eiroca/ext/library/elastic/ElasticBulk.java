@@ -44,6 +44,7 @@ public class ElasticBulk {
   public ElasticBulkStats stats = new ElasticBulkStats();
 
   final private List<IndexEntry> data = new ArrayList<>();
+  private int version;
   private int size = 0;
   private boolean deflate = true;
   private final String encoding = "UTF-8";
@@ -56,12 +57,13 @@ public class ElasticBulk {
   private long discardTime = 1000;
   private long lastOverload;
 
-  public ElasticBulk(final String server) {
-    this(server, true, ElasticBulk.DEFAULT_BULKSIZE, ElasticBulk.DEFAULT_THREADS);
+  public ElasticBulk(final String server, int version) {
+    this(server, version, true, ElasticBulk.DEFAULT_BULKSIZE, ElasticBulk.DEFAULT_THREADS);
   }
 
-  public ElasticBulk(final String elasticServer, final boolean checkResult, final int bulkSize, final int numThreads) {
+  public ElasticBulk(final String elasticServer, int version, final boolean checkResult, final int bulkSize, final int numThreads) {
     super();
+    this.version = version;
     this.numThreads = numThreads;
     this.bulkSize = bulkSize;
     setElasticServer(elasticServer);
@@ -77,7 +79,7 @@ public class ElasticBulk {
 
   public void add(final String index, final String type, final String id, final String pipeline, final String document) throws Exception {
     final long now = System.currentTimeMillis();
-    final IndexEntry e = new IndexEntry(index, type, id, pipeline, document);
+    final IndexEntry e = new IndexEntry(index, type, id, pipeline, document, version);
     size += e.entrySize();
     data.add(e);
     stats.incEventCount(1);

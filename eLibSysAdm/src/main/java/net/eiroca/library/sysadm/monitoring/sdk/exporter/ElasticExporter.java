@@ -37,6 +37,7 @@ public class ElasticExporter extends GenericExporter {
   public static IntegerParameter _elasticIndexMode = new IntegerParameter(ElasticExporter.config, "elasticIndexMode", 1, 0, 2);
   public static StringParameter _indexDateFormat = new StringParameter(ElasticExporter.config, "indexDateFormat", "yyyy.MM.dd");
   public static StringParameter _elasticType = new StringParameter(ElasticExporter.config, "elasticType", "metric");
+  public static IntegerParameter _elasticVersion = new IntegerParameter(ElasticExporter.config, "elasticVersion", 7);
   public static StringParameter _elasticPipeline = new StringParameter(ElasticExporter.config, "elasticPipeline", null);
   // Dynamic mapped to parameters
   protected String config_elasticURL;
@@ -44,6 +45,7 @@ public class ElasticExporter extends GenericExporter {
   protected int config_elasticIndexMode;// 0 fixed, 1 fixed+now 2 fixed+event.date
   protected String config_indexDateFormat;
   protected String config_elasticType;
+  protected int config_elasticVersion;
   protected String config_elasticPipeline;
   //
   protected ElasticBulk elasticServer = null;
@@ -58,7 +60,7 @@ public class ElasticExporter extends GenericExporter {
     super.setup(context);
     GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
     indexDateFormat = new SimpleDateFormat(config_indexDateFormat);
-    elasticServer = LibStr.isNotEmptyOrNull(config_elasticURL) ? new ElasticBulk(config_elasticURL) : null;
+    elasticServer = LibStr.isNotEmptyOrNull(config_elasticURL) ? new ElasticBulk(config_elasticURL, config_elasticVersion) : null;
     if (elasticServer != null) {
       elasticServer.open();
     }

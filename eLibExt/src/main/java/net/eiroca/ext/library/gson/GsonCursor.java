@@ -147,4 +147,9 @@ public class GsonCursor {
     addProperty(name, val);
   }
 
+  @Override
+  public String toString() {
+    return simpleJson != null ? simpleJson.toString() : "";
+  }
+
 }
