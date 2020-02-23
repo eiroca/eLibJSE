@@ -178,11 +178,17 @@ public class DatabaseMonitor extends TCPServerMonitor {
 
   @Override
   public boolean runCheck() throws CommandException {
-    if (runSQL) {
-      runSQL();
+    try {
+      if (runSQL) {
+        runSQL();
+      }
+      if (checks != null) {
+        executeSQLchecks(checks, dbVariant);
+      }
     }
-    if (checks != null) {
-      executeSQLchecks(checks, dbVariant);
+    finally {
+      Helper.close(con);
+      con = null;
     }
     return true;
   }
@@ -353,9 +359,6 @@ public class DatabaseMonitor extends TCPServerMonitor {
     }
     catch (final Exception e) {
       CommandException.InfrastructureError(Helper.getExceptionAsString(e, false));
-    }
-    finally {
-      Helper.close(con);
     }
   }
 

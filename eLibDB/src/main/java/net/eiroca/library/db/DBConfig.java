@@ -87,7 +87,7 @@ public class DBConfig {
   private static HashMap<String, String> urlTemplate = new HashMap<>();
   static {
     DBConfig.drivers.put(DBConfig.TYPE_SQLSERVER, new DriverInfo("com.microsoft.sqlserver.jdbc.SQLServerDriver", true));
-    DBConfig.drivers.put(DBConfig.TYPE_ORACLE, new DriverInfo("oracle.jdbc.driver.OracleDriver", true));
+    DBConfig.drivers.put(DBConfig.TYPE_ORACLE, new DriverInfo("oracle.jdbc.OracleDriver", true));
     DBConfig.drivers.put(DBConfig.TYPE_DB2, new DriverInfo("com.ibm.db2.jcc.DB2Driver", true));
     DBConfig.drivers.put(DBConfig.TYPE_INGRES, new DriverInfo("com.ingres.jdbc.IngresDriver", false));
     DBConfig.drivers.put(DBConfig.TYPE_POSTGRES, new DriverInfo("org.postgresql.Driver", true));
@@ -163,7 +163,7 @@ public class DBConfig {
         Class.forName(sqlclass);
       }
       catch (final ClassNotFoundException e) {
-        lastError = new Exception("Invalid JDBC driver: " + sqlclass);
+        lastError = new Exception("Missing JDBC driver: " + sqlclass);
         return false;
       }
     }

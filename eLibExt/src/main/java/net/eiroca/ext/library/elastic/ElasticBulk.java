@@ -123,11 +123,9 @@ public class ElasticBulk {
   public void checkResult(final int responseCode, final HttpEntity entity, final int size) {
     if (checkResult) {
       int errors = size;
-      if (responseCode < 400) {
-        final String resultStr = HttpClientHelper.consume(entity);
-        if (resultStr != null) {
-          errors = checkResult(null, resultStr);
-        }
+      final String resultStr = HttpClientHelper.consume(entity);
+      if ((responseCode < 400) && (resultStr != null)) {
+        errors = checkResult(null, resultStr);
       }
       stats.incEventErrors(errors);
     }
