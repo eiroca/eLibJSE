@@ -35,16 +35,6 @@
    <build>
       <finalName>${project.artifactId}-${project.version}</finalName>
       <plugins>
-         <!-- download source code in Eclipse, best practice -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-eclipse-plugin</artifactId>
-            <version>2.9</version>
-            <configuration>
-               <downloadSources>true</downloadSources>
-               <downloadJavadocs>false</downloadJavadocs>
-            </configuration>
-         </plugin>
          <!-- Set a JDK compiler level -->
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
