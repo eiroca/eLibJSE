@@ -8,7 +8,7 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Affero General Public License for more details.
+ * Affero General Public License for more details. 
  *
  * You should have received a copy of the GNU Affero General Public License along with this program.
  * If not, see <http://www.gnu.org/licenses/>.
@@ -34,18 +34,18 @@ public class FLUMEServerMonitor extends RESTServerMonitor {
   /* @formatter:off
     Each Source, Sink or Channel will provide metrics like this:
     {
-      “CHANNEL.fc1”: {
-        “ChannelCapacity”: “1000000”,
-        “ChannelFillPercentage”: “0.0”,
-        “ChannelSize”:
-        “0”,
-        “EventPutAttemptCount”: “0”,
-        “EventPutSuccessCount”: “0”,
-        “EventTakeAttemptCount”: “3203”,
-        “EventTakeSuccessCount”: “0”,
-        “StartTime”: “1367940231789”,
-        “StopTime”: “0”,
-        “Type”: “CHANNEL”
+      "CHANNEL.fc1": {
+        "ChannelCapacity": "1000000",
+        "ChannelFillPercentage": "0.0",
+        "ChannelSize":
+        "0",
+        "EventPutAttemptCount": "0",
+        "EventPutSuccessCount": "0",
+        "EventTakeAttemptCount": "3203",
+        "EventTakeSuccessCount": "0",
+        "StartTime": "1367940231789",
+        "StopTime": "0",
+        "Type": "CHANNEL"
       }
     }
     @formatter:on */
