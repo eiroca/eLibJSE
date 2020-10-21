@@ -55,4 +55,21 @@ public class Event {
     return rule;
   }
 
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder(1024);
+    sb.append("Event [");
+    sb.append("timestamp=" + timestamp);
+    sb.append(", ");
+    sb.append("metricInfo=" + metricInfo);
+    sb.append(", ");
+    sb.append("data=" + data);
+    sb.append(", ");
+    sb.append("rule=" + rule);
+    sb.append(", ");
+    sb.append("value=" + value);
+    sb.append("]");
+    return sb.toString();
+  }
+
 }

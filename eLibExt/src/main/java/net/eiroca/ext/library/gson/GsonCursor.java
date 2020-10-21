@@ -28,7 +28,6 @@ import net.eiroca.library.core.LibStr;
 public class GsonCursor {
 
   private static final SimpleDateFormat ISO8601 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-  private static final JsonParser parser = new JsonParser();
 
   private final SimpleGson simpleJson;
   public String propertyName;
@@ -62,7 +61,7 @@ public class GsonCursor {
 
   public void addJson(final String name, final String value) {
     seek(name);
-    node.add(propertyName, GsonCursor.parser.parse(value));
+    node.add(propertyName, JsonParser.parseString(value));
   }
 
   public void addProperty(final String name, final String val) {

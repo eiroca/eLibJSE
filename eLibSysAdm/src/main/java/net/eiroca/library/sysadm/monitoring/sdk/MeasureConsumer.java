@@ -41,7 +41,7 @@ import net.eiroca.library.sysadm.monitoring.sdk.exporter.Exporters;
 import net.eiroca.library.system.ContextParameters;
 import net.eiroca.library.system.IContext;
 
-public class GenericConsumer implements IMeasureConsumer, Runnable {
+public class MeasureConsumer implements IMeasureConsumer, Runnable {
 
   private static final String CONFIG_PREFIX = null;
   private static final String ARRAY_SUFFIX = "[]";
@@ -57,7 +57,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   public static final String STATUS_OK = "OK";
 
   public static ContextParameters config = new ContextParameters();
-  public static StringParameter _timezone = new StringParameter(GenericConsumer.config, "timezone", null);
+  public static StringParameter _timezone = new StringParameter(MeasureConsumer.config, "timezone", null);
   // Dynamic mapped to parameters
   protected String config_timezone;
   //
@@ -71,11 +71,11 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   private static List<IExporter> exporters = new ArrayList<>();
   static {
     for (final String name : Exporters.registry.getNames()) {
-      GenericConsumer.exporters.add(Exporters.newInstance(name));
+      MeasureConsumer.exporters.add(Exporters.newInstance(name));
     }
   }
 
-  public GenericConsumer(final RuleEngine ruleEngine, final Map<String, String> alias) {
+  public MeasureConsumer(final RuleEngine ruleEngine, final Map<String, String> alias) {
     this.ruleEngine = ruleEngine;
     this.alias = alias;
   }
@@ -83,8 +83,8 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   @Override
   public void setup(final IContext context) throws Exception {
     this.context = context;
-    GenericConsumer.config.convert(context, GenericConsumer.CONFIG_PREFIX, this, "config_");
-    for (final IExporter connector : GenericConsumer.exporters) {
+    MeasureConsumer.config.convert(context, MeasureConsumer.CONFIG_PREFIX, this, "config_");
+    for (final IExporter connector : MeasureConsumer.exporters) {
       connector.setup(context);
     }
     context.info(this.getClass().getName(), " setup done");
@@ -93,7 +93,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   @Override
   public void teardown() throws Exception {
     context.info(this.getClass().getName(), " teardown");
-    for (final IExporter connector : GenericConsumer.exporters) {
+    for (final IExporter connector : MeasureConsumer.exporters) {
       connector.teardown();
     }
   }
@@ -137,7 +137,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
   private void flush(final List<Event> events) throws Exception {
     context.debug("flush events");
     final List<IExporter> validConnectors = new ArrayList<>();
-    for (final IExporter connector : GenericConsumer.exporters) {
+    for (final IExporter connector : MeasureConsumer.exporters) {
       if (connector.beginBulk()) {
         validConnectors.add(connector);
       }
@@ -173,7 +173,7 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
     }
     cal.setTime(new Date(timeStamp));
     timeStamp = cal.getTimeInMillis();
-    json.addProperty(GenericConsumer.FLD_DATETIME, cal.getTime(), GenericConsumer.ISO8601_FULL);
+    json.addProperty(MeasureConsumer.FLD_DATETIME, cal.getTime(), MeasureConsumer.ISO8601_FULL);
     if (metadata != null) {
       for (final Map.Entry<String, Object> metaEntry : metadata.entrySet()) {
         String key = metaEntry.getKey();
@@ -191,8 +191,8 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
             val = newVal;
           }
         }
-        if (key.endsWith(GenericConsumer.ARRAY_SUFFIX)) {
-          key = key.substring(0, key.length() - GenericConsumer.ARRAY_SUFFIX.length());
+        if (key.endsWith(MeasureConsumer.ARRAY_SUFFIX)) {
+          key = key.substring(0, key.length() - MeasureConsumer.ARRAY_SUFFIX.length());
           if (val instanceof String[]) {
             json.addProperty(key, (String[])val);
           }
@@ -223,35 +223,35 @@ public class GenericConsumer implements IMeasureConsumer, Runnable {
             }
           }
         }
-        json.set(GenericConsumer.FLD_STATUS, fail.getCheckName().toUpperCase());
+        json.set(MeasureConsumer.FLD_STATUS, fail.getCheckName().toUpperCase());
         final Double min = fail.getMin();
         if (min != null) {
-          json.addProperty(GenericConsumer.FLD_STATUS_MINVAL, min);
+          json.addProperty(MeasureConsumer.FLD_STATUS_MINVAL, min);
         }
         final Double max = fail.getMax();
         if (max != null) {
-          json.addProperty(GenericConsumer.FLD_STATUS_MAXVAL, max);
+          json.addProperty(MeasureConsumer.FLD_STATUS_MAXVAL, max);
         }
         switch (fail.check(datum)) {
           case MIN:
-            json.set(GenericConsumer.FLD_STATUS_DESC, "Value lower than minimum");
+            json.set(MeasureConsumer.FLD_STATUS_DESC, "Value lower than minimum");
             break;
           case MAX:
-            json.set(GenericConsumer.FLD_STATUS_DESC, "Value greather than maximum");
+            json.set(MeasureConsumer.FLD_STATUS_DESC, "Value greather than maximum");
             break;
           case BOTH:
-            json.set(GenericConsumer.FLD_STATUS_DESC, "Value is invalid");
+            json.set(MeasureConsumer.FLD_STATUS_DESC, "Value is invalid");
             break;
           default:
             break;
         }
       }
       else {
-        json.set(GenericConsumer.FLD_STATUS, GenericConsumer.STATUS_OK);
+        json.set(MeasureConsumer.FLD_STATUS, MeasureConsumer.STATUS_OK);
       }
     }
     final double value = datum.getValue();
-    json.addProperty(GenericConsumer.FLD_VALUE, value);
+    json.addProperty(MeasureConsumer.FLD_VALUE, value);
     addMeasure(rule, timeStamp, data, metricInfo, value);
     return true;
   }

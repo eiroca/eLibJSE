@@ -132,8 +132,7 @@ public class ElasticBulk {
   }
 
   public int checkResult(final List<IndexEntry> data, final String resultStr) {
-    final JsonParser parser = new JsonParser();
-    final JsonElement result = parser.parse(resultStr);
+    final JsonElement result = JsonParser.parseString(resultStr);
     JsonArray items = null;
     items = result.getAsJsonObject().get("items").getAsJsonArray();
     int idx = 0;
