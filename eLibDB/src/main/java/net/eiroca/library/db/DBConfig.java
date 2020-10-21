@@ -16,6 +16,7 @@
  **/
 package net.eiroca.library.db;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -27,6 +28,8 @@ import net.eiroca.library.system.IConfig;
 import net.eiroca.library.system.IContext;
 
 public class DBConfig {
+
+  private static final String ORACLE_NET_TNS_ADMIN = "oracle.net.tns_admin";
 
   private static final String CONFIG_TYPE = "DBType";
   private static final String CONFIG_PORT = "port";
@@ -71,17 +74,8 @@ public class DBConfig {
   String sqlclass;
   boolean prepared = false;
 
-  final static class DriverInfo {
-
-    String className;
-    boolean legacy;
-
-    public DriverInfo(final String className, final boolean legacy) {
-      super();
-      this.className = className;
-      this.legacy = legacy;
-    }
-  }
+  Exception lastError;
+  IContext context;
 
   private static HashMap<String, DriverInfo> drivers = new HashMap<>();
   private static HashMap<String, String> urlTemplate = new HashMap<>();
@@ -101,16 +95,28 @@ public class DBConfig {
     DBConfig.urlTemplate.put(DBConfig.TYPE_POSTGRES, "jdbc:postgresql://{0}:{1}/{2}");
     DBConfig.urlTemplate.put(DBConfig.TYPE_MYSQL, "jdbc:mysql://{0}:{1}/{2}");
     DBConfig.urlTemplate.put(DBConfig.TYPE_IBMNETEZZA, "jdbc:netezza://{0}:{1}/{2}");
+    //
+    setTnsAdmin();
   }
-
-  Exception lastError;
-  IContext context;
 
   public DBConfig(final IContext context) {
     if (context != null) {
       setup(context);
     }
     this.context = context;
+  }
+
+  private static void setTnsAdmin() {
+    if (System.getProperty(ORACLE_NET_TNS_ADMIN) == null) {
+      String tnsAdmin = System.getenv("TNS_ADMIN");
+      if (tnsAdmin == null) {
+        String oracleHome = System.getenv("ORACLE_HOME");
+        if (oracleHome != null) {
+          tnsAdmin = oracleHome + File.separatorChar + "network" + File.separatorChar + "admin";
+        }
+      }
+      System.setProperty(ORACLE_NET_TNS_ADMIN, tnsAdmin);
+    }
   }
 
   public void setup(final IConfig config) {
@@ -157,8 +163,8 @@ public class DBConfig {
       lastError = new Exception("Unknown SQLType: " + SQLType);
       return false;
     }
-    sqlclass = info.className;
-    if (info.legacy) {
+    sqlclass = info.getClassName();
+    if (info.isLegacy()) {
       try {
         Class.forName(sqlclass);
       }
