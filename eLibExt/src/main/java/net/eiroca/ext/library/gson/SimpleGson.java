@@ -61,6 +61,11 @@ public class SimpleGson {
     return pos > 0 ? newName.substring(0, pos) : null;
   }
 
+  public String get(final String name, String def) {
+    JsonObject node = getNode(name);
+    return (node != null) ? node.getAsString() : def;
+  }
+
   public JsonObject getNode(final String name) {
     JsonObject node;
     if (expandName) {

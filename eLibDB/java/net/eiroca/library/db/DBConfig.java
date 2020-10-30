@@ -22,6 +22,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Properties;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.system.IConfig;
@@ -29,8 +30,18 @@ import net.eiroca.library.system.IContext;
 
 public class DBConfig {
 
+  //
+  private static final String ENV_ORACLEHOME = "ORACLE_HOME";
+  private static final String ENV_TNSADMIN = "TNS_ADMIN";
+  //
+  private static final String ORACLE_NET_CONNECT_TIMEOUT = "oracle.net.CONNECT_TIMEOUT";
+  private static final String DEF_ORACLE_NET_CONNECT_TIMEOUT = "5000";
   private static final String ORACLE_NET_TNS_ADMIN = "oracle.net.tns_admin";
-
+  private static final String ORACLE_NET_USER = "user";
+  private static final String ORACLE_NET_PASSWORD = "password";
+  //
+  private static final int TIMEOUT_CONNECT = 10;
+  //
   private static final String CONFIG_TYPE = "DBType";
   private static final String CONFIG_PORT = "port";
   private static final String CONFIG_DATABASE = "Database";
@@ -108,18 +119,19 @@ public class DBConfig {
 
   private static void setTnsAdmin() {
     if (System.getProperty(ORACLE_NET_TNS_ADMIN) == null) {
-      String tnsAdmin = System.getenv("TNS_ADMIN");
+      String tnsAdmin = System.getenv(ENV_TNSADMIN);
       if (tnsAdmin == null) {
-        String oracleHome = System.getenv("ORACLE_HOME");
+        String oracleHome = System.getenv(ENV_ORACLEHOME);
         if (oracleHome != null) {
           tnsAdmin = oracleHome + File.separatorChar + "network" + File.separatorChar + "admin";
         }
       }
-      System.setProperty(ORACLE_NET_TNS_ADMIN, tnsAdmin);
+      if (tnsAdmin != null) System.setProperty(ORACLE_NET_TNS_ADMIN, tnsAdmin);
     }
   }
 
   public void setup(final IConfig config) {
+    DriverManager.setLoginTimeout(TIMEOUT_CONNECT);
     username = config.getConfigString(DBConfig.CONFIG_USERNAME, null);
     password = config.getConfigPassword(DBConfig.CONFIG_PASSWORD);
     server = config.getConfigString(DBConfig.CONFIG_SERVER, null);
@@ -223,6 +235,13 @@ public class DBConfig {
     try {
       if (SQLType.equals(DBConfig.TYPE_SQLSERVER)) {
         con = DriverManager.getConnection(connectionUrl);
+      }
+      else if (SQLType.equals(DBConfig.TYPE_ORACLE)) {
+        Properties props = new Properties();
+        props.setProperty(ORACLE_NET_USER, username);
+        props.setProperty(ORACLE_NET_PASSWORD, password);
+        props.setProperty(ORACLE_NET_CONNECT_TIMEOUT, DEF_ORACLE_NET_CONNECT_TIMEOUT);
+        con = DriverManager.getConnection(connectionUrl, props);
       }
       else {
         con = DriverManager.getConnection(connectionUrl, username, password);
