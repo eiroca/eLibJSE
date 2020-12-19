@@ -54,7 +54,7 @@ public class LibDB {
         sb.append("NULL");
       }
       else if (o instanceof Date) {
-        sb.append("to_date('" + LibDB.dateFormat.format((Date)o) + "', 'yyyy/mm/dd hh24:mi:ss')");
+        sb.append("to_date('").append(LibDB.dateFormat.format((Date)o)).append("', 'yyyy/mm/dd hh24:mi:ss')");
       }
       else if (o instanceof Double) {
         sb.append(o.toString());
@@ -65,7 +65,7 @@ public class LibDB {
           datum = datum.substring(0, limit);
         }
         datum = datum.replaceAll("'", "''");
-        sb.append("'" + datum + "'");
+        sb.append('\'').append(datum).append('\'');
       }
       else {
         sb.append(String.valueOf(o));
@@ -74,7 +74,7 @@ public class LibDB {
     sb.append(')');
     try {
       LibDB.logger.trace(sb.toString());
-      // execute insert SQL stetement
+      // execute insert SQL statement
       statement = conn.createStatement();
       statement.executeUpdate(sb.toString());
     }
