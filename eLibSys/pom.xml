@@ -25,5 +25,10 @@
          <artifactId>re2j</artifactId>
          <version>${re2j.version}</version>
       </dependency>
+      <dependency>
+         <groupId>com.github.seancfoley</groupId>
+         <artifactId>ipaddress</artifactId>
+         <version>${ipaddress.version}</version>
+      </dependency>
    </dependencies>
 </project>
