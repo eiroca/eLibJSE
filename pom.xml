@@ -28,7 +28,7 @@
     <commons-codecs.version>1.15</commons-codecs.version>
     <trilead-ssh2.version>1.0.0-build222</trilead-ssh2.version>
     <soa-model-core.version>1.6.3</soa-model-core.version>
-    <guava.version>11.0.2</guava.version>
+    <guava.version>30.1.1-jre</guava.version>
     <languagetool.version>5.4</languagetool.version>
     <jcifs-ng.version>2.1.6</jcifs-ng.version>
     <re2j.version>1.6</re2j.version>

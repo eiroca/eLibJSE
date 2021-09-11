@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2020 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -33,18 +33,19 @@ import net.eiroca.library.system.Logs;
 
 public class ElasticBulk {
 
+  public static final String STR_BULKMIMETYPE = "application/json";
+
   public static final int ELASTIC_OVERLOAD = 429;
 
   private static final int DEFAULT_THREADS = 1;
   private static final int DEFAULT_BULKSIZE = 1 * 1024 * 1024;
-  private static final String STR_BULKMIMETYPE = "application/json";
 
   private static final Logger logger = Logs.getLogger();
 
   public ElasticBulkStats stats = new ElasticBulkStats();
 
   final private List<IndexEntry> data = new ArrayList<>();
-  private int version;
+  private final int version;
   private int size = 0;
   private boolean deflate = true;
   private final String encoding = "UTF-8";
@@ -53,15 +54,16 @@ public class ElasticBulk {
   private int numThreads = ElasticBulk.DEFAULT_THREADS;
   private boolean checkResult;
   private final ThreadPoolExecutor senderPool;
+  private String authorization;
 
   private long discardTime = 1000;
   private long lastOverload;
 
-  public ElasticBulk(final String server, int version) {
+  public ElasticBulk(final String server, final int version) {
     this(server, version, true, ElasticBulk.DEFAULT_BULKSIZE, ElasticBulk.DEFAULT_THREADS);
   }
 
-  public ElasticBulk(final String elasticServer, int version, final boolean checkResult, final int bulkSize, final int numThreads) {
+  public ElasticBulk(final String elasticServer, final int version, final boolean checkResult, final int bulkSize, final int numThreads) {
     super();
     this.version = version;
     this.numThreads = numThreads;
@@ -70,6 +72,14 @@ public class ElasticBulk {
     this.checkResult = checkResult;
     senderPool = (ThreadPoolExecutor)Executors.newFixedThreadPool(numThreads);
     open();
+  }
+
+  public String getAuthorization() {
+    return authorization;
+  }
+
+  public void setAuthorization(final String authorization) {
+    this.authorization = authorization;
   }
 
   public void open() {

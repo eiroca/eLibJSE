@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2020 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -143,8 +143,8 @@ public class MultipleWords implements Comparator<WeightedWord> {
 
   public boolean contains(final String word, final double minWeight) {
     WeightedWord ww;
-    for (int i = 0; i < words.size(); i++) {
-      ww = words.get(i);
+    for (final WeightedWord word2 : words) {
+      ww = word2;
       if (ww.word.equals(word) && (ww.weight >= minWeight)) { return true; }
     }
     return false;

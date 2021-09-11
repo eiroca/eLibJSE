@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2020 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -64,8 +64,8 @@ public class LibMap {
   }
 
   public static Map<String, String> buildMapFrom(final List<String> values) {
-    int siz = values.size();
-    Map<String, String> result = new HashMap<>(siz * 2);
+    final int siz = values.size();
+    final Map<String, String> result = new HashMap<>(siz * 2);
     for (int i = 0; i < siz; i++) {
       final String key = String.valueOf(i);
       final String val = values.get(i);
@@ -78,10 +78,10 @@ public class LibMap {
   public static Map<String, String> buildMapFromAlt(final List<String> values, final List<String>... namesOptions) {
     Map<String, String> result = null;
     if (values != null) {
-      int valSize = values.size();
-      for (List<String> names : namesOptions) {
+      final int valSize = values.size();
+      for (final List<String> names : namesOptions) {
         if (names != null) {
-          int nameSize = names.size();
+          final int nameSize = names.size();
           if (valSize == nameSize) {
             result = new HashMap<>(nameSize * 2);
             for (int i = 0; i < nameSize; i++) {
@@ -100,8 +100,8 @@ public class LibMap {
   public static Map<String, String> buildMapFrom(final List<String> names, final List<String> values) {
     Map<String, String> result = null;
     if ((values != null) && (names != null)) {
-      int valSize = values.size();
-      int nameSize = names.size();
+      final int valSize = values.size();
+      final int nameSize = names.size();
       if (valSize == nameSize) {
         result = new HashMap<>(nameSize * 2);
         for (int i = 0; i < nameSize; i++) {

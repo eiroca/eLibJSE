@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2020 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -18,11 +18,9 @@ package net.eiroca.library.regex;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import net.eiroca.library.core.LibStr;
@@ -40,25 +38,13 @@ public class RegularExpression {
   private static List<ARegEx> rules = new ArrayList<>();
 
   static {
-    final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, new ThreadFactory() {
-
-      @Override
-      public Thread newThread(final Runnable r) {
-        final Thread t = Executors.defaultThreadFactory().newThread(r);
-        t.setName(RegularExpression.REG_EX_REPORTING);
-        t.setDaemon(true);
-        return t;
-      }
-
+    final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1, r -> {
+      final Thread t = Executors.defaultThreadFactory().newThread(r);
+      t.setName(RegularExpression.REG_EX_REPORTING);
+      t.setDaemon(true);
+      return t;
     });
-    scheduler.scheduleAtFixedRate(new Runnable() {
-
-      @Override
-      public void run() {
-        RegularExpression.dump();
-      }
-
-    }, RegularExpression.REGEX_DUMPTIME, RegularExpression.REGEX_DUMPTIME, TimeUnit.SECONDS);
+    scheduler.scheduleAtFixedRate(() -> RegularExpression.dump(), RegularExpression.REGEX_DUMPTIME, RegularExpression.REGEX_DUMPTIME, TimeUnit.SECONDS);
   }
 
   public static ARegEx build(final String name, final String pattern, final int engine) {
@@ -82,15 +68,10 @@ public class RegularExpression {
   public static List<ARegEx> getRules() {
     final List<ARegEx> result = new ArrayList<>();
     result.addAll(RegularExpression.rules);
-    Collections.sort(result, new Comparator<ARegEx>() {
-
-      @Override
-      public int compare(final ARegEx r1, final ARegEx r2) {
-        if (r1.totalTime < r2.totalTime) { return 1; }
-        if (r1.totalTime > r2.totalTime) { return -1; }
-        return r1.pattern.compareTo(r2.pattern);
-      }
-
+    Collections.sort(result, (r1, r2) -> {
+      if (r1.totalTime < r2.totalTime) { return 1; }
+      if (r1.totalTime > r2.totalTime) { return -1; }
+      return r1.pattern.compareTo(r2.pattern);
     });
     return result;
   }

@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2020 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -40,6 +40,7 @@ import java.nio.file.attribute.BasicFileAttributeView;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
 import java.util.Scanner;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -361,6 +362,21 @@ final public class LibFile {
     }
     catch (final IOException e1) {
     }
+  }
+
+  public static Properties loadConfiguration(final String... paths) {
+    final Properties properties = new Properties();
+    properties.putAll(System.getProperties());
+    final InputStream prop = LibFile.findResource(paths);
+    if (prop != null) {
+      try {
+        final Properties localConf = Helper.loadProperties(prop, false);
+        properties.putAll(localConf);
+      }
+      catch (final IOException e) {
+      }
+    }
+    return properties;
   }
 
 }

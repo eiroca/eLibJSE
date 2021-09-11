@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2020 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -43,8 +43,7 @@ public class WeightedWord {
   @Override
   public boolean equals(final Object obj) {
     if (this == obj) { return true; }
-    if (obj == null) { return false; }
-    if (getClass() != obj.getClass()) { return false; }
+    if ((obj == null) || (getClass() != obj.getClass())) { return false; }
     final WeightedWord other = (WeightedWord)obj;
     if (Double.doubleToLongBits(weight) != Double.doubleToLongBits(other.weight)) { return false; }
     if (word == null) {

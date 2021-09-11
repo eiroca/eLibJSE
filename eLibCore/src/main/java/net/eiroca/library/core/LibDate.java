@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2020 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -16,9 +16,12 @@
  **/
 package net.eiroca.library.core;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class LibDate {
+
+  public static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
 
   public static final int ONE_HOUR = 3600 * 1000;
   public static final int ONE_DAY = 24 * 60 * 60 * 1000;

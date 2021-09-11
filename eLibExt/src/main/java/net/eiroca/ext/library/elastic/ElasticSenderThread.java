@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2020 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -26,15 +26,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
+import com.google.common.net.HttpHeaders;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.system.Logs;
 
 public class ElasticSenderThread implements Runnable {
 
   private static final Logger logger = Logs.getLogger();
-
-  private static final String HEADER_ACCEPT = "Accept";
-  private static final String STR_APPLICATIONJSON = "application/json";
 
   CloseableHttpClient httpclient;
   HttpEntity entity;
@@ -54,7 +52,11 @@ public class ElasticSenderThread implements Runnable {
     ElasticSenderThread.logger.debug("Running...");
     final HttpPost httpRequest = new HttpPost(owner.getElasticServer());
     httpRequest.setEntity(entity);
-    httpRequest.setHeader(ElasticSenderThread.HEADER_ACCEPT, ElasticSenderThread.STR_APPLICATIONJSON);
+    httpRequest.setHeader(HttpHeaders.ACCEPT, ElasticBulk.STR_BULKMIMETYPE);
+    final String auth = owner.getAuthorization();
+    if (auth != null) {
+      httpRequest.setHeader(HttpHeaders.AUTHORIZATION, auth);
+    }
     httpRequest.setHeader(entity.getContentType());
     final Header encoding = entity.getContentEncoding();
     if (encoding != null) {

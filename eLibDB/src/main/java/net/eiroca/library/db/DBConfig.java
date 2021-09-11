@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2020 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -80,6 +80,8 @@ public class DBConfig {
   protected boolean windows;
   protected String DB2schema;
 
+  protected boolean autoCommit = false;
+
   String connectionUrl;
 
   String sqlclass;
@@ -107,7 +109,7 @@ public class DBConfig {
     DBConfig.urlTemplate.put(DBConfig.TYPE_MYSQL, "jdbc:mysql://{0}:{1}/{2}");
     DBConfig.urlTemplate.put(DBConfig.TYPE_IBMNETEZZA, "jdbc:netezza://{0}:{1}/{2}");
     //
-    setTnsAdmin();
+    DBConfig.setTnsAdmin();
   }
 
   public DBConfig(final IContext context) {
@@ -118,20 +120,22 @@ public class DBConfig {
   }
 
   private static void setTnsAdmin() {
-    if (System.getProperty(ORACLE_NET_TNS_ADMIN) == null) {
-      String tnsAdmin = System.getenv(ENV_TNSADMIN);
+    if (System.getProperty(DBConfig.ORACLE_NET_TNS_ADMIN) == null) {
+      String tnsAdmin = System.getenv(DBConfig.ENV_TNSADMIN);
       if (tnsAdmin == null) {
-        String oracleHome = System.getenv(ENV_ORACLEHOME);
+        final String oracleHome = System.getenv(DBConfig.ENV_ORACLEHOME);
         if (oracleHome != null) {
           tnsAdmin = oracleHome + File.separatorChar + "network" + File.separatorChar + "admin";
         }
       }
-      if (tnsAdmin != null) System.setProperty(ORACLE_NET_TNS_ADMIN, tnsAdmin);
+      if (tnsAdmin != null) {
+        System.setProperty(DBConfig.ORACLE_NET_TNS_ADMIN, tnsAdmin);
+      }
     }
   }
 
   public void setup(final IConfig config) {
-    DriverManager.setLoginTimeout(TIMEOUT_CONNECT);
+    DriverManager.setLoginTimeout(DBConfig.TIMEOUT_CONNECT);
     username = config.getConfigString(DBConfig.CONFIG_USERNAME, null);
     password = config.getConfigPassword(DBConfig.CONFIG_PASSWORD);
     server = config.getConfigString(DBConfig.CONFIG_SERVER, null);
@@ -221,7 +225,7 @@ public class DBConfig {
     return prepared;
   }
 
-  public void releaseConnection(Connection c) {
+  public void releaseConnection(final Connection c) {
     if (c != null) {
       Helper.close(c);
     }
@@ -237,14 +241,17 @@ public class DBConfig {
         con = DriverManager.getConnection(connectionUrl);
       }
       else if (SQLType.equals(DBConfig.TYPE_ORACLE)) {
-        Properties props = new Properties();
-        props.setProperty(ORACLE_NET_USER, username);
-        props.setProperty(ORACLE_NET_PASSWORD, password);
-        props.setProperty(ORACLE_NET_CONNECT_TIMEOUT, DEF_ORACLE_NET_CONNECT_TIMEOUT);
+        final Properties props = new Properties();
+        props.setProperty(DBConfig.ORACLE_NET_USER, username);
+        props.setProperty(DBConfig.ORACLE_NET_PASSWORD, password);
+        props.setProperty(DBConfig.ORACLE_NET_CONNECT_TIMEOUT, DBConfig.DEF_ORACLE_NET_CONNECT_TIMEOUT);
         con = DriverManager.getConnection(connectionUrl, props);
       }
       else {
         con = DriverManager.getConnection(connectionUrl, username, password);
+      }
+      if (con != null) {
+        con.setAutoCommit(autoCommit);
       }
     }
     catch (final SQLException e) {
