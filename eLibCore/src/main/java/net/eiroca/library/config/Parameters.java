@@ -16,6 +16,8 @@
  **/
 package net.eiroca.library.config;
 
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,7 +80,21 @@ public class Parameters {
     }
   }
 
-  public void saveConfig(final Map<String, String> config, final String prefix) {
+  public boolean saveConfig(final String path) {
+    final Properties x = new Properties();
+    saveConfig(x, null, false);
+    OutputStream output;
+    try {
+      output = new FileOutputStream(path);
+      x.store(output, null);
+    }
+    catch (final Exception e) {
+      return false;
+    }
+    return true;
+  }
+
+  public void saveConfig(final Properties config, final String prefix, final boolean saveAll) {
     for (final Parameter<?> p : params) {
       final String key = LibStr.concatenate(prefix, p.getName());
       Object val = values.get(p);
@@ -86,8 +102,30 @@ public class Parameters {
         val = p.getDefault();
       }
       if (val != null) {
-        final String value = p.encodeString(val);
-        config.put(key, value);
+        if (saveAll || !p.isDefault(val)) {
+          final String value = p.encodeString(val);
+          config.put(key, value);
+        }
+      }
+    }
+  }
+
+  public void saveConfig(final Map<String, String> config, final String prefix) {
+    saveConfig(config, prefix, true);
+  }
+
+  public void saveConfig(final Map<String, String> config, final String prefix, final boolean saveAll) {
+    for (final Parameter<?> p : params) {
+      final String key = LibStr.concatenate(prefix, p.getName());
+      Object val = values.get(p);
+      if (val == null) {
+        val = p.getDefault();
+      }
+      if (val != null) {
+        if (saveAll || !p.isDefault(val)) {
+          final String value = p.encodeString(val);
+          config.put(key, value);
+        }
       }
     }
   }

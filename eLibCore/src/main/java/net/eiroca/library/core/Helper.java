@@ -43,6 +43,7 @@ final public class Helper {
   public static final String NL = System.getProperty("line.separator", "\n");
   public static final String OS_NAME = System.getProperty("os.name", "Unknown");
   public static final String LISTSEPERATOR = System.getProperty("list.separator", ";");
+  public final static String FS = System.getProperty("file.separator", "/");
 
   public static final String EMPTY_STRING = "";
   public static final String DOUBLE_QUOTE = "\"";

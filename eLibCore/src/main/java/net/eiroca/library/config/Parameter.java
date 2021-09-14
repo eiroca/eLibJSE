@@ -26,7 +26,7 @@ public abstract class Parameter<T extends Object> {
   protected String name;
   protected boolean required;
   protected boolean nullable;
-  private T defValue;
+  protected T defValue;
 
   protected String label;
 
@@ -139,6 +139,10 @@ public abstract class Parameter<T extends Object> {
   public Parameter<T> setDescription(final String description) {
     this.description = description;
     return this;
+  }
+
+  public boolean isDefault(final Object value) {
+    return (value != null ? value.equals(defValue) : (value == defValue));
   }
 
 }
