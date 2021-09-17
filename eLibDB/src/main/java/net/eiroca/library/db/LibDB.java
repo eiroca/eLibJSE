@@ -31,7 +31,7 @@ public class LibDB {
   private final static DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
   private final static Logger logger = Logs.getLogger();
 
-  public static void insertRecord(final Connection conn, final String table, final String[] fields, final Object[] values, final int limit) throws SQLException {
+  public static void insertRecord(final Connection conn, final String table, final Object[] fields, final Object[] values, final int limit) throws SQLException {
     Statement statement = null;
     final StringBuilder sb = new StringBuilder();
     sb.append("INSERT INTO ").append(table);
