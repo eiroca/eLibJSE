@@ -20,17 +20,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class Registry {
+public class Registry<T> {
 
   private final String defaultName = "*";
-  private final HashMap<String, String> names = new HashMap<>();
+  private final HashMap<String, T> names = new HashMap<>();
 
-  public void addEntry(final String classname) {
-    names.put(defaultName.toLowerCase(), classname);
+  public void addEntry(final T obj) {
+    names.put(defaultName.toLowerCase(), obj);
   }
 
-  public void addEntry(final String name, final String classname) {
-    names.put(name.toLowerCase(), classname);
+  public void addEntry(final String name, final T obj) {
+    names.put(name.toLowerCase(), obj);
   }
 
   public List<String> getNames() {
@@ -49,15 +49,20 @@ public class Registry {
     return (name != null) ? names.get(name.toLowerCase()) != null : false;
   }
 
-  public String className(String name) {
+  public String value(String name) {
     if (name == null) {
       name = defaultName();
     }
-    String clazzName = names.get(name.toLowerCase());
-    if (clazzName == null) {
-      clazzName = name;
+    final T obj = names.get(name.toLowerCase());
+    if (obj == null) { return name; }
+    return obj.toString();
+  }
+
+  public T get(String name) {
+    if (name == null) {
+      name = defaultName();
     }
-    return clazzName;
+    return names.get(name.toLowerCase());
   }
 
 }

@@ -24,7 +24,7 @@ import net.eiroca.library.system.Logs;
 
 public class Exporters {
 
-  public static final Registry registry = new Registry();
+  public static final Registry<String> registry = new Registry<>();
 
   public static final List<String> defExporters = new ArrayList<>();
 
@@ -35,6 +35,7 @@ public class Exporters {
 
   static {
     Exporters.registry.addEntry(ElasticExporter.ID, ElasticExporter.class.getName());
+    Exporters.registry.addEntry(SysAdmExporter.ID, SysAdmExporter.class.getName());
     Exporters.registry.addEntry(LoggerExporter.ID, LoggerExporter.class.getName());
     Exporters.registry.addEntry(NotifyExporter.ID, NotifyExporter.class.getName());
   }
@@ -42,7 +43,7 @@ public class Exporters {
   public static IExporter newInstance(final String name) {
     IExporter obj = null;
     try {
-      obj = (IExporter)Class.forName(Exporters.registry.className(name)).newInstance();
+      obj = (IExporter)Class.forName(Exporters.registry.value(name)).newInstance();
     }
     catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
       Logs.ignore(e);

@@ -157,14 +157,14 @@ public class DatabaseMonitor extends TCPServerMonitor {
     context.debug("Prepare database connection");
     if (!config.prepareConnection()) {
       context.info("Connection URL: ", config.getConnectionUrl());
-      CommandException.ConfigurationError("Unable to create DB connection URL. " + config.getLastError().getMessage());
+      CommandException.ConfigurationError("Unable to create DB connection URL. " + Helper.getExceptionAsString(config.getLastError(), true));
     }
     connectStartTime = System.nanoTime();
-    context.debug("get connection: ", config.getConnectionUrl());
+    context.debug("Opening connection: ", config.getConnectionUrl());
     con = config.getConnection();
     final Exception lastError = config.getLastError();
     if (con == null) {
-      CommandException.InfrastructureError("Unable to connect to " + config.getConnectionUrl() + ". " + lastError.getMessage());
+      CommandException.InfrastructureError("Unable to connect to " + config.getConnectionUrl() + ". " + Helper.getExceptionAsString(lastError, true));
     }
     connectEndTime = System.nanoTime();
     // Update server metrics

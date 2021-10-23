@@ -18,12 +18,12 @@ package net.eiroca.library.metrics.datum;
 
 public class Datum implements IDatum {
 
-  public long timeStamp;
+  public long timestamp;
   public double value;
 
   public Datum() {
     value = 0;
-    timeStamp = 0;
+    timestamp = 0;
   }
 
   public Datum(final double value) {
@@ -32,34 +32,34 @@ public class Datum implements IDatum {
 
   public Datum(final IDatum m) {
     if (m.hasValue()) {
-      timeStamp = m.getTimeStamp();
+      timestamp = m.getTimeStamp();
       value = m.getValue();
     }
     else {
-      timeStamp = System.currentTimeMillis();
+      timestamp = System.currentTimeMillis();
       value = 0;
     }
   }
 
   @Override
   public void init(final double defVal) {
-    timeStamp = 0;
+    timestamp = 0;
     value = defVal;
   }
 
   @Override
   public String toString() {
-    return (timeStamp == 0) ? "?" : String.valueOf(value);
+    return (timestamp == 0) ? "?" : String.valueOf(value);
   }
 
   @Override
   public long getTimeStamp() {
-    return timeStamp;
+    return timestamp;
   }
 
   @Override
   public boolean hasValue() {
-    return timeStamp != 0;
+    return timestamp != 0;
   }
 
   @Override
@@ -70,20 +70,26 @@ public class Datum implements IDatum {
   @Override
   public void setValue(final double value) {
     this.value = value;
-    timeStamp = System.currentTimeMillis();
+    timestamp = System.currentTimeMillis();
+  }
+
+  @Override
+  public void setValue(final long timestamp, final double value) {
+    this.timestamp = timestamp;
+    this.value = value;
   }
 
   public void addValue(final Datum datum) {
-    if (timeStamp == 0) {
-      timeStamp = datum.timeStamp != 0 ? datum.timeStamp : System.currentTimeMillis();
+    if (timestamp == 0) {
+      timestamp = datum.timestamp != 0 ? datum.timestamp : System.currentTimeMillis();
     }
     value += datum.value;
   }
 
   @Override
   public void addValue(final double value) {
-    if (timeStamp == 0) {
-      timeStamp = System.currentTimeMillis();
+    if (timestamp == 0) {
+      timestamp = System.currentTimeMillis();
     }
     this.value += value;
   }
@@ -92,8 +98,8 @@ public class Datum implements IDatum {
   public void toJson(final StringBuilder sb, final boolean simple) {
     if (!simple) {
       sb.append('{');
-      sb.append("\"date:\"");
-      sb.append(timeStamp);
+      sb.append("\"timestamp:\"");
+      sb.append(timestamp);
       sb.append(",\"value:\"");
     }
     sb.append(value);

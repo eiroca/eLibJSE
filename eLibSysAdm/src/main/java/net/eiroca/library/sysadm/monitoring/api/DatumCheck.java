@@ -22,7 +22,7 @@ public class DatumCheck {
 
   public enum CheckViolation {
     OK, MIN, MAX, BOTH
-  };
+  }
 
   private final String checkName;
   private final double weight;

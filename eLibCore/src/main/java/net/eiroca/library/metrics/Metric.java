@@ -186,6 +186,11 @@ public abstract class Metric<M extends IMetric<D>, D extends IDatum> implements 
     datum.setValue(value);
   }
 
+  @Override
+  public void setValue(final long timestamp, final double value) {
+    datum.setValue(timestamp, value);
+  }
+
   public void setValue(final boolean value) {
     datum.setValue(value ? Metric.VALUE_TRUE : Metric.VALUE_FALSE);
   }

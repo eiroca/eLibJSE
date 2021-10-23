@@ -16,7 +16,6 @@
  **/
 package net.eiroca.library.sysadm.monitoring.sdk;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,6 +28,7 @@ import net.eiroca.ext.library.gson.GsonCursor;
 import net.eiroca.ext.library.gson.SimpleGson;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
+import net.eiroca.library.core.LibDate;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.metrics.MetricMetadata;
 import net.eiroca.library.metrics.datum.IDatum;
@@ -45,14 +45,6 @@ public class MeasureConsumer implements IMeasureConsumer, Runnable {
 
   private static final String CONFIG_PREFIX = null;
   private static final String ARRAY_SUFFIX = "[]";
-  private static final SimpleDateFormat ISO8601_FULL = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-
-  public static final String FLD_DATETIME = "@timestamp";
-  public static final String FLD_VALUE = "value";
-  public static final String FLD_STATUS = "status";
-  public static final String FLD_STATUS_DESC = "violation";
-  public static final String FLD_STATUS_MINVAL = "minval";
-  public static final String FLD_STATUS_MAXVAL = "maxval";
 
   public static final String STATUS_OK = "OK";
 
@@ -173,7 +165,7 @@ public class MeasureConsumer implements IMeasureConsumer, Runnable {
     }
     cal.setTime(new Date(timeStamp));
     timeStamp = cal.getTimeInMillis();
-    json.addProperty(MeasureConsumer.FLD_DATETIME, cal.getTime(), MeasureConsumer.ISO8601_FULL);
+    json.addProperty(MeasureFields.FLD_DATETIME, cal.getTime(), LibDate.ISO8601_FULL);
     if (metadata != null) {
       for (final Map.Entry<String, Object> metaEntry : metadata.entrySet()) {
         String key = metaEntry.getKey();
@@ -223,35 +215,35 @@ public class MeasureConsumer implements IMeasureConsumer, Runnable {
             }
           }
         }
-        json.set(MeasureConsumer.FLD_STATUS, fail.getCheckName().toUpperCase());
+        json.set(MeasureFields.FLD_STATUS, fail.getCheckName().toUpperCase());
         final Double min = fail.getMin();
         if (min != null) {
-          json.addProperty(MeasureConsumer.FLD_STATUS_MINVAL, min);
+          json.addProperty(MeasureFields.FLD_STATUS_MINVAL, min);
         }
         final Double max = fail.getMax();
         if (max != null) {
-          json.addProperty(MeasureConsumer.FLD_STATUS_MAXVAL, max);
+          json.addProperty(MeasureFields.FLD_STATUS_MAXVAL, max);
         }
         switch (fail.check(datum)) {
           case MIN:
-            json.set(MeasureConsumer.FLD_STATUS_DESC, "Value lower than minimum");
+            json.set(MeasureFields.FLD_STATUS_DESC, "Value lower than minimum");
             break;
           case MAX:
-            json.set(MeasureConsumer.FLD_STATUS_DESC, "Value greather than maximum");
+            json.set(MeasureFields.FLD_STATUS_DESC, "Value greather than maximum");
             break;
           case BOTH:
-            json.set(MeasureConsumer.FLD_STATUS_DESC, "Value is invalid");
+            json.set(MeasureFields.FLD_STATUS_DESC, "Value is invalid");
             break;
           default:
             break;
         }
       }
       else {
-        json.set(MeasureConsumer.FLD_STATUS, MeasureConsumer.STATUS_OK);
+        json.set(MeasureFields.FLD_STATUS, MeasureConsumer.STATUS_OK);
       }
     }
     final double value = datum.getValue();
-    json.addProperty(MeasureConsumer.FLD_VALUE, value);
+    json.addProperty(MeasureFields.FLD_VALUE, value);
     addMeasure(rule, timeStamp, data, metricInfo, value);
     return true;
   }

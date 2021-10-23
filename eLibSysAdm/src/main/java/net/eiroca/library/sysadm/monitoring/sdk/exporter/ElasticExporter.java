@@ -17,6 +17,8 @@
 package net.eiroca.library.sysadm.monitoring.sdk.exporter;
 
 import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Base64.Encoder;
 import java.util.Date;
 import java.util.UUID;
 import net.eiroca.ext.library.elastic.ElasticBulk;
@@ -30,9 +32,13 @@ import net.eiroca.library.system.IContext;
 
 public class ElasticExporter extends GenericExporter {
 
+  private static final Encoder BASE64ENCODER = Base64.getEncoder();
+
   public static String ID = "elastic";
   //
-  public static StringParameter _elasticURL = new StringParameter(ElasticExporter.config, "elasticURL", "http://localhost:9200/_bulk");
+  public static StringParameter _elasticURL = new StringParameter(ElasticExporter.config, "elasticURL", null);
+  protected static StringParameter _elasticUsername = new StringParameter(ElasticExporter.config, "elasticUsername", null);
+  protected static StringParameter _elasticPassword = new StringParameter(ElasticExporter.config, "elasticPassword", null);
   public static StringParameter _elasticIndex = new StringParameter(ElasticExporter.config, "elasticIndex", "metrics-");
   public static IntegerParameter _elasticIndexMode = new IntegerParameter(ElasticExporter.config, "elasticIndexMode", 1, 0, 2);
   public static StringParameter _indexDateFormat = new StringParameter(ElasticExporter.config, "indexDateFormat", "yyyy.MM.dd");
@@ -41,6 +47,8 @@ public class ElasticExporter extends GenericExporter {
   public static StringParameter _elasticPipeline = new StringParameter(ElasticExporter.config, "elasticPipeline", null);
   // Dynamic mapped to parameters
   protected String config_elasticURL;
+  protected String config_elasticUsername;
+  protected String config_elasticPassword;
   protected String config_elasticIndex;
   protected int config_elasticIndexMode;// 0 fixed, 1 fixed+now 2 fixed+event.date
   protected String config_indexDateFormat;
@@ -62,6 +70,12 @@ public class ElasticExporter extends GenericExporter {
     indexDateFormat = new SimpleDateFormat(config_indexDateFormat);
     elasticServer = LibStr.isNotEmptyOrNull(config_elasticURL) ? new ElasticBulk(config_elasticURL, config_elasticVersion) : null;
     if (elasticServer != null) {
+      if (config_elasticUsername != null) {
+        final String credential = config_elasticUsername + ":" + config_elasticPassword;
+        final String auth = ElasticExporter.BASE64ENCODER.encodeToString(credential.getBytes());
+        elasticServer.setAuthorization("Basic " + auth);
+      }
+      context.info("Elastic Search: " + config_elasticURL + (config_elasticUsername != null ? " Auth: " + config_elasticUsername : ""));
       elasticServer.open();
     }
   }
@@ -105,13 +119,13 @@ public class ElasticExporter extends GenericExporter {
   }
 
   private String getEventIndex(final Event event) {
-    final long timestamp = event.getTimestamp();
     String index;
     switch (config_elasticIndexMode) {
       case 1:
         index = config_elasticIndex + indexDateFormat.format(new Date());
         break;
       case 2:
+        final long timestamp = event.getTimestamp();
         index = config_elasticIndex + indexDateFormat.format(new Date(timestamp));
         break;
       default:

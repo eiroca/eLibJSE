@@ -38,15 +38,6 @@ import net.eiroca.library.system.IContext;
 
 public class MeasureProducer implements IMeasureProducer {
 
-  public static final String FLD_GROUP = "group";
-  public static final String FLD_METRIC = "metric";
-  public static final String FLD_MASTER = "master";
-  public static final String FLD_SPLIT_GROUP = "splitGroup";
-  public static final String FLD_SPLIT_NAME = "splitName";
-  public static final String FLD_HOST = "host";
-  public static final String FLD_SOURCE = "source";
-  public static final String FLD_TAGS = "tags[]";
-
   protected String id;
 
   protected final String name;
@@ -117,8 +108,8 @@ public class MeasureProducer implements IMeasureProducer {
       context.info(name, " ", host, " -> ", ok);
       if (ok) {
         final SortedMap<String, Object> meta = new TreeMap<>();
-        meta.put(MeasureProducer.FLD_SOURCE, name);
-        meta.put(MeasureProducer.FLD_HOST, host);
+        meta.put(MeasureFields.FLD_SOURCE, name);
+        meta.put(MeasureFields.FLD_HOST, host);
         final Set<String> hostTags = (tagProvider != null) ? tagProvider.getTags(host) : null;
         if ((hostTags != null) && (hostTags.size() > 0)) {
           final List<String> _tags = new ArrayList<>();
@@ -126,11 +117,11 @@ public class MeasureProducer implements IMeasureProducer {
           if (tags != null) {
             _tags.addAll(tags);
           }
-          meta.put(MeasureProducer.FLD_TAGS, _tags);
+          meta.put(MeasureFields.FLD_TAGS, _tags);
         }
         else {
           if (tags != null) {
-            meta.put(MeasureProducer.FLD_TAGS, tags);
+            meta.put(MeasureFields.FLD_TAGS, tags);
           }
         }
         exported_measure += exportMeasures(meta, groups);
@@ -169,7 +160,7 @@ public class MeasureProducer implements IMeasureProducer {
       newMeta = new TreeMap<>();
       newMeta.putAll(meta);
       @SuppressWarnings("unchecked")
-      List<String> oldTags = (List<String>)newMeta.get(MeasureProducer.FLD_TAGS);
+      List<String> oldTags = (List<String>)newMeta.get(MeasureFields.FLD_TAGS);
       final Iterator<Entry<String, Object>> i = tags.namedIterator();
       while (i.hasNext()) {
         final Entry<String, Object> t = i.next();
@@ -186,7 +177,7 @@ public class MeasureProducer implements IMeasureProducer {
         }
       }
       if (oldTags != null) {
-        newMeta.put(MeasureProducer.FLD_TAGS, oldTags);
+        newMeta.put(MeasureFields.FLD_TAGS, oldTags);
       }
     }
     if (value.hasValue()) {
@@ -226,11 +217,11 @@ public class MeasureProducer implements IMeasureProducer {
   }
 
   public static boolean exportData(final IMeasureConsumer consumer, final MetricMetadata metricInfo, final String group, final String metric, final String splitGroup, final String splitName, final SortedMap<String, Object> meta, final IDatum datum) {
-    meta.put(MeasureProducer.FLD_GROUP, group);
-    meta.put(MeasureProducer.FLD_METRIC, metric);
-    meta.put(MeasureProducer.FLD_MASTER, (splitGroup != null));
-    meta.put(MeasureProducer.FLD_SPLIT_GROUP, splitGroup);
-    meta.put(MeasureProducer.FLD_SPLIT_NAME, splitName);
+    meta.put(MeasureFields.FLD_GROUP, group);
+    meta.put(MeasureFields.FLD_METRIC, metric);
+    meta.put(MeasureFields.FLD_SPLIT, (splitGroup != null));
+    meta.put(MeasureFields.FLD_SPLIT_GROUP, splitGroup);
+    meta.put(MeasureFields.FLD_SPLIT_NAME, splitName);
     return consumer.exportDatum(meta, metricInfo, datum);
   }
 

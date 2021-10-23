@@ -46,22 +46,27 @@ public class DateParameter extends Parameter<Date> {
 
   public DateParameter(final Parameters owner, final String paramName, final Date defValue, final boolean required, final boolean nullable) {
     super(owner, paramName, defValue, required, nullable);
-    formats.add(LibDate.SDF);
+    addDateFormats();
   }
 
   public DateParameter(final Parameters owner, final String paramName, final boolean required) {
     super(owner, paramName, null, required, true);
-    formats.add(LibDate.SDF);
+    addDateFormats();
   }
 
   public DateParameter(final Parameters owner, final String paramName, final Date defValue) {
     super(owner, paramName, defValue);
-    formats.add(LibDate.SDF);
+    addDateFormats();
   }
 
   public DateParameter(final Parameters owner, final String paramName) {
     super(owner, paramName);
-    formats.add(LibDate.SDF);
+    addDateFormats();
+  }
+
+  private void addDateFormats() {
+    formats.add(LibDate.ISO8601_1);
+    formats.add(LibDate.ISO8601_2);
   }
 
   @Override

@@ -19,7 +19,6 @@ package net.eiroca.library.db;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Properties;
@@ -35,12 +34,11 @@ public class DBConfig {
   private static final String ENV_TNSADMIN = "TNS_ADMIN";
   //
   private static final String ORACLE_NET_CONNECT_TIMEOUT = "oracle.net.CONNECT_TIMEOUT";
-  private static final String DEF_ORACLE_NET_CONNECT_TIMEOUT = "5000";
   private static final String ORACLE_NET_TNS_ADMIN = "oracle.net.tns_admin";
   private static final String ORACLE_NET_USER = "user";
   private static final String ORACLE_NET_PASSWORD = "password";
   //
-  private static final int TIMEOUT_CONNECT = 10;
+  private static final String ORACLE_CFG_SID = "sid";
   //
   private static final String CONFIG_TYPE = "DBType";
   private static final String CONFIG_PORT = "port";
@@ -53,8 +51,9 @@ public class DBConfig {
   private static final String CONFIG_SID = "OracleType";
   private static final String CONFIG_DB2HASSCHEMA = "HasDB2Schema";
   private static final String CONFIG_DB2SCHEMA = "DB2Schema";
-
-  private static final String CFG_ORACLESID = "sid";
+  private static final String CONFIG_TIMEOUT = "timeoutConnect";
+  //
+  private static final int CONFIG_TIMEOUT_DEF = 5000;
 
   public final static String TYPE_SQLSERVER = "Microsoft SQL Server";
   public final static String TYPE_ORACLE = "Oracle";
@@ -79,7 +78,9 @@ public class DBConfig {
   //
   protected boolean windows;
   protected String DB2schema;
-
+  //
+  protected int timeoutConnect;
+  //
   protected boolean autoCommit = false;
 
   String connectionUrl;
@@ -135,7 +136,6 @@ public class DBConfig {
   }
 
   public void setup(final IConfig config) {
-    DriverManager.setLoginTimeout(DBConfig.TIMEOUT_CONNECT);
     username = config.getConfigString(DBConfig.CONFIG_USERNAME, null);
     password = config.getConfigPassword(DBConfig.CONFIG_PASSWORD);
     server = config.getConfigString(DBConfig.CONFIG_SERVER, null);
@@ -144,8 +144,12 @@ public class DBConfig {
     URL = config.getConfigString(DBConfig.CONFIG_DBURL, null);
     setSQLType(config.getConfigString(DBConfig.CONFIG_TYPE, null));
     windows = config.getConfigBoolean(DBConfig.CONFIG_AD, false);
-    sid = DBConfig.CFG_ORACLESID.equalsIgnoreCase(config.getConfigString(DBConfig.CONFIG_SID, null));
+    sid = DBConfig.ORACLE_CFG_SID.equalsIgnoreCase(config.getConfigString(DBConfig.CONFIG_SID, null));
     DB2schema = config.getConfigBoolean(DBConfig.CONFIG_DB2HASSCHEMA, false) ? config.getConfigString(DBConfig.CONFIG_DB2SCHEMA, null) : null;
+    timeoutConnect = config.getConfigInt(DBConfig.CONFIG_TIMEOUT, DBConfig.CONFIG_TIMEOUT_DEF);
+    if (timeoutConnect > 0) {
+      DriverManager.setLoginTimeout(timeoutConnect / 1000);
+    }
     prepared = false;
   }
 
@@ -244,7 +248,7 @@ public class DBConfig {
         final Properties props = new Properties();
         props.setProperty(DBConfig.ORACLE_NET_USER, username);
         props.setProperty(DBConfig.ORACLE_NET_PASSWORD, password);
-        props.setProperty(DBConfig.ORACLE_NET_CONNECT_TIMEOUT, DBConfig.DEF_ORACLE_NET_CONNECT_TIMEOUT);
+        props.setProperty(DBConfig.ORACLE_NET_CONNECT_TIMEOUT, String.valueOf(timeoutConnect));
         con = DriverManager.getConnection(connectionUrl, props);
       }
       else {
@@ -254,8 +258,12 @@ public class DBConfig {
         con.setAutoCommit(autoCommit);
       }
     }
-    catch (final SQLException e) {
+    catch (final Exception e) {
       lastError = e;
+      if (con != null) {
+        Helper.close(con);
+        con = null;
+      }
     }
     return con;
   }

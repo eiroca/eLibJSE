@@ -28,16 +28,16 @@ import java.util.List;
 
 final public class LibStr {
 
-  final private static String UTF8 = "UTF-8";
+  public static final String UTF8 = "UTF-8";
 
-  final public static String DEFAULT_ENCODING = System.getProperty("file.encoding", LibStr.UTF8);
-  final public static String NL = System.getProperty("line.separator");
+  public static final String DEFAULT_ENCODING = System.getProperty("file.encoding", LibStr.UTF8);
+  public static final String NL = System.getProperty("line.separator");
 
-  final public static String VALUE_SEP = "=";
-  final public static String LIST_SEP = ",";
+  public static final String VALUE_SEP = "=";
+  public static final String LIST_SEP = ",";
 
-  final public static String EMPTY_STRING = "";
-  final public static String[] EMPTY_STRINGS = new String[0];
+  public static final String EMPTY_STRING = "";
+  public static final String[] EMPTY_STRINGS = new String[0];
 
   final public static String upper(final String s) {
     return (s != null) ? s.toUpperCase() : null;

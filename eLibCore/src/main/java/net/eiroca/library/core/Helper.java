@@ -313,15 +313,22 @@ final public class Helper {
   }
 
   public static String getExceptionAsString(final Throwable e) {
-    return Helper.getExceptionAsString(e, false);
+    return Helper.getExceptionAsString(null, e, false);
   }
 
   public static String getExceptionAsString(final Throwable e, final boolean stacktrace) {
+    return Helper.getExceptionAsString(null, e, stacktrace);
+  }
+
+  public static String getExceptionAsString(final String prefix, final Throwable e, final boolean stacktrace) {
     String msg = e.getMessage();
     if (msg == null) {
       msg = Helper.NO_DATA;
     }
     final StringBuilder sb = new StringBuilder(256);
+    if (prefix != null) {
+      sb.append(prefix);
+    }
     sb.append(e.getClass().getCanonicalName()).append(Helper.STR_EXCEPTION_MESSAGE).append(msg);
     if (stacktrace) {
       sb.append(Helper.STR_EXCEPTION_STACKTRACE).append(Helper.getStackTraceAsString(e));

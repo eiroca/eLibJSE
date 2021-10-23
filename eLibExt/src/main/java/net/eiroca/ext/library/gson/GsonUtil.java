@@ -135,6 +135,19 @@ public class GsonUtil {
     o.remove(key);
   }
 
+  public static String getLower(final JsonObject o, final String name) {
+    final JsonElement e = (name != null) ? o.get(name) : null;
+    final String data = (e != null) ? (!e.isJsonNull() ? e.getAsString() : null) : null;
+    return LibStr.isEmptyOrNull(data) ? null : data.toLowerCase();
+  }
+
+  public static void move(final JsonObject dest, final String destName, final JsonObject source, final String srcName) {
+    final String val = GsonUtil.getString(source, srcName);
+    if (val == null) { return; }
+    dest.addProperty(destName, val);
+    source.remove(srcName);
+  }
+
   public static String getString(final JsonObject o, final String name) {
     String result = null;
     final JsonElement e = o.get(name);
@@ -154,6 +167,15 @@ public class GsonUtil {
     return defVal;
   }
 
+  public static double getDouble(final JsonObject json, final String name, final double defVal) {
+    final JsonElement e = json.get(name);
+    if (e != null) {
+      final String data = e.getAsString();
+      return Helper.getDouble(data, defVal);
+    }
+    return defVal;
+  }
+
   public static Date getDate(final JsonObject o, final String name, final SimpleDateFormat... formats) {
     final JsonElement dataFld = o.get(name);
     final String data = (dataFld != null) ? dataFld.getAsString() : null;
@@ -169,19 +191,6 @@ public class GsonUtil {
       }
     }
     return result;
-  }
-
-  public static String getLower(final JsonObject o, final String name) {
-    final JsonElement e = (name != null) ? o.get(name) : null;
-    final String data = (e != null) ? (!e.isJsonNull() ? e.getAsString() : null) : null;
-    return LibStr.isEmptyOrNull(data) ? null : data.toLowerCase();
-  }
-
-  public static void move(final JsonObject dest, final String destName, final JsonObject source, final String srcName) {
-    final String val = GsonUtil.getString(source, srcName);
-    if (val == null) { return; }
-    dest.addProperty(destName, val);
-    source.remove(srcName);
   }
 
 }

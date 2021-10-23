@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collection;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpHost;
@@ -32,9 +34,12 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.config.RequestConfig.Builder;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustAllStrategy;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -48,7 +53,7 @@ import net.eiroca.library.system.Logs;
 public class HttpClientHelper {
 
   public static Logger logger = Logs.getLogger();
-  
+
   public static final String APPLICATION_JSON = "application/json;charset=%s";
   public static final String APPLICATION_XML = "application/xml;charset=%s";
 
@@ -71,10 +76,15 @@ public class HttpClientHelper {
   }
 
   public static CloseableHttpClient getHttpClient(final HttpHost proxy) {
+    return HttpClientHelper.getHttpClient(proxy, null);
+  }
+
+  public static CloseableHttpClient getHttpClient(final HttpHost proxy, final Collection<Header> defHeader) {
     final RequestConfig.Builder requestConfigBuilder = HttpClientHelper.getRequestBuilder(proxy);
     final HttpClientBuilder builder = HttpClientBuilder.create();
     builder.setDefaultRequestConfig(requestConfigBuilder.build());
     builder.setDefaultCredentialsProvider(HttpClientHelper.credsProvider);
+    builder.setDefaultHeaders(defHeader);
     return builder.build();
   }
 
@@ -92,6 +102,27 @@ public class HttpClientHelper {
   public static String GET(final CloseableHttpClient httpClient, final String url) {
     String result = null;
     final HttpGet httpMethod = new HttpGet(url);
+    try (CloseableHttpResponse response = httpClient.execute(httpMethod)) {
+      final int httpStatusCode = response.getStatusLine().getStatusCode();
+      final HttpEntity entity = response.getEntity();
+      if (httpStatusCode < 300) {
+        result = EntityUtils.toString(entity, "UTF-8");
+      }
+      else {
+        EntityUtils.consume(entity);
+      }
+    }
+    catch (final IOException e) {
+      Logs.ignore(e);
+    }
+    return result;
+  }
+
+  public static String POST(final CloseableHttpClient httpClient, final String url, final String doc, final ContentType type) {
+    String result = null;
+    final HttpPost httpMethod = new HttpPost(url);
+    final HttpEntity body = new StringEntity(doc, type);
+    httpMethod.setEntity(body);
     try (CloseableHttpResponse response = httpClient.execute(httpMethod)) {
       final int httpStatusCode = response.getStatusLine().getStatusCode();
       final HttpEntity entity = response.getEntity();

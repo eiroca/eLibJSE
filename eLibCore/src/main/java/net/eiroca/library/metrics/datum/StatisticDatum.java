@@ -36,16 +36,15 @@ public class StatisticDatum implements IDatum {
     init(0.0);
   }
 
-  @Override
-  public void addValue(final double value) {
+  public void addValue(final long timestamp, final double value) {
     count++;
-    lastDate = System.currentTimeMillis();
     last = value;
     if (count == 1) {
       min = value;
       max = value;
       first = value;
-      firstDate = lastDate;
+      firstDate = timestamp;
+      lastDate = timestamp;
     }
     else {
       if (value < min) {
@@ -54,6 +53,12 @@ public class StatisticDatum implements IDatum {
       else if (value > max) {
         max = value;
       }
+      if (timestamp < firstDate) {
+        firstDate = timestamp;
+      }
+      else if (timestamp > lastDate) {
+        lastDate = timestamp;
+      }
     }
     double t = value;
     sumX += t;
@@ -61,6 +66,11 @@ public class StatisticDatum implements IDatum {
     sumX2 += t;
     t *= value;
     sumX3 += t;
+  }
+
+  @Override
+  public void addValue(final double value) {
+    addValue(System.currentTimeMillis(), value);
   }
 
   @Override
@@ -121,7 +131,12 @@ public class StatisticDatum implements IDatum {
 
   @Override
   public void setValue(final double value) {
-    addValue(value);
+    addValue(System.currentTimeMillis(), value);
+  }
+
+  @Override
+  public void setValue(final long timestamp, final double value) {
+    addValue(timestamp, value);
   }
 
   @Override

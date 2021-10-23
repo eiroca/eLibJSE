@@ -14,23 +14,25 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.metrics.datum;
+package net.eiroca.library.config.parameter;
 
-public interface IDatum {
+import java.net.InetAddress;
+import net.eiroca.library.config.Parameters;
 
-  public void init(final double defVal);
+public final class HostnameParameter extends StringParameter {
 
-  public long getTimeStamp();
+  public HostnameParameter(final Parameters owner, final String paramName, final String paramDef) {
+    super(owner, paramName, paramDef);
+  }
 
-  public boolean hasValue();
+  @Override
+  public String getDefault() {
+    try {
+      return InetAddress.getLocalHost().getHostName();
+    }
+    catch (final Exception e) {
+      return super.getDefault();
+    }
+  }
 
-  public double getValue();
-
-  public void setValue(final long timestamp, final double value);
-
-  public void setValue(final double value);
-
-  public void addValue(final double value);
-
-  public void toJson(StringBuilder sb, boolean simple);
 }

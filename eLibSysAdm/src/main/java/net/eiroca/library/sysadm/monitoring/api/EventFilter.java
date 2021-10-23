@@ -20,7 +20,7 @@ public class EventFilter {
 
   enum Logic {
     OR, AND
-  };
+  }
 
   public String keyName;
   public String keyValue;

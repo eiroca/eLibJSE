@@ -35,7 +35,7 @@ import net.eiroca.library.diagnostics.monitors.eSysAdmServerMonitor;
 
 public class ServerMonitors {
 
-  public static final Registry registry = new Registry();
+  public static final Registry<String> registry = new Registry<>();
 
   static {
     ServerMonitors.registry.addEntry("TCP Server", TCPServerMonitor.class.getName());
@@ -56,7 +56,7 @@ public class ServerMonitors {
   }
 
   public static IServerMonitor build(final String name) throws Exception {
-    String clazzName = ServerMonitors.registry.className(name);
+    String clazzName = ServerMonitors.registry.value(name);
     if (clazzName == null) {
       clazzName = name;
     }

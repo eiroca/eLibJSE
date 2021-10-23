@@ -65,7 +65,7 @@ public class LibDB {
           datum = datum.substring(0, limit);
         }
         datum = datum.replaceAll("'", "''");
-        sb.append('\'').append(datum).append('\'');
+        sb.append('\'').append(datum).append('\'');   
       }
       else {
         sb.append(String.valueOf(o));
