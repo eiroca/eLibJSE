@@ -47,10 +47,17 @@ public class SniHttpClientConnectionOperator extends DefaultHttpClientConnection
       final boolean enableSni = (enableSniValue == null) || enableSniValue;
       if (enableSni) {
         final String m = e.getMessage();
-        if ((m != null) && (m.equals("handshake alert:  unrecognized_name") || m.equals("received handshake warning: unrecognized_name"))) {
-          SniHttpClientConnectionOperator.log.debug("Server received wrong SNI host, retrying without SNI");
+        if ((m != null) && (m.contains("handshake") && m.contains("unrecognized_name"))) {
+          SniHttpClientConnectionOperator.log.debug("Received unrecognized_name for SNI host, retrying without SNI");
           context.setAttribute(SniSSLSocketFactory.ENABLE_SNI, false);
-          super.connect(conn, host, localAddress, connectTimeout, socketConfig, context);
+          try {
+            super.connect(conn, host, localAddress, connectTimeout, socketConfig, context);
+          }
+          catch (final SSLException e2) {
+            SniHttpClientConnectionOperator.log.debug("Failed again, restoring SNI");
+            context.setAttribute(SniSSLSocketFactory.ENABLE_SNI, true);
+            throw e;
+          }
         }
         else {
           throw e;

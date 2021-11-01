@@ -30,7 +30,7 @@ import net.eiroca.library.system.IContext;
 
 public class NotifyExporter extends GenericExporter {
 
-  public static String ID = "notify";
+  public static final String ID = "notify".toLowerCase();
   //
   public static StringParameter _notifyUrl = new StringParameter(NotifyExporter.config, "notifyUrl", null);
   // Dynamic mapped to parameters
@@ -46,7 +46,7 @@ public class NotifyExporter extends GenericExporter {
   public void setup(final IContext context) throws Exception {
     super.setup(context);
     GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
-    context.info(this.getClass().getName(), " setup done");
+    context.debug(this.getClass().getName(), " setup done");
   }
 
   private CloseableHttpClient client;

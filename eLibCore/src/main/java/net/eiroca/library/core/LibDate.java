@@ -24,7 +24,7 @@ public class LibDate {
   public static final SimpleDateFormat ISO8601_1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
   public static final SimpleDateFormat ISO8601_2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
 
-  public static final SimpleDateFormat ISO8601_FULL = ISO8601_2;
+  public static final SimpleDateFormat ISO8601_FULL = LibDate.ISO8601_2;
 
   public static final int ONE_HOUR = 3600 * 1000;
   public static final int ONE_DAY = 24 * 60 * 60 * 1000;

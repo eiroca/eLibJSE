@@ -33,7 +33,7 @@ public class SysAdmExporter extends GenericExporter {
 
   private static final String ESYSADM_TOKEN_HEADER = "X-eSysAdm-TOKEN";
 
-  public static String ID = "eSysAdm";
+  public static final String ID = "eSysAdm".toLowerCase();
   //
   public static StringParameter _eSysAdmUrl = new StringParameter(SysAdmExporter.config, "eSysAdmUrl", null);
   public static StringParameter _eSysAdmToken = new StringParameter(SysAdmExporter.config, "eSysAdmToken", null);
@@ -41,6 +41,7 @@ public class SysAdmExporter extends GenericExporter {
   protected String config_eSysAdmUrl;
   protected String config_eSysAdmToken;
   //
+  private CloseableHttpClient client;
 
   public SysAdmExporter() {
     super();
@@ -50,10 +51,8 @@ public class SysAdmExporter extends GenericExporter {
   public void setup(final IContext context) throws Exception {
     super.setup(context);
     GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
-    context.info(this.getClass().getName(), " setup done");
+    context.debug(this.getClass().getName(), " setup done, url=" + config_eSysAdmUrl);
   }
-
-  private CloseableHttpClient client;
 
   @Override
   public boolean beginBulk() {
@@ -66,17 +65,19 @@ public class SysAdmExporter extends GenericExporter {
       final HttpHost proxy = null;
       client = HttpClientHelper.getHttpClient(proxy, headers);
     }
-    return (config_eSysAdmUrl != null) && (client != null);
+    final boolean result = (config_eSysAdmUrl != null) && (client != null);
+    GenericExporter.logger.debug("beginbulk()=" + result);
+    return result;
   }
 
   @Override
   public void process(final Event event) {
+    GenericExporter.logger.debug("process()");
     final SimpleGson json = event.getData();
     final String _doc = json.toString();
     final String url = config_eSysAdmUrl;
     final String r = HttpClientHelper.POST(client, url, _doc, ContentType.APPLICATION_JSON);
-    context.debug("POST " + url + " " + _doc);
-    context.info(url + " --> " + r);
+    context.debug("POST " + url + " " + _doc + " --> " + r);
   }
 
   @Override

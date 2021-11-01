@@ -62,4 +62,9 @@ public class DatumCheck {
     return weight;
   }
 
+  @Override
+  public String toString() {
+    return "DatumCheck [checkName=" + checkName + ", weight=" + weight + ", min=" + min + ", max=" + max + "]";
+  }
+
 }

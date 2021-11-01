@@ -192,7 +192,7 @@ public class StatisticDatum implements IDatum {
 
   @Override
   public long getTimeStamp() {
-    return firstDate;
+    return lastDate;
   }
 
 }

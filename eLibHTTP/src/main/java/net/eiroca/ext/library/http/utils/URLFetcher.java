@@ -29,6 +29,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SNIHostName;
+import javax.net.ssl.SNIServerName;
 import javax.net.ssl.SSLContext;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -68,10 +70,14 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.apache.http.ssl.TrustStrategy;
 import org.apache.http.util.EncodingUtils;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.eiroca.library.core.LibStr;
 import net.eiroca.library.system.IContext;
 
 public class URLFetcher implements AutoCloseable {
+
+  private static final Logger log = LoggerFactory.getLogger(URLFetcher.class.getName());
 
   private static final int READ_CHUNK_SIZE = 1024;
   private static final int BUFFER_STARTSIZE = 16 * URLFetcher.READ_CHUNK_SIZE;
@@ -81,6 +87,7 @@ public class URLFetcher implements AutoCloseable {
   private AuthCache authCache;
   private URLFetcherConfig config;
   private VirtualHostInterception virtualHostInterceptor;
+  private SNIServerName sniServer;
 
   public int httpStatusCode = 0;
   public long responseSize = 0;
@@ -121,8 +128,9 @@ public class URLFetcher implements AutoCloseable {
     this.config = config;
     credsProvider = new BasicCredentialsProvider();
     authCache = new BasicAuthCache();
-    httpClient = getHttpClient();
     virtualHostInterceptor = (config.virtualHost != null) ? new VirtualHostInterception(config.virtualHost) : null;
+    sniServer = (config.virtualHost != null) ? new SNIHostName(config.virtualHost) : null;
+    httpClient = getHttpClient();
   }
 
   @Override
@@ -187,7 +195,8 @@ public class URLFetcher implements AutoCloseable {
       context.error("Unable to build SSL context -> " + e.getMessage());
       URLFetcherException.InvalidParameters(e);
     }
-    sslSocketFactory = new SniSSLSocketFactory(sslContext, hostVerifier);
+    URLFetcher.log.debug("SNI server = " + sniServer);
+    sslSocketFactory = new SniSSLSocketFactory(sslContext, hostVerifier, sniServer);
     final RegistryBuilder<ConnectionSocketFactory> factory = RegistryBuilder.<ConnectionSocketFactory> create();
     factory.register("http", PlainConnectionSocketFactory.getSocketFactory());
     factory.register("https", sslSocketFactory);

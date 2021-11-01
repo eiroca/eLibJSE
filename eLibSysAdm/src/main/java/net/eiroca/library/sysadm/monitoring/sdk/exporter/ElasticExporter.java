@@ -34,7 +34,7 @@ public class ElasticExporter extends GenericExporter {
 
   private static final Encoder BASE64ENCODER = Base64.getEncoder();
 
-  public static String ID = "elastic";
+  public static final String ID = "elastic".toLowerCase();
   //
   public static StringParameter _elasticURL = new StringParameter(ElasticExporter.config, "elasticURL", null);
   protected static StringParameter _elasticUsername = new StringParameter(ElasticExporter.config, "elasticUsername", null);

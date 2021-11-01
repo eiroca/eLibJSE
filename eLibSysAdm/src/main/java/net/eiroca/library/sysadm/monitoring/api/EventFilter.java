@@ -32,4 +32,9 @@ public class EventFilter {
     this.logic = logic;
   }
 
+  @Override
+  public String toString() {
+    return "EventFilter [keyName=" + keyName + ", keyValue=" + keyValue + ", logic=" + logic + "]";
+  }
+
 }

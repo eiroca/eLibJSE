@@ -27,11 +27,13 @@ import net.eiroca.library.sysadm.monitoring.sdk.exporter.Exporters;
 
 public class EventRule {
 
+  private String id;
   private final List<EventFilter> filters = new ArrayList<>();
   private final Set<String> enabledConnectors = new HashSet<>();
   private final Set<DatumCheck> checks = new HashSet<>();
 
-  public EventRule() {
+  public EventRule(final String id) {
+    this.id = id;
     connectors(true);
   }
 
@@ -42,6 +44,7 @@ public class EventRule {
   public boolean apply(final SortedMap<String, Object> metadata) {
     boolean found = true;
     if ((filters != null) && (filters.size() > 0)) {
+      boolean first = true;
       for (final EventFilter filter : filters) {
         boolean negate = false;
         final String keyNam = filter.keyName;
@@ -59,13 +62,19 @@ public class EventRule {
         else {
           check = !negate;
         }
-        switch (logic) {
-          case OR:
-            found |= check;
-            break;
-          case AND:
-            found &= check;
-            break;
+        if (first) {
+          found = check;
+          first = false;
+        }
+        else {
+          switch (logic) {
+            case OR:
+              found |= check;
+              break;
+            case AND:
+              found &= check;
+              break;
+          }
         }
       }
     }
@@ -88,7 +97,7 @@ public class EventRule {
   public void connectors(final boolean enable) {
     enabledConnectors.clear();
     if (enable) {
-      enabledConnectors.addAll(Exporters.defExporters);
+      enabledConnectors.addAll(Exporters.defaultExporters);
     }
   }
 
@@ -118,6 +127,14 @@ public class EventRule {
   @Override
   public String toString() {
     return "EventRule [filters=" + filters + ", enabledConnectors=" + enabledConnectors + ", checks=" + checks + "]";
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(final String id) {
+    this.id = id;
   }
 
 }

@@ -26,7 +26,7 @@ import net.eiroca.library.system.Logs;
 
 public class LoggerExporter extends GenericExporter {
 
-  public static String ID = "logger";
+  public static final String ID = "logger".toLowerCase();
   //
   public static StringParameter _logger = new StringParameter(LoggerExporter.config, "logger", "Metrics");
   // Dynamic mapped to parameters

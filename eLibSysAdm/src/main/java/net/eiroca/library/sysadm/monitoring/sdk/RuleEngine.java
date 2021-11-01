@@ -31,11 +31,15 @@ import net.eiroca.library.core.LibStr;
 import net.eiroca.library.sysadm.monitoring.api.DatumCheck;
 import net.eiroca.library.sysadm.monitoring.api.EventFilter;
 import net.eiroca.library.sysadm.monitoring.api.EventRule;
+import net.eiroca.library.sysadm.monitoring.sdk.exporter.Exporters;
 import net.eiroca.library.system.Logs;
 
 public class RuleEngine {
 
   private static final Logger logger = Logs.getLogger();
+
+  private static final String CONFIG_DEFAULT_EXPORTERS = "exporters";
+  private static final String CONFIG_EXPORTERS_SEPARATOR = ",";
 
   private static final char HASH_SEPARATOR = '\t';
   private static final double ZERO = 0.000001;
@@ -45,6 +49,24 @@ public class RuleEngine {
 
   public void loadRules(final Properties config) {
     final Map<String, EventRule> alias = new TreeMap<>();
+    final String defExporters = config.getProperty(RuleEngine.CONFIG_DEFAULT_EXPORTERS);
+    if (defExporters != null) {
+      RuleEngine.logger.debug("confing exporters = " + defExporters);
+      Exporters.defaultExporters.clear();
+      final String[] IDs = defExporters.split(RuleEngine.CONFIG_EXPORTERS_SEPARATOR);
+      for (String id : IDs) {
+        id = (id != null) ? id.trim().toLowerCase() : null;
+        RuleEngine.logger.debug("exportedID = " + id);
+        if (LibStr.isNotEmptyOrNull(id)) {
+          if (Exporters.registry.isValid(id)) {
+            if (!Exporters.defaultExporters.contains(id)) {
+              Exporters.defaultExporters.add(id);
+            }
+          }
+        }
+      }
+      RuleEngine.logger.debug("Default exporters = " + LibStr.merge(Exporters.defaultExporters, RuleEngine.CONFIG_EXPORTERS_SEPARATOR, ""));
+    }
     for (final String name : config.stringPropertyNames()) {
       String val = config.getProperty(name);
       final String[] command = name.split("\\.", -1);
@@ -58,7 +80,7 @@ public class RuleEngine {
       final String ruleName = command[0];
       EventRule rule = alias.get(ruleName);
       if (rule == null) {
-        rule = new EventRule();
+        rule = new EventRule(ruleName);
         alias.put(ruleName, rule);
       }
       final String ruleType = command[1];
@@ -163,7 +185,7 @@ public class RuleEngine {
         break;
       }
     }
-    RuleEngine.logger.debug("findRule: " + metadata + " -> " + result);
+    RuleEngine.logger.debug("findRule: " + getHash(metadata) + " -> " + result);
     return result;
   }
 
@@ -184,8 +206,10 @@ public class RuleEngine {
       if (!first) {
         hash.append(RuleEngine.HASH_SEPARATOR);
       }
+      hash.append(keyName);
+      hash.append('=');
       hash.append(String.valueOf(key));
-      first = true;
+      first = false;
     }
     return hash.toString();
   }

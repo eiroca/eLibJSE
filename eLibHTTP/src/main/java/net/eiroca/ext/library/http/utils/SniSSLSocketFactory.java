@@ -18,27 +18,59 @@ package net.eiroca.ext.library.http.utils;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SNIServerName;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLParameters;
+import javax.net.ssl.SSLSocket;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SniSSLSocketFactory extends SSLConnectionSocketFactory {
 
+  private static final Logger log = LoggerFactory.getLogger(SniSSLSocketFactory.class.getName());
+
   public static final String ENABLE_SNI = "net.eiroca.sysadm.diagnostics.utils.enable_sni";
+
+  private final SNIServerName sniServer;
+  boolean enableSni;
 
   /*
    * Implement any constructor you need for your particular application - SSLConnectionSocketFactory
    * has many variants
    */
-  public SniSSLSocketFactory(final SSLContext sslContext, final HostnameVerifier verifier) {
+  public SniSSLSocketFactory(final SSLContext sslContext, final HostnameVerifier verifier, final SNIServerName sniServer) {
     super(sslContext, verifier);
+    this.sniServer = sniServer;
+  }
+
+  @Override
+  protected void prepareSocket(final SSLSocket socket) throws IOException {
+    final SSLParameters p = socket.getSSLParameters();
+    SniSSLSocketFactory.log.debug("Parameters=" + p);
+    if (!enableSni) {
+      p.setServerNames(null);
+    }
+    else {
+      if (sniServer != null) {
+        final ArrayList<SNIServerName> a = new ArrayList<>();
+        a.add(sniServer);
+        p.setServerNames(a);
+      }
+    }
+    socket.setSSLParameters(p);
   }
 
   @Override
   public Socket createLayeredSocket(final Socket socket, final String target, final int port, final HttpContext context) throws IOException {
     final Boolean enableSniValue = (Boolean)context.getAttribute(SniSSLSocketFactory.ENABLE_SNI);
-    final boolean enableSni = (enableSniValue == null) || enableSniValue;
-    return super.createLayeredSocket(socket, enableSni ? target : "", port, context);
+    enableSni = (enableSniValue == null) || enableSniValue;
+    SniSSLSocketFactory.log.debug((socket == null ? "Creating" : "Setting") + " socket for " + target + (enableSni ? " with SNI (" + sniServer + ")" : " without SNI"));
+    final SSLSocket s = (SSLSocket)super.createLayeredSocket(socket, target, port, context);
+    return s;
   }
+
 }

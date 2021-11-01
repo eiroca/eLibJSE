@@ -26,11 +26,10 @@ public class Exporters {
 
   public static final Registry<String> registry = new Registry<>();
 
-  public static final List<String> defExporters = new ArrayList<>();
+  public static final List<String> defaultExporters = new ArrayList<>();
 
   static {
-    Exporters.defExporters.add(ElasticExporter.ID);
-    Exporters.defExporters.add(LoggerExporter.ID);
+    Exporters.defaultExporters.add(LoggerExporter.ID);
   }
 
   static {
