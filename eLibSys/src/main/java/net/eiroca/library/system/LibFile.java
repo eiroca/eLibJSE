@@ -175,7 +175,6 @@ final public class LibFile {
     try {
       fileWriter = new FileWriter(path, false);
       fileWriter.write(data);
-      fileWriter.close();
       result = true;
     }
     catch (final IOException e) {

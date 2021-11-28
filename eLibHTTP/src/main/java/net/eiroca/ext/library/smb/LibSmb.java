@@ -49,6 +49,9 @@ public class LibSmb {
   private static final Map<String, CIFSContext> cache = new HashMap<>();
 
   public static synchronized CIFSContext getContext(final NtlmPasswordAuthenticator principal) {
+    if (principal == null) {
+      LibSmb.logger.error("Principal is null");
+    }
     final String key = principal.getName() + "\t" + principal.getPassword();
     CIFSContext context = LibSmb.cache.get(key);
     if (context == null) {
@@ -74,7 +77,8 @@ public class LibSmb {
   }
 
   public static SmbFile build(final String url, final String domain, final String username, final String password) {
-    return LibSmb.build(url, LibSmb.getContext(new NtlmPasswordAuthenticator(domain, username, password)));
+    NtlmPasswordAuthenticator a = new NtlmPasswordAuthenticator(domain, username, password);
+    return LibSmb.build(url, LibSmb.getContext(a));
   }
 
   public static SmbFile build(final String url, final NtlmPasswordAuthenticator principal) {

@@ -37,8 +37,8 @@ public class ElasticExporter extends GenericExporter {
   public static final String ID = "elastic".toLowerCase();
   //
   public static StringParameter _elasticURL = new StringParameter(ElasticExporter.config, "elasticURL", null);
-  protected static StringParameter _elasticUsername = new StringParameter(ElasticExporter.config, "elasticUsername", null);
-  protected static StringParameter _elasticPassword = new StringParameter(ElasticExporter.config, "elasticPassword", null);
+  public static StringParameter _elasticUsername = new StringParameter(ElasticExporter.config, "elasticUsername", null);
+  public static StringParameter _elasticPassword = new StringParameter(ElasticExporter.config, "elasticPassword", null);
   public static StringParameter _elasticIndex = new StringParameter(ElasticExporter.config, "elasticIndex", "metrics-");
   public static IntegerParameter _elasticIndexMode = new IntegerParameter(ElasticExporter.config, "elasticIndexMode", 1, 0, 2);
   public static StringParameter _indexDateFormat = new StringParameter(ElasticExporter.config, "indexDateFormat", "yyyy.MM.dd");

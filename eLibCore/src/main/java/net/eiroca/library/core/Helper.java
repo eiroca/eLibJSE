@@ -103,6 +103,12 @@ final public class Helper {
     buf.append(Helper.LIST_END);
   }
 
+  final public static String writeList(final List<? extends Object> objects, final String prefix, final String suffix) {
+    final StringBuilder buf = new StringBuilder();
+    writeList(buf, objects, prefix, suffix);
+    return buf.toString();
+  }
+
   final public static void writeList(final StringBuilder buf, final List<? extends Object> objects) {
     Helper.writeList(buf, objects, Helper.DOUBLE_QUOTE, Helper.DOUBLE_QUOTE);
   }

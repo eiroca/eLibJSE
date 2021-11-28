@@ -17,6 +17,8 @@
 package net.eiroca.ext.library.http;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -165,7 +167,12 @@ public class HttpClientHelper {
       }
       sb.append(param);
       sb.append('=');
-      sb.append(val);
+      try {
+        sb.append(URLEncoder.encode(val, "UTF-8"));
+      }
+      catch (UnsupportedEncodingException e) {
+        Logs.ignore(e);
+      }
       first = false;
     }
     return first;

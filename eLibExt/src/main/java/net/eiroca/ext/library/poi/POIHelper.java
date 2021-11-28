@@ -20,6 +20,8 @@ import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 import net.eiroca.library.core.LibStr;
 
 public class POIHelper {
@@ -41,6 +43,16 @@ public class POIHelper {
     }
     else {
       return null;
+    }
+  }
+
+  public static void setDate(final Row row, final int col, final Date value, final CellStyle cellStyle) {
+    if (value != null) {
+      final Cell cell = row.createCell(col, CellType.NUMERIC);
+      cell.setCellValue(value);
+      if (cellStyle != null) {
+        cell.setCellStyle(cellStyle);
+      }
     }
   }
 
@@ -82,14 +94,48 @@ public class POIHelper {
     cell.setCellValue(value);
   }
 
-  public static void setDate(final Row row, final int col, final Date value, final CellStyle cellStyle) {
-    if (value != null) {
-      final Cell cell = row.createCell(col, CellType.NUMERIC);
-      cell.setCellValue(value);
-      if (cellStyle != null) {
-        cell.setCellStyle(cellStyle);
+  public static String getStringValue(final Row row, final int col, final boolean trim) {
+    final Cell cell = row.getCell(col, MissingCellPolicy.CREATE_NULL_AS_BLANK);
+    String result;
+    try {
+      if (cell.getCellType() == CellType.FORMULA) {
+        CellType type = cell.getCachedFormulaResultType();
+        switch (type) {
+          case NUMERIC:
+            result = String.valueOf(cell.getNumericCellValue());
+            break;
+          case BOOLEAN:
+            result = String.valueOf(cell.getBooleanCellValue());
+            break;
+          default:
+            result = cell.getRichStringCellValue().toString();
+            break;
+        }
+      }
+      else {
+        result = cell.getStringCellValue();
       }
     }
+    catch (final java.lang.IllegalStateException e) {
+      result = cell.toString();
+    }
+    if (trim) {
+      if (LibStr.isNotEmptyOrNull(result)) {
+        result = result.replace((char)160, ' ').trim();
+      }
+      if (result.endsWith(".0")) {
+        result = result.substring(0, result.length() - 2);
+      }
+    }
+    return result;
+  }
+
+  public static XSSFRow getRow(final XSSFSheet ws, final int rowNum) {
+    XSSFRow result = ws.getRow(rowNum);
+    if (result == null) {
+      result = ws.createRow(rowNum);
+    }
+    return result;
   }
 
 }

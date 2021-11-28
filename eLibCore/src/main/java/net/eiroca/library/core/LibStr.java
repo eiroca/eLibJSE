@@ -261,6 +261,19 @@ final public class LibStr {
     return res;
   }
 
+  public static String toString(final Iterable<?> objects, final String sep) {
+    final StringBuilder buf = new StringBuilder();
+    if (objects != null) {
+      for (final Object o : objects) {
+        if (buf.length() > 0) {
+          buf.append(sep);
+        }
+        buf.append(String.valueOf(o));
+      }
+    }
+    return buf.toString();
+  }
+
   public static String getVarName(final String p) {
     final StringBuilder sb = new StringBuilder();
     final int l = p.length();
