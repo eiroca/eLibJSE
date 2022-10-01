@@ -47,4 +47,8 @@ public class ServerResponse {
     this.message = message;
   }
 
+  public Object getPayload() {
+    return null;
+  }
+
 }

@@ -206,17 +206,17 @@ final public class LibStr {
     return path;
   }
 
-  final public static void encodeJson(final StringBuilder sb, final String string) {
-    if ((string == null) || string.isEmpty()) {
+  final public static void encodeJson(final StringBuilder sb, final String value) {
+    if ((value == null) || value.isEmpty()) {
       sb.append("\"\"");
       return;
     }
     char oldCh;
     char ch = 0;
     sb.append('"');
-    for (int i = 0; i < string.length(); i++) {
+    for (int i = 0; i < value.length(); i++) {
       oldCh = ch;
-      ch = string.charAt(i);
+      ch = value.charAt(i);
       switch (ch) {
         case '\\':
         case '"':

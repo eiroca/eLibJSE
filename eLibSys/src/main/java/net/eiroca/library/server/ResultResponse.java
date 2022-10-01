@@ -24,16 +24,25 @@ public class ResultResponse<T> extends ServerResponse {
     this(status, null, null);
   }
 
+  public ResultResponse(final int status, final String message) {
+    this(status, message, null);
+  }
+
   public ResultResponse(final int status, final String message, final T result) {
     super(status, message);
     this.result = result;
   }
 
-  public Object getResult() {
+  public T getResult() {
     return result;
   }
 
   public void setResult(final T result) {
     this.result = result;
   }
+
+  public Object getPayload() {
+    return result;
+  }
+
 }

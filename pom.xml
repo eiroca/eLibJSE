@@ -28,12 +28,12 @@
     <jcifs-ng.version>2.1.7</jcifs-ng.version>
     <jedis.version>4.2.3</jedis.version>
     <json.version>20220320</json.version>
-    <languagetool.version>5.7</languagetool.version>
+    <languagetool.version>5.8</languagetool.version>
     <poi.version>5.2.2</poi.version>
     <re2j.version>1.7</re2j.version>
     <slf4j.version>1.7.36</slf4j.version>
     <soa-model-core.version>1.6.4</soa-model-core.version>
-    <spark.version>2.9.3</spark.version>
+    <spark.version>2.9.4</spark.version>
     <trilead-ssh2.version>1.0.0-build222</trilead-ssh2.version>
   </properties>
   <build>
