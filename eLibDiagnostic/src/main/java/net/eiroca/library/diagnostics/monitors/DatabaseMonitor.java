@@ -70,7 +70,7 @@ public class DatabaseMonitor extends TCPServerMonitor {
   private static final String CONFIG_RUNSQL = "runSQL";
 
   protected final MetricGroup mgDBMonitor = new MetricGroup(mgMonitor, "Database Statistics");
-  protected final Measure mDBQueryTime = mgDBMonitor.createMeasure("Query Time", MetricAggregation.zero, "Tikem taken by the query", "ms");
+  protected final Measure mDBQueryTime = mgDBMonitor.createMeasure("Query Time", MetricAggregation.zero, "Time taken by the query", "ms");
   protected final Measure mDBQueryRows = mgDBMonitor.createMeasure("Query Rows", MetricAggregation.zero, "Rows returned by the query", "number");
   protected final Measure mDBQueryCols = mgDBMonitor.createMeasure("Query Columns", MetricAggregation.zero, "Columns returned by the query", "number");
 
