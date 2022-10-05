@@ -32,6 +32,10 @@ public class LibDB {
   private final static Logger logger = Logs.getLogger();
 
   public static void insertRecord(final Connection conn, final String table, final Object[] fields, final Object[] values, final int limit) throws SQLException {
+    LibDB.insertRecord(conn, table, fields, values, limit, true);
+  }
+
+  public static void insertRecord(final Connection conn, final String table, final Object[] fields, final Object[] values, final int limit, final boolean commit) throws SQLException {
     Statement statement = null;
     final StringBuilder sb = new StringBuilder();
     sb.append("INSERT INTO ").append(table);
@@ -65,7 +69,7 @@ public class LibDB {
           datum = datum.substring(0, limit);
         }
         datum = datum.replaceAll("'", "''");
-        sb.append('\'').append(datum).append('\'');   
+        sb.append('\'').append(datum).append('\'');
       }
       else {
         sb.append(String.valueOf(o));
@@ -73,10 +77,13 @@ public class LibDB {
     }
     sb.append(')');
     try {
-      LibDB.logger.trace(sb.toString());
+      LibDB.logger.trace("SQL: " + sb.toString());
       // execute insert SQL statement
       statement = conn.createStatement();
       statement.executeUpdate(sb.toString());
+      if (commit) {
+        conn.commit();
+      }
     }
     catch (final SQLException e) {
       LibDB.logger.warn(sb.toString());
@@ -87,14 +94,16 @@ public class LibDB {
     }
   }
 
-  public static void callSP(Connection conn, String spName, Object[] params, int timeout) throws SQLException {
+  public static void callSP(final Connection conn, final String spName, final Object[] params, final int timeout) throws SQLException {
     Statement statement = null;
     final StringBuilder sb = new StringBuilder();
     sb.append("CALL ").append(spName);
     sb.append("(");
     boolean first = true;
-    for (Object p : params) {
-      if (!first) sb.append(",");
+    for (final Object p : params) {
+      if (!first) {
+        sb.append(",");
+      }
       sb.append("'");
       sb.append(p != null ? String.valueOf(p) : "");
       sb.append("'");
@@ -106,7 +115,9 @@ public class LibDB {
       // execute insert SQL stetement
       statement = conn.createStatement();
       statement.executeUpdate(sb.toString());
-      if (timeout > 0) statement.setQueryTimeout(timeout);
+      if (timeout > 0) {
+        statement.setQueryTimeout(timeout);
+      }
     }
     catch (final SQLException e) {
       LibDB.logger.warn(sb.toString());
