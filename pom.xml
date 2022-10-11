@@ -63,6 +63,7 @@
             <exclude>**/placeholder</exclude>
           </excludes>
           <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
             <manifestEntries>
               <Build-Jdk>${jdk.version}</Build-Jdk>
               <Implementation-Title>${project.name}</Implementation-Title>
