@@ -49,15 +49,19 @@ public class LibSmb {
   private static final Map<String, CIFSContext> cache = new HashMap<>();
 
   public static synchronized CIFSContext getContext(final NtlmPasswordAuthenticator principal) {
-    if (principal == null) {
-      LibSmb.logger.error("Principal is null");
+    String key;
+    if (principal != null) {
+      key = principal.getName() + "\t" + principal.getPassword();
     }
-    final String key = principal.getName() + "\t" + principal.getPassword();
+    else {
+      LibSmb.logger.error("Principal is null");
+      key = "";
+    }
     CIFSContext context = LibSmb.cache.get(key);
     if (context == null) {
       context = LibSmb.getCIFSContext();
       if (context != null) {
-        context = context.withCredentials(principal);
+        if (principal != null) context = context.withCredentials(principal);
         LibSmb.cache.put(key, context);
       }
     }
