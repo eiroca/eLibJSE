@@ -20,6 +20,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import net.eiroca.library.core.LibParser;
+import net.eiroca.library.data.Tags;
 
 public class TestLibParser {
 
@@ -104,5 +105,100 @@ public class TestLibParser {
     Assert.assertTrue(c.get(7).equals("\"A\""));
     c = LibParser.splitWebLog(null);
     Assert.assertTrue((c == null));
+  }
+
+  @Test
+  public void splitAltLog() {
+    List<String> c;
+    c = LibParser.splitAltLog(null, 3, ' ', '[', ']');
+    Assert.assertTrue((c == null));
+    final String val = "field1 field2 [tag1] [tag[2]] [tag3] field3 last field";
+    // output list is: "filed1" "field2" "tag1" "tag[2]" "tag3" "field3" "last field"
+    c = LibParser.splitAltLog(val, 3, ' ', '[', ']');
+    Assert.assertTrue(c != null);
+    Assert.assertTrue(c.size() == 7);
+    Assert.assertTrue(c.get(0).equals("field1"));
+    Assert.assertTrue(c.get(1).equals("field2"));
+    Assert.assertTrue(c.get(2).equals("tag1"));
+    Assert.assertTrue(c.get(3).equals("tag[2]"));
+    Assert.assertTrue(c.get(4).equals("tag3"));
+    Assert.assertTrue(c.get(5).equals("field3"));
+    Assert.assertTrue(c.get(6).equals("last field"));
+  }
+
+  private void check(String row, String[] output) {
+    List<String> c = LibParser.splitOptAndMessage(row, ' ', ':', '-');
+    Assert.assertTrue(c != null);
+    Assert.assertTrue(c.size() == output.length);
+    for (int i = 0; i < output.length; i++) {
+      Assert.assertTrue(c.get(i).equals(output[i]));
+    }
+  }
+
+  @Test
+  public void splitOptMessage() {
+    List<String> c;
+    c = LibParser.splitOptAndMessage(null, ' ', ':', '-');
+    Assert.assertTrue((c == null));
+    check("opt : message", new String[] {
+        "opt", "message"
+    });
+    check("opt - message", new String[] {
+        "opt", "message"
+    });
+    check("opt: message", new String[] {
+        "opt", "message"
+    });
+    check("opt- message", new String[] {
+        "opt", "message"
+    });
+    check(": message", new String[] {
+        "", "message"
+    });
+    check("mess:a: g e", new String[] {
+        "mess:a: g e"
+    });
+    check("  message", new String[] {
+        "message"
+    });
+  }
+
+  //[tagValue1] [tagValue2] [tagA: tagValue[]] [tagB: tagValue] messag[e]
+  //Names: "F1", "F2"
+  //output: "5:messag[e]", "F1:tagValue1", "F2:tagValue2", "tagA:tagValue[]", "tagB:tagValue" 
+  //[ ] [ a : x ]
+  //output: "a:x", "F1:"
+  // fields are ordered
+  // null in -> null out
+  private static final String[] NAMES = {
+      "F1", "F2"
+  };
+
+  private void checkTags(String row, String[] output) {
+    Tags c = LibParser.splitTagAndMessage(row, ' ', '[', ']', ':', NAMES);
+    Assert.assertTrue(c != null);
+    c.setTagFormat("%s:%s");
+    List<String> vals = c.getTags();
+    Assert.assertTrue(vals.size() == output.length);
+    for (int i = 0; i < output.length; i++) {
+      Assert.assertTrue(vals.get(i).equals(output[i]));
+    }
+  }
+
+  @Test
+  public void splitTagAndMessage() {
+    Tags c;
+    c = LibParser.splitTagAndMessage(null, ' ', '[', ']', ':', NAMES);
+    Assert.assertTrue((c == null));
+    checkTags("[ ] [ a : x ]", new String[] {
+        "F1:", "a:x"
+    });
+    checkTags("[tagValue1] [tagValue2] [tagA: tagValue[]] [tagB: tagValue ] messag[e]", new String[] {
+        "5:messag[e]",
+        "F1:tagValue1",
+        "F2:tagValue2",
+        "tagA:tagValue[]",
+        "tagB:tagValue"
+    });
   }
 }

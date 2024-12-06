@@ -74,6 +74,7 @@ public class LibMap {
     return result;
   }
 
+  @Deprecated
   @SafeVarargs
   public static Map<String, String> buildMapFromAlt(final List<String> values, final List<String>... namesOptions) {
     Map<String, String> result = null;

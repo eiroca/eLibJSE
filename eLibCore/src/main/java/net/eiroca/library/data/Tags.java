@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import net.eiroca.library.core.Helper;
 
 public class Tags implements ITags {
 
@@ -211,6 +212,10 @@ public class Tags implements ITags {
     return result;
   }
 
+  public Map<String, Object> map() {
+    return tags;
+  }
+
   public boolean tagValueIs(final String name, final String value) {
     final Object v = tags.get(name);
     return v != null ? v.equals(value) : value == null;
@@ -218,6 +223,58 @@ public class Tags implements ITags {
 
   public Object tagValue(final String name) {
     return tags.get(name);
+  }
+
+  public boolean addValues(final List<String> values) {
+    boolean result = false;
+    if (values != null) {
+      final int siz = values.size();
+      for (int i = 0; i < siz; i++) {
+        final String key = String.valueOf(i);
+        final String val = values.get(i);
+        add(key, val);
+        result = true;
+      }
+    }
+    return result;
+  }
+
+  public boolean addValues(final List<String> names, final List<String> values) {
+    boolean result = false;
+    if ((values != null) && (names != null)) {
+      final int valSize = values.size();
+      final int nameSize = names.size();
+      if (valSize == nameSize) {
+        for (int i = 0; i < nameSize; i++) {
+          final String key = names.get(i);
+          final String val = values.get(i);
+          add(key, val);
+          result = true;
+        }
+      }
+    }
+    return result;
+  }
+
+  final public String getValues(final String[] tagNames, final String sep) {
+    final StringBuilder sb = new StringBuilder();
+    boolean first = true;
+    for (final String tagName : tagNames) {
+      final Object newVal = tags.get(tagName);
+      if (first) {
+        Helper.concatenate(sb, newVal);
+        first = false;
+      }
+      else {
+        Helper.concatenate(sb, sep, newVal);
+      }
+    }
+    return sb.toString();
+  }
+
+  @Override
+  public String toString() {
+    return "tags=" + tags;
   }
 
 }

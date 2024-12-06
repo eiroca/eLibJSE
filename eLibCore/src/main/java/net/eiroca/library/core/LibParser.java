@@ -18,6 +18,7 @@ package net.eiroca.library.core;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.eiroca.library.data.Tags;
 
 public class LibParser {
 
@@ -188,108 +189,112 @@ public class LibParser {
     return result;
   }
 
+  private enum WebLogStates {
+    START, IN_FIELD, IN_BRACKET, IN_QUOTE, QUOTEESCAPE
+  }
+
   public static List<String> splitWebLog(final String row) {
     if (row == null) { return null; }
     final List<String> result = new ArrayList<>();
-    final int l = row.length();
-    int i = 0;
-    int s = 0;
-    int state = 0;
+    final int len = row.length();
+    int pos = 0;
+    int start = 0;
+    WebLogStates state = WebLogStates.START;
     StringBuilder sb = null;
-    while (i < l) {
-      final char ch = row.charAt(i);
+    while (pos < len) {
+      final char ch = row.charAt(pos);
       switch (state) {
-        case 0:
+        case START:
           // space
           if ((ch != ' ') && (ch != '\t')) {
             if (ch == '-') {
               result.add(LibParser.EMPTY);
             }
             else if (ch == '[') {
-              state = 2;
-              s = i + 1;
+              state = WebLogStates.IN_BRACKET;
+              start = pos + 1;
             }
             else if (ch == '\"') {
-              state = 3;
-              s = i + 1;
+              state = WebLogStates.IN_QUOTE;
+              start = pos + 1;
             }
             else {
-              state = 1;
-              s = i;
+              state = WebLogStates.IN_FIELD;
+              start = pos;
             }
           }
           break;
-        case 1:
+        case IN_FIELD:
           // normal field
           if ((ch == ' ') || (ch == '\t')) {
-            state = 0;
-            result.add(row.substring(s, i));
+            state = WebLogStates.START;
+            result.add(row.substring(start, pos));
           }
           break;
-        case 2:
+        case IN_BRACKET:
           // [] field
           if ((ch == ']')) {
-            state = 0;
-            result.add(row.substring(s, i));
+            state = WebLogStates.START;
+            result.add(row.substring(start, pos));
           }
           break;
-        case 3:
+        case IN_QUOTE:
           // "" field
           if ((ch == '\"')) {
-            if ((i < (l - 1)) && (row.charAt(i + 1) == '\"')) {
+            if ((pos < (len - 1)) && (row.charAt(pos + 1) == '\"')) {
               // escaped quote with ""
-              state = 4;
+              state = WebLogStates.QUOTEESCAPE;
               if (sb == null) {
-                sb = new StringBuilder(l);
+                sb = new StringBuilder(len);
               }
               else {
                 sb.setLength(0);
               }
-              i++;
-              sb.append(row.substring(s, i));
+              pos++;
+              sb.append(row.substring(start, pos));
             }
             else {
-              state = 0;
-              result.add(row.substring(s, i));
+              state = WebLogStates.START;
+              result.add(row.substring(start, pos));
             }
           }
           if ((ch == '\\')) {
-            if ((i < (l - 1)) && (row.charAt(i + 1) == '\"')) {
+            if ((pos < (len - 1)) && (row.charAt(pos + 1) == '\"')) {
               // escaped quote with \"
-              state = 4;
+              state = WebLogStates.QUOTEESCAPE;
               if (sb == null) {
-                sb = new StringBuilder(l);
+                sb = new StringBuilder(len);
               }
               else {
                 sb.setLength(0);
               }
-              sb.append(row.substring(s, i));
+              sb.append(row.substring(start, pos));
               sb.append('\"');
-              i++;
+              pos++;
             }
             else {
-              state = 0;
-              result.add(row.substring(s, i));
+              state = WebLogStates.START;
+              result.add(row.substring(start, pos));
             }
           }
           break;
-        case 4:
+        case QUOTEESCAPE:
           if ((ch == '\"')) {
-            if (i < (l - 1)) {
-              if (row.charAt(i + 1) == '\"') {
+            if (pos < (len - 1)) {
+              if (row.charAt(pos + 1) == '\"') {
                 sb.append(ch);
-                i++;
+                pos++;
                 break;
               }
             }
-            state = 0;
+            state = WebLogStates.START;
             result.add(sb.toString());
           }
           else if ((ch == '\\')) {
-            if (i < (l - 1)) {
-              if (row.charAt(i + 1) == '\"') {
+            if (pos < (len - 1)) {
+              if (row.charAt(pos + 1) == '\"') {
                 sb.append('\"');
-                i++;
+                pos++;
                 break;
               }
             }
@@ -300,10 +305,10 @@ public class LibParser {
           }
           break;
       }
-      i++;
+      pos++;
     }
-    if (state > 0) {
-      if (state == 4) {
+    if (state != WebLogStates.START) {
+      if (state == WebLogStates.QUOTEESCAPE) {
         if (sb != null) {
           result.add(sb.toString());
         }
@@ -312,8 +317,299 @@ public class LibParser {
         }
       }
       else {
-        result.add(row.substring(s, i));
+        result.add(row.substring(start, pos));
       }
+    }
+    return result;
+  }
+
+  // extract max + 1 field separated by space and unlimited tags surrounded by [] 
+  // nested [] are supported [a[]] -> tag = a[]
+  // with max=3
+  // field1 field2 [tag1] [tag[2]] [tag3] field3 last field
+  // output list is: "filed1" "field2" "tag1" "tag[2]" "tag3" "field3" "last field"
+  // null in -> null out
+  private enum AltLogStates {
+    INITAIL, IN_FIELD, IN_TAG, LAST
+  }
+
+  public static List<String> splitAltLog(final String row, final int max, final char sep, final char bracketOpen, final char bracketClose) {
+    if (row == null) { return null; }
+    final List<String> result = new ArrayList<>();
+    final int len = row.length();
+    int level = 0;
+    int pos = 0;
+    int start = 0;
+    int cnt = 0;
+    AltLogStates state = AltLogStates.INITAIL;
+    while (pos < len) {
+      final char ch = row.charAt(pos);
+      switch (state) {
+        case INITAIL:
+          // space
+          if (ch != sep) {
+            if (ch == bracketOpen) {
+              state = AltLogStates.IN_TAG;
+              start = pos + 1;
+            }
+            else {
+              cnt++;
+              start = pos;
+              if (cnt > max) {
+                state = AltLogStates.LAST;
+              }
+              else {
+                state = AltLogStates.IN_FIELD;
+              }
+            }
+          }
+          break;
+        case IN_FIELD:
+          // normal field
+          if (ch == sep) {
+            state = AltLogStates.INITAIL;
+            result.add(row.substring(start, pos));
+          }
+          break;
+        case IN_TAG:
+          // [] field
+          if ((ch == bracketClose)) {
+            if (level == 0) {
+              state = AltLogStates.INITAIL;
+              result.add(row.substring(start, pos));
+            }
+            else {
+              level--;
+            }
+          }
+          else if (ch == bracketOpen) {
+            level++;
+          }
+          break;
+        case LAST:
+          pos = len - 1;
+          break;
+      }
+      pos++;
+    }
+    if (state != AltLogStates.INITAIL) {
+      result.add(row.substring(start, pos));
+    }
+    return result;
+  }
+
+  private enum OptMsgStates {
+    START, OPT, TRANSITION, SKIP, MESSAGE
+  }
+
+  // Split:
+  // "opt : message" -> "opt", "message"
+  // "opt - message" -> "opt", "message"
+  // "opt: message"  -> "opt", "message"
+  // "opt- message"  -> "opt", "message"
+  // " opt: message" -> "opt", "message"
+  // ": message"     -> "", "message"
+  // " - message"    -> "", "message"
+  // "mess:a: g e"   -> "mess:a: g e"
+  // "  message"     -> "message"
+  // null in -> null out
+  public static List<String> splitOptAndMessage(final String row, final char sep, char sp1, char sp2) {
+    if (row == null) { return null; }
+    final List<String> result = new ArrayList<>();
+    final int len = row.length();
+    int pos = 0;
+    int start = 0;
+    int last = 0;
+    OptMsgStates state = OptMsgStates.START;
+    while (pos < len) {
+      final char ch = row.charAt(pos);
+      switch (state) {
+        case START:
+          if (ch == sep) {
+            start++;
+          }
+          else if ((ch == sp1) || (ch == sp2)) {
+            state = OptMsgStates.TRANSITION;
+          }
+          else {
+            state = OptMsgStates.OPT;
+            last++;
+          }
+          break;
+        case OPT:
+          if (ch == sep) {
+          }
+          else if ((ch == sp1) || (ch == sp2)) {
+            state = OptMsgStates.TRANSITION;
+          }
+          else {
+            last++;
+          }
+          break;
+        case TRANSITION:
+          if (ch == sep) {
+            // valid opt
+            result.add(row.substring(start, last));
+            state = OptMsgStates.SKIP;
+          }
+          else {
+            state = OptMsgStates.MESSAGE;
+          }
+          break;
+        case SKIP:
+          if (ch != sep) {
+            start = pos;
+            state = OptMsgStates.MESSAGE;
+          }
+          break;
+        case MESSAGE:
+          pos = len - 1;
+          break;
+      }
+      pos++;
+    }
+    if (state != OptMsgStates.START) {
+      result.add(row.substring(start, pos));
+    }
+    return result;
+  }
+
+  private enum TagAndMessageStates {
+    START, IN_VALUE, IN_NAMEVALUE, MESSAGE
+  }
+
+  //[tagValue1] [tagValue2] [tagA: tagValue[]] [tagB: tagValue] messag[e]
+  //Names: "F1", "F2"
+  //output: "F1:tagValue1", "F2:tagValue2", "tagA:tagValue[]", "tagB:tagValue", "5:messag[e]"
+  //[ ] [ a : x ]
+  //output: "F1:", "a:x"
+  // null in -> null out
+  public static Tags splitTagAndMessage(final String row, char sep, final char bracketOpen, final char bracketClose, final char bracketSep, String[] names) {
+    if (row == null) { return null; }
+    final Tags result = new Tags();
+    final int len = row.length();
+    int level = 0;
+    int pos = 0;
+    int start = 0;
+    int startBraket = 0;
+    int last = 0;
+    String name = null;
+    String val = null;
+    int count = 0;
+    boolean empty = true;
+    TagAndMessageStates state = TagAndMessageStates.START;
+    while (pos < len) {
+      final char ch = row.charAt(pos);
+      switch (state) {
+        case START:
+          if (ch == sep) {
+            start++;
+          }
+          else if (ch == bracketOpen) {
+            startBraket = pos;
+            start = pos + 1;
+            state = TagAndMessageStates.IN_VALUE;
+            empty = true;
+          }
+          else {
+            state = TagAndMessageStates.MESSAGE;
+            last++;
+          }
+          break;
+        case IN_VALUE:
+          if (ch == sep) {
+            if (empty) start++;
+          }
+          else if (ch == bracketClose) {
+            if (level == 0) {
+              name = getName(names, count);
+              count++;
+              val = row.substring(start, pos);
+              result.add(name, val);
+              start = pos + 1;
+            }
+            else {
+              level--;
+            }
+            last = pos + 1;
+            state = TagAndMessageStates.START;
+          }
+          else {
+            if (ch == bracketOpen) {
+              last = pos + 1;
+              level++;
+            }
+            else if ((ch == bracketSep) && (level == 0)) {
+              state = TagAndMessageStates.IN_NAMEVALUE;
+              name = row.substring(start, last);
+              start = pos + 1;
+              empty = true;
+            }
+            else {
+              empty = false;
+              last = pos + 1;
+            }
+          }
+          break;
+        case IN_NAMEVALUE:
+          if (ch == sep) {
+            if (empty) start++;
+          }
+          else if (ch == bracketClose) {
+            if (level == 0) {
+              count++;
+              val = row.substring(start, last);
+              result.add(name, val);
+              state = TagAndMessageStates.START;
+              start = pos + 1;
+            }
+            else {
+              level--;
+            }
+            last = pos + 1;
+          }
+          else {
+            last = pos + 1;
+            if (ch == bracketOpen) {
+              level++;
+            }
+            empty = false;
+          }
+          break;
+        case MESSAGE:
+          pos = len - 1;
+          break;
+      }
+      pos++;
+    }
+    switch (state) {
+      case MESSAGE:
+        if (start < len) {
+          name = getName(names, count);
+          val = row.substring(start, len);
+          result.add(name, val);
+        }
+        break;
+      case IN_VALUE:
+      case IN_NAMEVALUE:
+        name = getName(names, count);
+        val = row.substring(startBraket, len);
+        result.add(name, val);
+        break;
+      default:
+        break;
+
+    }
+    return result;
+  }
+
+  private static String getName(String[] names, int count) {
+    String result;
+    if ((names != null) && (names.length > count)) {
+      result = names[count];
+    }
+    else {
+      result = String.valueOf(count + 1);
     }
     return result;
   }

@@ -263,8 +263,7 @@ final public class Helper {
   }
 
   public static Properties loadProperties(final String propertiesFile, final boolean sorted) throws IOException {
-    InputStream inputStream = null;
-    inputStream = new FileInputStream(propertiesFile);
+    InputStream inputStream = new FileInputStream(propertiesFile);
     return Helper.loadProperties(inputStream, sorted);
   }
 
