@@ -16,6 +16,7 @@
  **/
 package core;
 
+import java.util.Properties;
 import org.junit.Assert;
 import org.junit.Test;
 import net.eiroca.library.core.Helper;
@@ -28,6 +29,24 @@ public class TestHelper {
     final StringBuilder concatenated = new StringBuilder();
     Helper.concatenate(concatenated, null, "", "OK", "", null);
     Assert.assertEquals(expexted, concatenated.toString());
+  }
+
+  @Test
+  public void propertiesTest() {
+    Properties a = Helper.buildProperties("A=1");
+    Properties b = Helper.buildProperties("B=1\nA=2");
+    Properties c = Helper.mergeProperties(a, new Properties[] {
+        b
+    }, null);
+    Assert.assertTrue(c != null);
+    Assert.assertTrue(c.size() == 2);
+    Assert.assertTrue(c.getProperty("A").equals("1"));
+    c = Helper.mergeProperties(b, new Properties[] {
+        a
+    }, null);
+    Assert.assertTrue(c != null);
+    Assert.assertTrue(c.size() == 2);
+    Assert.assertTrue(c.getProperty("A").equals("2"));
   }
 
 }

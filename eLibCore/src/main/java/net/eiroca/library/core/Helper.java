@@ -16,15 +16,19 @@
  **/
 package net.eiroca.library.core;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -34,6 +38,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import net.eiroca.library.data.SortedProperties;
 
@@ -262,6 +267,44 @@ final public class Helper {
     return path;
   }
 
+  public static Properties mergeProperties(Properties main, Properties[] defs, String[] paths) {
+    Properties merged = new Properties();
+    if (defs != null) {
+      for (Properties p : defs) {
+        copyProperties(p, merged);
+      }
+    }
+    if (paths != null) {
+      for (String s : paths) {
+        try {
+          Properties p = loadProperties(s, false);
+          copyProperties(p, merged);
+        }
+        catch (IOException e) {
+        }
+      }
+    }
+    copyProperties(main, merged);
+    return merged;
+  }
+
+  private static void copyProperties(Properties source, Properties dest) {
+    for (Entry<Object, Object> e : source.entrySet()) {
+      dest.put(e.getKey(), e.getValue());
+    }
+  }
+
+  public static Properties buildProperties(final String propertiesStr) {
+    InputStream is = new ByteArrayInputStream(propertiesStr.getBytes(StandardCharsets.UTF_8));
+    Properties p = null;
+    try {
+      p = loadProperties(is, false);
+    }
+    catch (IOException e) {
+    }
+    return p;
+  }
+
   public static Properties loadProperties(final String propertiesFile, final boolean sorted) throws IOException {
     InputStream inputStream = new FileInputStream(propertiesFile);
     return Helper.loadProperties(inputStream, sorted);
@@ -402,6 +445,21 @@ final public class Helper {
 
   public static final String get(final String val, final String def) {
     return (val != null) ? val : def;
+  }
+
+  public static final String getHostName() {
+    String host = System.getenv("HOSTNAME");
+    if (host == null) {
+      host = System.getenv("COMPUTERNAME");
+    }
+    if (host == null) {
+      try {
+        host = InetAddress.getLocalHost().getHostName();
+      }
+      catch (UnknownHostException e) {
+      }
+    }
+    return host;
   }
 
 }
