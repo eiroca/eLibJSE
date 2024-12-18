@@ -90,11 +90,27 @@ public class TestLibParser {
   }
 
   @Test
+  public void splitSeparator2() {
+    final String val = "A|B|C|D|E||";
+    List<String> c = LibParser.splitWithSep(val, '|', -1);
+    Assert.assertTrue(c != null);
+    Assert.assertTrue(c.size() == 7);
+    Assert.assertTrue(c.get(0).equals("A"));
+    Assert.assertTrue(c.get(1).equals("B"));
+    Assert.assertTrue(c.get(2).equals("C"));
+    Assert.assertTrue(c.get(3).equals("D"));
+    Assert.assertTrue(c.get(4).equals("E"));
+    Assert.assertTrue(c.get(5).equals(""));
+    Assert.assertTrue(c.get(6).equals(""));
+  }
+  
+
+  @Test
   public void splitWebLog() {
-    final String val = "abc 123 - \"abc \"\"123\"\"\" [1/1/2000 10:00] \"zzz\" 1 \"\\\"A\\\"\"";
+    final String val = "abc 123 - \"abc \"\"123\"\"\" [1/1/2000 10:00] \"zzz\" 1 \"\\\"A\\\"\" -1";
     List<String> c = LibParser.splitWebLog(val);
     Assert.assertTrue(c != null);
-    Assert.assertTrue(c.size() == 8);
+    Assert.assertTrue(c.size() == 9);
     Assert.assertTrue(c.get(0).equals("abc"));
     Assert.assertTrue(c.get(1).equals("123"));
     Assert.assertTrue(c.get(2).equals(""));
@@ -103,6 +119,7 @@ public class TestLibParser {
     Assert.assertTrue(c.get(5).equals("zzz"));
     Assert.assertTrue(c.get(6).equals("1"));
     Assert.assertTrue(c.get(7).equals("\"A\""));
+    Assert.assertTrue(c.get(8).equals("-1"));
     c = LibParser.splitWebLog(null);
     Assert.assertTrue((c == null));
   }

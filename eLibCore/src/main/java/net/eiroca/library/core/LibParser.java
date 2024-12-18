@@ -178,8 +178,8 @@ public class LibParser {
           break;
         }
       }
-      if (s <= e) {
-        result.add(row.substring(s, e + 1));
+      if (s <= l) {
+        result.add(row.substring(s));
       }
     }
     else {
@@ -190,7 +190,7 @@ public class LibParser {
   }
 
   private enum WebLogStates {
-    START, IN_FIELD, IN_BRACKET, IN_QUOTE, QUOTEESCAPE
+    START, IN_EMPTYFIELD, IN_FIELD, IN_BRACKET, IN_QUOTE, QUOTEESCAPE
   }
 
   public static List<String> splitWebLog(final String row) {
@@ -207,10 +207,7 @@ public class LibParser {
         case START:
           // space
           if ((ch != ' ') && (ch != '\t')) {
-            if (ch == '-') {
-              result.add(LibParser.EMPTY);
-            }
-            else if (ch == '[') {
+            if (ch == '[') {
               state = WebLogStates.IN_BRACKET;
               start = pos + 1;
             }
@@ -218,10 +215,23 @@ public class LibParser {
               state = WebLogStates.IN_QUOTE;
               start = pos + 1;
             }
+            else if (ch == '-') {
+              state = WebLogStates.IN_EMPTYFIELD;
+              start = pos;
+            }
             else {
               state = WebLogStates.IN_FIELD;
               start = pos;
             }
+          }
+          break;
+        case IN_EMPTYFIELD:
+          if ((ch == ' ') || (ch == '\t')) {
+            result.add(LibParser.EMPTY);
+            state = WebLogStates.START;
+          }
+          else {
+            state = WebLogStates.IN_FIELD;
           }
           break;
         case IN_FIELD:
@@ -307,18 +317,25 @@ public class LibParser {
       }
       pos++;
     }
-    if (state != WebLogStates.START) {
-      if (state == WebLogStates.QUOTEESCAPE) {
+    switch (state) {
+      case START:
+        break;
+      case IN_EMPTYFIELD:
+        result.add(LibParser.EMPTY);
+        break;
+      case IN_FIELD:
+      case IN_BRACKET:
+        result.add(row.substring(start));
+        break;
+      case IN_QUOTE:
+      case QUOTEESCAPE:
         if (sb != null) {
           result.add(sb.toString());
         }
         else {
           result.add(LibParser.EMPTY);
         }
-      }
-      else {
-        result.add(row.substring(start, pos));
-      }
+        break;
     }
     return result;
   }
