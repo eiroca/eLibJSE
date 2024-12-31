@@ -28,7 +28,7 @@
       <dependency>
          <groupId>commons-codec</groupId>
          <artifactId>commons-codec</artifactId>
-         <version>${commons-codecs.version}</version>
+         <version>${commons-codec.version}</version>
       </dependency>
    </dependencies>
 </project>

@@ -57,3 +57,7 @@ local.properties
 
 #
 **/target/*
+.project
+**/.project
+.classpath
+**/.classpath
