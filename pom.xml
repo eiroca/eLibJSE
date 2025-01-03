@@ -33,9 +33,7 @@
     <commons-dbcp.version>2.13.0</commons-dbcp.version>
     <commons-io.version>2.18.0</commons-io.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
-    <commons-lang3.version>3.12.0</commons-lang3.version>
     <commons-logging.version>1.2</commons-logging.version>
-    <commons-text.version>1.13.0</commons-text.version>
     <commons-text.version>1.13.0</commons-text.version>
     <curator.version>5.7.1</curator.version>
     <derby.version>10.17.1.0</derby.version>
@@ -115,7 +113,8 @@
     <mvn-checkstyle-plugin.version>3.1.2</mvn-checkstyle-plugin.version>
     <mvn-checksum-plugin.version>1.7</mvn-checksum-plugin.version>
     <mvn-clean-plugin.version>3.1.0</mvn-clean-plugin.version>
-    <mvn-compiler-plugin.version>3.8.1</mvn-compiler-plugin.version>
+    <mvn-compiler-plugin.version>3.13.0</mvn-compiler-plugin.version>
+    <mvn-dependecy-plugin.version>3.8.1</mvn-dependecy-plugin.version>
     <mvn-deploy-plugin.version>2.8.2</mvn-deploy-plugin.version>
     <mvn-gpg-plugin.version>1.6</mvn-gpg-plugin.version>
     <mvn-jar-plugin.version>3.2.2</mvn-jar-plugin.version>
@@ -138,41 +137,17 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
+        <version>${mvn-compiler-plugin.version}</version>
         <configuration>
           <source>${jdk.version}</source>
           <target>${jdk.version}</target>
-        </configuration>
-      </plugin>
-      <!-- Make the jar -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.3.0</version>
-        <configuration>
-          <!-- DO NOT include log4j.properties file in your Jar -->
-          <excludes>
-            <exclude>**/log4j.properties</exclude>
-            <exclude>**/simplelogger.properties</exclude>
-            <exclude>**/placeholder</exclude>
-          </excludes>
-          <archive>
-            <addMavenDescriptor>false</addMavenDescriptor>
-            <manifestEntries>
-              <Build-Jdk>${jdk.version}</Build-Jdk>
-              <Implementation-Title>${project.name}</Implementation-Title>
-              <Implementation-Version>${project.version}</Implementation-Version>
-              <Specification-Title>${project.name} Library</Specification-Title>
-              <Specification-Version>${project.version}</Specification-Version>
-            </manifestEntries>
-          </archive>
         </configuration>
       </plugin>
       <!-- Copy project dependency -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>${mvn-dependecy-plugin.version}</version>
         <executions>
           <execution>
             <id>copy-dependencies</id>
@@ -188,6 +163,35 @@
           </execution>
         </executions>
       </plugin>
+      <!-- Make the jar -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${mvn-jar-plugin.version}</version>
+        <configuration>
+          <!-- DO NOT include log4j.properties file in your Jar -->
+          <excludes>
+            <exclude>**/log4j.properties</exclude>
+            <exclude>**/simplelogger.properties</exclude>
+            <exclude>**/placeholder</exclude>
+          </excludes>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+            <manifest>
+              <addDefaultEntries>false</addDefaultEntries>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>false</addDefaultSpecificationEntries>
+              <addBuildEnvironmentEntries>false</addBuildEnvironmentEntries>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>libs/</classpathPrefix>
+            </manifest>
+            <manifestEntries>
+              <Build-Jdk>${jdk.version}</Build-Jdk>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <!-- Unit test surefire -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
