@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2025 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -33,10 +33,11 @@ public class Exporters {
   }
 
   static {
-    Exporters.registry.addEntry(ElasticExporter.ID, ElasticExporter.class.getName());
-    Exporters.registry.addEntry(SysAdmExporter.ID, SysAdmExporter.class.getName());
     Exporters.registry.addEntry(LoggerExporter.ID, LoggerExporter.class.getName());
+    Exporters.registry.addEntry(SysAdmExporter.ID, SysAdmExporter.class.getName());
     Exporters.registry.addEntry(NotifyExporter.ID, NotifyExporter.class.getName());
+    Exporters.registry.addEntry(ElasticExporter.ID, ElasticExporter.class.getName());
+    Exporters.registry.addEntry(DynatraceMetricExporter.ID, DynatraceMetricExporter.class.getName());
   }
 
   public static IExporter newInstance(final String name) {

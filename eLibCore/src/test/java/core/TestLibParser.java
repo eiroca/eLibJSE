@@ -125,6 +125,24 @@ public class TestLibParser {
   }
 
   @Test
+  public void splitWebLogBIR() {
+    final String val = "1.2.3.4 - - [11/Mar/2023:23:04:03 +0100] \"GET /\\\\/moin_static182/modern/css/print.css HTTP/1.0\" 403 34";
+    List<String> c = LibParser.splitWebLog(val);
+    Assert.assertTrue(c != null);
+    Assert.assertTrue(c.size() == 7);
+    Assert.assertTrue(c.get(0).equals("1.2.3.4"));
+    Assert.assertTrue(c.get(1).equals(""));
+    Assert.assertTrue(c.get(2).equals(""));
+    Assert.assertTrue(c.get(3).equals("11/Mar/2023:23:04:03 +0100"));
+    Assert.assertTrue(c.get(4).equals("GET /\\\\/moin_static182/modern/css/print.css HTTP/1.0"));
+    Assert.assertTrue(c.get(5).equals("403"));
+    Assert.assertTrue(c.get(6).equals("34"));
+    c = LibParser.splitWebLog(null);
+    Assert.assertTrue((c == null));
+  }
+
+  
+  @Test
   public void splitAltLog() {
     List<String> c;
     c = LibParser.splitAltLog(null, 3, ' ', '[', ']');

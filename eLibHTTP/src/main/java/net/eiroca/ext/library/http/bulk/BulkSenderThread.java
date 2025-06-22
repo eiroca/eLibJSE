@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2025 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -14,11 +14,15 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.ext.library.elastic;
+package net.eiroca.ext.library.http.bulk;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHeaders;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -26,45 +30,49 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
-import com.google.common.net.HttpHeaders;
+import net.eiroca.ext.library.http.HttpClientHelper;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.system.Logs;
 
-public class ElasticSenderThread implements Runnable {
+public class BulkSenderThread implements Runnable {
 
   private static final Logger logger = Logs.getLogger();
 
-  CloseableHttpClient httpclient;
-  HttpEntity entity;
-  ElasticBulk owner;
-  int numEvents;
+  private CloseableHttpClient httpclient;
+  private final HttpEntity entity;
+  private final BulkSender<?> owner;
+  private final int numEvents;
   private final HttpContext context;
 
-  public ElasticSenderThread(final ElasticBulk elasticBulk, final HttpEntity entity, final int numEvents) {
+  public BulkSenderThread(final BulkSender<?> bulkSender, final HttpEntity entity, final int numEvents) {
     this.entity = entity;
     this.numEvents = numEvents;
-    owner = elasticBulk;
+    owner = bulkSender;
     context = new BasicHttpContext();
   }
 
   @Override
   public void run() {
-    ElasticSenderThread.logger.debug("Running...");
-    final HttpPost httpRequest = new HttpPost(owner.getElasticServer());
-    httpRequest.setEntity(entity);
-    httpRequest.setHeader(HttpHeaders.ACCEPT, ElasticBulk.STR_BULKMIMETYPE);
+    BulkSenderThread.logger.debug("Running...");
+    final String serverURL = owner.getServerURL();
+    final String acceptType = owner.getAcceptType();
     final String auth = owner.getAuthorization();
+    final HttpPost httpRequest = new HttpPost(serverURL);
+    httpRequest.setEntity(entity);
+    httpRequest.setHeader(entity.getContentType());
+    final Header encoding = entity.getContentEncoding();
+    if (acceptType != null) {
+      httpRequest.setHeader(HttpHeaders.ACCEPT, acceptType);
+    }
     if (auth != null) {
       httpRequest.setHeader(HttpHeaders.AUTHORIZATION, auth);
     }
-    httpRequest.setHeader(entity.getContentType());
-    final Header encoding = entity.getContentEncoding();
     if (encoding != null) {
       httpRequest.setHeader(encoding);
     }
     final long sendStartTime = System.currentTimeMillis();
     try {
-      ElasticSenderThread.logger.trace("exceuting... {}", numEvents);
+      BulkSenderThread.logger.trace("exceuting... {}", numEvents);
       final CloseableHttpClient client = getHttpClient();
       final CloseableHttpResponse response = client.execute(httpRequest, context);
       final int responseCode = response.getStatusLine().getStatusCode();
@@ -72,30 +80,33 @@ public class ElasticSenderThread implements Runnable {
       if (elapsed < 1) {
         elapsed = 1;
       }
-      owner.setOverload(responseCode == ElasticBulk.ELASTIC_OVERLOAD);
+      final boolean overload = owner.checkOverload(responseCode);
+      final boolean failed = owner.checkFailed(responseCode);
+      boolean valid = true;
+      owner.setOverload(overload);
       owner.stats.incEventSent(numEvents);
       owner.stats.addSendTime(elapsed);
-      if (responseCode < 400) {
-        ElasticSenderThread.logger.debug(numEvents + "\t" + httpRequest + "\t" + responseCode + "\t" + Math.round((numEvents / (elapsed * .001))));
-      }
-      else {
-        ElasticSenderThread.logger.warn(numEvents + "\t" + httpRequest + "\t" + responseCode + "\t" + Math.round((numEvents / (elapsed * .001))));
-      }
-
       final long checkStartTime = System.currentTimeMillis();
       try {
         final HttpEntity entity2 = response.getEntity();
-        owner.checkResult(responseCode, entity2, numEvents);
+        valid = owner.checkValidResponse(responseCode, entity2, numEvents);
       }
       finally {
         Helper.close(response);
         httpRequest.releaseConnection();
+        if (failed || !valid) {
+          BulkSenderThread.logger.warn(numEvents + "\t" + httpRequest + "\t" + responseCode + "\t" + Math.round((numEvents / (elapsed * .001))));
+        }
+        else {
+          BulkSenderThread.logger.debug(numEvents + "\t" + httpRequest + "\t" + responseCode + "\t" + Math.round((numEvents / (elapsed * .001))));
+        }
+
       }
       owner.stats.addCheckTime(System.currentTimeMillis() - checkStartTime);
-      ElasticSenderThread.logger.debug("Exiting... {}", responseCode);
+      BulkSenderThread.logger.debug("Exiting... {}", responseCode);
     }
     catch (final IOException e) {
-      ElasticSenderThread.logger.warn("Sending error " + e.getMessage(), e);
+      BulkSenderThread.logger.warn("Sending error " + e.getMessage(), e);
       Helper.close(httpclient);
       httpclient = null;
       httpclient = getHttpClient();
@@ -104,7 +115,12 @@ public class ElasticSenderThread implements Runnable {
 
   public CloseableHttpClient getHttpClient() {
     if (httpclient == null) {
-      httpclient = HttpClients.createDefault();
+      try {
+        httpclient = HttpClientHelper.createAcceptAllClient(null);
+      }
+      catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+        httpclient = HttpClients.createDefault();
+      }
     }
     return httpclient;
   }

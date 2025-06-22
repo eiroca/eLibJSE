@@ -21,7 +21,7 @@ import net.eiroca.library.metrics.MetricMetadata;
 
 public class Event {
 
-  private final long timestamp;
+  private final long timestamp; // ms UTC
   private final MetricMetadata metricInfo;
   private final SimpleGson data;
   private final EventRule rule;

@@ -282,10 +282,6 @@ public class LibParser {
               sb.append('\"');
               pos++;
             }
-            else {
-              state = WebLogStates.START;
-              result.add(row.substring(start, pos));
-            }
           }
           break;
         case QUOTEESCAPE:

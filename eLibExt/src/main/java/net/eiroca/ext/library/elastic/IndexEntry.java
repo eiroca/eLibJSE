@@ -16,24 +16,21 @@
  **/
 package net.eiroca.ext.library.elastic;
 
-public class IndexEntry {
+import net.eiroca.ext.library.http.bulk.BulkEntry;
 
-  public int status = 0;
-  public String _id;
-  public String meta;
-  public String data;
+public class IndexEntry extends BulkEntry {
 
   public IndexEntry() {
   }
 
-  public IndexEntry(final String index, final String type, final String id, final String pipeline, final String document, int version) {
+  public IndexEntry(final String index, final String type, final String id, final String pipeline, final String document, final int version) {
     super();
     _id = id;
     meta = getMetadata(index, type, id, pipeline, version);
     data = document;
   }
 
-  private String getMetadata(final String index, final String type, final String id, final String pipeline, int version) {
+  private String getMetadata(final String index, final String type, final String id, final String pipeline, final int version) {
     final StringBuilder sb = new StringBuilder();
     sb.append("{\"index\":{\"_index\":\"").append(index).append("\"");
     if ((type != null) && (version < 7)) {
@@ -47,15 +44,6 @@ public class IndexEntry {
     }
     sb.append("}}");
     return sb.toString();
-  }
-
-  public int entrySize() {
-    return meta.length() + data.length() + 2;
-  }
-
-  public String bulkEntry() {
-    final String entry = meta + "\n" + data + "\n";
-    return entry;
   }
 
 }

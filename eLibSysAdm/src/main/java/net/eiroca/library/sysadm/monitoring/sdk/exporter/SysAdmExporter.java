@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2025 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -51,7 +51,8 @@ public class SysAdmExporter extends GenericExporter {
   public void setup(final IContext context) throws Exception {
     super.setup(context);
     GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
-    context.debug(this.getClass().getName(), " setup done, url=" + config_eSysAdmUrl);
+    final String token = config_eSysAdmToken != null ? config_eSysAdmToken.substring(0, 8) : null;
+    context.info(this.getClass().getName(), " setup done, url=", config_eSysAdmUrl, " token=", token);
   }
 
   @Override

@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2025 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -69,15 +69,17 @@ public class ElasticExporter extends GenericExporter {
     GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
     indexDateFormat = new SimpleDateFormat(config_indexDateFormat);
     elasticServer = LibStr.isNotEmptyOrNull(config_elasticURL) ? new ElasticBulk(config_elasticURL, config_elasticVersion) : null;
+    String token = null;
     if (elasticServer != null) {
       if (config_elasticUsername != null) {
         final String credential = config_elasticUsername + ":" + config_elasticPassword;
         final String auth = ElasticExporter.BASE64ENCODER.encodeToString(credential.getBytes());
+        token = auth.substring(0, 8);
         elasticServer.setAuthorization("Basic " + auth);
       }
-      context.info("Elastic Search: " + config_elasticURL + (config_elasticUsername != null ? " Auth: " + config_elasticUsername : ""));
       elasticServer.open();
     }
+    context.info(this.getClass().getName(), " setup done, url=", config_elasticURL, " token=", token);
   }
 
   @Override

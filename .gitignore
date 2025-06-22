@@ -57,7 +57,8 @@ local.properties
 
 #
 **/target/*
-.project
 **/.project
-.classpath
 **/.classpath
+**/.project
+eExtLib/.project
+eExtLib/.project

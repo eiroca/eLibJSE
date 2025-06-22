@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2025 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -14,11 +14,9 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.ext.library.elastic;
+package net.eiroca.ext.library.http.bulk;
 
-import net.eiroca.ext.library.gson.GsonUtil;
-
-public class ElasticBulkStats {
+public class BulkStats {
 
   private long event_count;
   private long event_sent;
@@ -93,11 +91,6 @@ public class ElasticBulkStats {
 
   public synchronized void addCheckTime(final long time) {
     checkTime += time;
-  }
-
-  @Override
-  public String toString() {
-    return GsonUtil.toJSON(this);
   }
 
 }

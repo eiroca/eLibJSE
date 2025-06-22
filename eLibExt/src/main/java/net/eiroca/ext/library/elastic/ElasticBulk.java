@@ -16,11 +16,7 @@
  **/
 package net.eiroca.ext.library.elastic;
 
-import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import org.apache.http.HttpEntity;
 import org.slf4j.Logger;
 import com.google.gson.JsonArray;
@@ -28,12 +24,10 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.eiroca.ext.library.http.HttpClientHelper;
-import net.eiroca.ext.library.http.WritableEntity;
+import net.eiroca.ext.library.http.bulk.BulkSender;
 import net.eiroca.library.system.Logs;
 
-public class ElasticBulk {
-
-  public static final String STR_BULKMIMETYPE = "application/json";
+public class ElasticBulk extends BulkSender<IndexEntry> {
 
   public static final int ELASTIC_OVERLOAD = 429;
 
@@ -42,19 +36,7 @@ public class ElasticBulk {
 
   private static final Logger logger = Logs.getLogger();
 
-  public ElasticBulkStats stats = new ElasticBulkStats();
-
-  final private List<IndexEntry> data = new ArrayList<>();
-  private final int version;
-  private int size = 0;
-  private boolean deflate = true;
-  private final String encoding = "UTF-8";
-  private String elasticServer;
-  private int bulkSize = ElasticBulk.DEFAULT_BULKSIZE;
-  private int numThreads = ElasticBulk.DEFAULT_THREADS;
   private boolean checkResult;
-  private final ThreadPoolExecutor senderPool;
-  private String authorization;
 
   private long discardTime = 1000;
   private long lastOverload;
@@ -63,28 +45,11 @@ public class ElasticBulk {
     this(server, version, true, ElasticBulk.DEFAULT_BULKSIZE, ElasticBulk.DEFAULT_THREADS);
   }
 
-  public ElasticBulk(final String elasticServer, final int version, final boolean checkResult, final int bulkSize, final int numThreads) {
-    super();
-    this.version = version;
-    this.numThreads = numThreads;
-    this.bulkSize = bulkSize;
-    setElasticServer(elasticServer);
+  public ElasticBulk(final String server, final int version, boolean checkResult, final int bulkSize, final int numThreads) {
+    super(server, version, bulkSize, numThreads);
     this.checkResult = checkResult;
-    senderPool = (ThreadPoolExecutor)Executors.newFixedThreadPool(numThreads);
-    open();
-  }
-
-  public String getAuthorization() {
-    return authorization;
-  }
-
-  public void setAuthorization(final String authorization) {
-    this.authorization = authorization;
-  }
-
-  public void open() {
-    data.clear();
-    size = 0;
+    setContentType("application/json");
+    setAcceptType("application/json");
   }
 
   public void add(final String index, final String type, final String id, final String pipeline, final String document) throws Exception {
@@ -94,51 +59,24 @@ public class ElasticBulk {
     data.add(e);
     stats.incEventCount(1);
     stats.addAddTime(System.currentTimeMillis() - now);
-    if (size > bulkSize) {
+    if (size > getBulkSize()) {
       ElasticBulk.logger.debug("Internal flush size:{}", size);
       flush();
     }
   }
 
-  public void flush() throws Exception {
-    if (data.size() < 1) { return; }
-    final long flushStartTime = System.currentTimeMillis();
-    final WritableEntity entity = new WritableEntity(ElasticBulk.STR_BULKMIMETYPE, encoding, deflate);
-    final OutputStream os = entity.openBuffer();
-    final int events = data.size();
-    for (final IndexEntry e : data) {
-      final String indexReq = e.bulkEntry();
-      ElasticBulk.logger.debug(indexReq);
-      os.write(indexReq.getBytes(encoding));
-    }
-    entity.closeBuffer();
-    final ElasticSenderThread sender = new ElasticSenderThread(this, entity, events);
-    stats.addFlushTime(System.currentTimeMillis() - flushStartTime);
-    if (numThreads > 1) {
-      ElasticBulk.logger.debug("Elastic Index taskCount:" + senderPool.getTaskCount() + " queueSize: " + senderPool.getQueue().size() + " activeCount:" + senderPool.getActiveCount());
-      senderPool.execute(sender);
-    }
-    else {
-      sender.run();
-    }
-    data.clear();
-    size = 0;
-  }
-
-  public void close() throws Exception {
-    ElasticBulk.logger.debug("Closing");
-    flush();
-  }
-
-  public void checkResult(final int responseCode, final HttpEntity entity, final int size) {
+  @Override
+  public boolean checkValidResponse(final int responseCode, final HttpEntity entity, final int size) {
+    int errors = 0;
     if (checkResult) {
-      int errors = size;
+      errors = size;
       final String resultStr = HttpClientHelper.consume(entity);
       if ((responseCode < 400) && (resultStr != null)) {
         errors = checkResult(null, resultStr);
       }
       stats.incEventErrors(errors);
     }
+    return errors == 0;
   }
 
   public int checkResult(final List<IndexEntry> data, final String resultStr) {
@@ -186,32 +124,6 @@ public class ElasticBulk {
     return errors;
   }
 
-  public boolean isDeflate() {
-    return deflate;
-  }
-
-  public void setDeflate(final boolean deflate) {
-    this.deflate = deflate;
-  }
-
-  public int getNumThreads() {
-    return numThreads;
-  }
-
-  public void setNumThreads(final int numThreads) {
-    this.numThreads = numThreads;
-    senderPool.setMaximumPoolSize(numThreads);
-    senderPool.setCorePoolSize(numThreads);
-  }
-
-  public int getBulkSize() {
-    return bulkSize;
-  }
-
-  public void setBulkSize(final int bulkSize) {
-    this.bulkSize = bulkSize;
-  }
-
   public boolean isCheckResult() {
     return checkResult;
   }
@@ -220,10 +132,7 @@ public class ElasticBulk {
     this.checkResult = checkResult;
   }
 
-  public int getQueueSize() {
-    return numThreads > 1 ? senderPool.getQueue().size() : 0;
-  }
-
+  @Override
   public void setOverload(final boolean overload) {
     if (overload) {
       final long now = System.currentTimeMillis();
@@ -234,6 +143,7 @@ public class ElasticBulk {
     }
   }
 
+  @Override
   public boolean isOverload() {
     final long now = System.currentTimeMillis();
     return (now <= lastOverload);
@@ -254,12 +164,9 @@ public class ElasticBulk {
     return lastOverload > 0 ? lastOverload - discardTime : 0;
   }
 
-  public String getElasticServer() {
-    return elasticServer;
-  }
-
-  public void setElasticServer(final String elasticServer) {
-    this.elasticServer = elasticServer;
+  @Override
+  public boolean checkOverload(final int responseCode) {
+    return (responseCode == ElasticBulk.ELASTIC_OVERLOAD);
   }
 
 }

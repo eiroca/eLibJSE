@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2025 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -64,6 +64,16 @@ public class SimpleGson {
   public String get(final String name, String def) {
     JsonObject node = getNode(name);
     return (node != null) ? node.getAsString() : def;
+  }
+
+  public boolean getBoolean(final String name, boolean def) {
+    JsonObject node = getNode(name);
+    try {
+      return (node != null) ? node.getAsBoolean() : def;
+    }
+    catch (ClassCastException e) {
+      return def;
+    }
   }
 
   public JsonObject getNode(final String name) {

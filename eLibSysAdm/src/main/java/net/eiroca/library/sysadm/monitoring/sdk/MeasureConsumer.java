@@ -160,12 +160,16 @@ public class MeasureConsumer implements IMeasureConsumer, Runnable {
       cal.setTimeZone(TimeZone.getTimeZone(config_timezone));
     }
     long timeStamp = datum.getTimeStamp();
+    Date timeDate;
     if (timeStamp == 0) {
-      timeStamp = System.currentTimeMillis();
+      timeDate = new Date();
     }
-    cal.setTime(new Date(timeStamp));
-    timeStamp = cal.getTimeInMillis();
-    json.addProperty(MeasureFields.FLD_DATETIME, cal.getTime(), LibDate.ISO8601_FULL);
+    else {
+      timeDate = new Date(timeStamp);
+    }
+    cal.setTime(timeDate); // In local time zone
+    timeStamp = cal.getTimeInMillis(); // In UTC
+    json.addProperty(MeasureFields.FLD_DATETIME, cal.getTime(), LibDate.ISO8601_FULL); // In local timezone
     if (metadata != null) {
       for (final Map.Entry<String, Object> metaEntry : metadata.entrySet()) {
         String key = metaEntry.getKey();
