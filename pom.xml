@@ -5,7 +5,7 @@
   <name>eLib for JSE</name>
   <groupId>net.eiroca</groupId>
   <artifactId>eLibJSE</artifactId>
-  <version>0.0.10</version>
+  <version>1.8.1</version>
   <packaging>pom</packaging>
   <organization>
     <name>net.eiroca</name>
@@ -17,9 +17,9 @@
 
     <!-- library internal  -->
     <cavour.version>0.0.1</cavour.version>
-    <eJDBCDrivers.version>0.0.10</eJDBCDrivers.version>
-    <eLib.version>0.0.10</eLib.version>
-    <eLicense.version>0.0.10</eLicense.version>
+    <eJDBCDrivers.version>1.8.1</eJDBCDrivers.version>
+    <eLib.version>1.8.1</eLib.version>
+    <eLicense.version>1.8.1</eLicense.version>
     <!-- library external  -->
     <activemq.version>5.7.0</activemq.version>
     <asynchbase.version>1.8.2</asynchbase.version>
