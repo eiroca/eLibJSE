@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>net.eiroca</groupId>
 		<artifactId>eLibJSE</artifactId>
-		<version>0.0.10</version>
+    <version>1.8.1</version>
 	</parent>
 	<name>eLibDB</name>
 	<artifactId>eLibDB</artifactId>
