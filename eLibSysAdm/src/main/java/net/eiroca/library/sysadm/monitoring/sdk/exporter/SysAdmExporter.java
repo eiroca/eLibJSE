@@ -34,12 +34,13 @@ public class SysAdmExporter extends GenericExporter {
   private static final String ESYSADM_TOKEN_HEADER = "X-eSysAdm-TOKEN";
 
   public static final String ID = "eSysAdm".toLowerCase();
+  protected static String CONFIG_PREFIX = SysAdmExporter.ID + ".";
   //
-  public static StringParameter _eSysAdmUrl = new StringParameter(SysAdmExporter.config, "eSysAdmUrl", null);
-  public static StringParameter _eSysAdmToken = new StringParameter(SysAdmExporter.config, "eSysAdmToken", null);
+  public static StringParameter _eSysAdmUrl = new StringParameter(SysAdmExporter.config, "url", null);
+  public static StringParameter _eSysAdmToken = new StringParameter(SysAdmExporter.config, "token", null);
   // Dynamic mapped to parameters
-  protected String config_eSysAdmUrl;
-  protected String config_eSysAdmToken;
+  protected String config_url;
+  protected String config_token;
   //
   private CloseableHttpClient client;
 
@@ -50,23 +51,23 @@ public class SysAdmExporter extends GenericExporter {
   @Override
   public void setup(final IContext context) throws Exception {
     super.setup(context);
-    GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
-    final String token = config_eSysAdmToken != null ? config_eSysAdmToken.substring(0, 8) : null;
-    context.info(this.getClass().getName(), " setup done, url=", config_eSysAdmUrl, " token=", token);
+    GenericExporter.config.convert(context, SysAdmExporter.CONFIG_PREFIX, this, "config_");
+    final String token = config_token != null ? config_token.substring(0, 8) : null;
+    context.info(this.getClass().getName(), " setup done, url=", config_url, " token=", token);
   }
 
   @Override
   public boolean beginBulk() {
-    if (config_eSysAdmUrl != null) {
+    if (config_url != null) {
       Collection<Header> headers = null;
-      if (config_eSysAdmToken != null) {
+      if (config_token != null) {
         headers = new ArrayList<>();
-        headers.add(new BasicHeader(SysAdmExporter.ESYSADM_TOKEN_HEADER, config_eSysAdmToken));
+        headers.add(new BasicHeader(SysAdmExporter.ESYSADM_TOKEN_HEADER, config_token));
       }
       final HttpHost proxy = null;
       client = HttpClientHelper.getHttpClient(proxy, headers);
     }
-    final boolean result = (config_eSysAdmUrl != null) && (client != null);
+    final boolean result = (config_url != null) && (client != null);
     GenericExporter.logger.debug("beginbulk()=" + result);
     return result;
   }
@@ -76,7 +77,7 @@ public class SysAdmExporter extends GenericExporter {
     GenericExporter.logger.debug("process()");
     final SimpleGson json = event.getData();
     final String _doc = json.toString();
-    final String url = config_eSysAdmUrl;
+    final String url = config_url;
     final String r = HttpClientHelper.POST(client, url, _doc, ContentType.APPLICATION_JSON);
     context.debug("POST " + url + " " + _doc + " --> " + r);
   }

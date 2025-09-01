@@ -31,10 +31,11 @@ import net.eiroca.library.system.IContext;
 public class NotifyExporter extends GenericExporter {
 
   public static final String ID = "notify".toLowerCase();
+  protected static String CONFIG_PREFIX = NotifyExporter.ID + ".";
   //
-  public static StringParameter _notifyUrl = new StringParameter(NotifyExporter.config, "notifyUrl", null);
+  public static StringParameter _notifyUrl = new StringParameter(NotifyExporter.config, "url", null);
   // Dynamic mapped to parameters
-  protected String config_notifyUrl;
+  protected String config_url;
   //
   private static final Pattern regExParams = Pattern.compile("\\$\\{(.+?)\\}");
 
@@ -45,7 +46,7 @@ public class NotifyExporter extends GenericExporter {
   @Override
   public void setup(final IContext context) throws Exception {
     super.setup(context);
-    GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
+    GenericExporter.config.convert(context, NotifyExporter.CONFIG_PREFIX, this, "config_");
     context.debug(this.getClass().getName(), " setup done");
   }
 
@@ -53,17 +54,17 @@ public class NotifyExporter extends GenericExporter {
 
   @Override
   public boolean beginBulk() {
-    if (config_notifyUrl != null) {
+    if (config_url != null) {
       client = HttpClientHelper.getHttpClient(null);
     }
-    return (config_notifyUrl != null) && (client != null);
+    return (config_url != null) && (client != null);
   }
 
   @Override
   public void process(final Event event) {
     final EventRule rule = event.getRule();
     if (rule == null) { return; }
-    final String url = expand(event, config_notifyUrl);
+    final String url = expand(event, config_url);
     final String r = HttpClientHelper.GET(client, url);
     context.info(url + " --> " + r);
   }

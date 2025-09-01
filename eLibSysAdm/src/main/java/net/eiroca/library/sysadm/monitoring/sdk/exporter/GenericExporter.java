@@ -28,8 +28,6 @@ public abstract class GenericExporter implements IExporter {
   protected static Logger logger = Logs.getLogger();
   protected static ContextParameters config = new ContextParameters();
 
-  protected static String CONFIG_PREFIX = null;
-
   protected IContext context = null;
 
   public GenericExporter() {

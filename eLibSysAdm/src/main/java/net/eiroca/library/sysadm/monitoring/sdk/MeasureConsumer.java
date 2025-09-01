@@ -74,6 +74,7 @@ public class MeasureConsumer implements IMeasureConsumer, Runnable {
 
   @Override
   public void setup(final IContext context) throws Exception {
+    context.debug(this.getClass().getName(), " setup: " + context);
     this.context = context;
     MeasureConsumer.config.convert(context, MeasureConsumer.CONFIG_PREFIX, this, "config_");
     for (final IExporter connector : MeasureConsumer.exporters) {

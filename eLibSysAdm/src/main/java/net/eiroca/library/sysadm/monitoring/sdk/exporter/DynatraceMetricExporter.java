@@ -16,15 +16,21 @@
  **/
 package net.eiroca.library.sysadm.monitoring.sdk.exporter;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.eiroca.ext.library.dynatrace.DynatraceBulk;
 import net.eiroca.library.config.parameter.IntegerParameter;
+import net.eiroca.library.config.parameter.PathParameter;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
 import net.eiroca.library.core.LibStr;
+import net.eiroca.library.csv.CSVData;
 import net.eiroca.library.sysadm.monitoring.api.Event;
 import net.eiroca.library.sysadm.monitoring.sdk.MeasureFields;
 import net.eiroca.library.system.IContext;
@@ -32,27 +38,33 @@ import net.eiroca.library.system.IContext;
 public class DynatraceMetricExporter extends GenericExporter {
 
   public static final String ID = "dynatrace".toLowerCase();
+  protected static String CONFIG_PREFIX = DynatraceMetricExporter.ID + ".";
+
   //
-  public static StringParameter _dynatraceURL = new StringParameter(DynatraceMetricExporter.config, "dynatraceURL", null);
-  public static IntegerParameter _dynatraceVersion = new IntegerParameter(ElasticExporter.config, "dynatraceVersion", 1);
-  public static StringParameter _dynatraceToken = new StringParameter(DynatraceMetricExporter.config, "dynatraceToken", null);
-  public static StringParameter _dynatraceMetric = new StringParameter(DynatraceMetricExporter.config, "dynatraceMetric", //
+  public static StringParameter _dynatraceURL = new StringParameter(DynatraceMetricExporter.config, "URL", null);
+  public static IntegerParameter _dynatraceVersion = new IntegerParameter(ElasticExporter.config, "version", 1);
+  public static StringParameter _dynatraceToken = new StringParameter(DynatraceMetricExporter.config, "token", null);
+  public static StringParameter _dynatraceMetric = new StringParameter(DynatraceMetricExporter.config, "metric", //
       // 0..5 metric name, 6..11 dimension name, 12..17 value
       // FLD_SOURCE[0,6,12], FLD_GROUP[1,7,13], FLD_METRIC[2,8,14], FLD_HOST[3,9,15], FLD_SPLIT_GROUP[4,10,16], FLD_SPLIT_NAME[5,11,17]
       "net.eiroca.{0}.{2},group=\"{13}\",hostname=\"{15}\"");
-  public static StringParameter _dynatraceMetricSplitted = new StringParameter(DynatraceMetricExporter.config, "dynatraceMetricSplitted", //
+  public static StringParameter _dynatraceMetricSplitted = new StringParameter(DynatraceMetricExporter.config, "metricSplitted", //
       // 0..5 metric name, 6..11 dimension name, 12..17 value
       // FLD_SOURCE[0,6,12], FLD_GROUP[1,7,13], FLD_METRIC[2,8,14], FLD_HOST[3,9,15], FLD_SPLIT_GROUP[4,10,16], FLD_SPLIT_NAME[5,11,17]
       "net.eiroca.{0}.{2},group=\"{13}\",hostname=\"{15}\",{10}=\"{17}\",split=\"1\"");
+  public static PathParameter _dynatraceDimension = new PathParameter(DynatraceMetricExporter.config, "dimensionPath", null);
+  // CSV-> dimensionName, dimensionSource, oldValue, newValue
+
   // Dynamic mapped to parameters
-  protected String config_dynatraceURL;
-  protected String config_dynatraceToken;
-  protected String config_dynatraceMetric;
-  protected String config_dynatraceMetricSplitted;
+  protected String config_URL;
+  protected int config_version;
+  protected String config_token;
+  protected String config_metric;
+  protected String config_metricSplitted;
+  protected Path config_dimensionPath;
   //
-  protected DynatraceBulk dynatraceServer = null;
-  protected int config_dynatraceVersion;
-  protected SimpleDateFormat indexDateFormat;
+  private DynatraceBulk dynatraceServer = null;
+  private Map<String, Map<String, Map<String, String>>> extraDim = null;
 
   public DynatraceMetricExporter() {
     super();
@@ -61,17 +73,66 @@ public class DynatraceMetricExporter extends GenericExporter {
   @Override
   public void setup(final IContext context) throws Exception {
     super.setup(context);
-    GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
-    dynatraceServer = LibStr.isNotEmptyOrNull(config_dynatraceURL) ? new DynatraceBulk(config_dynatraceURL, config_dynatraceVersion) : null;
+    GenericExporter.config.convert(context, DynatraceMetricExporter.CONFIG_PREFIX, this, "config_");
+    dynatraceServer = LibStr.isNotEmptyOrNull(config_URL) ? new DynatraceBulk(config_URL, config_version) : null;
     String token = null;
     if (dynatraceServer != null) {
-      if (config_dynatraceToken != null) {
-        token = config_dynatraceToken.substring(0, 8);
-        dynatraceServer.setAuthorization("Api-Token " + config_dynatraceToken);
+      if (config_token != null) {
+        token = config_token.substring(0, 8);
+        dynatraceServer.setAuthorization("Api-Token " + config_token);
       }
       dynatraceServer.open();
     }
-    context.info(this.getClass().getName(), " setup done, url=", config_dynatraceURL, " token=", token);
+    if ((config_dimensionPath != null) && (Files.exists(config_dimensionPath)) && (Files.isRegularFile(config_dimensionPath))) {
+      loadExtraDim();
+    }
+    else {
+      extraDim = null;
+    }
+    context.info(this.getClass().getName(), " setup done, url=", config_URL, " token=", token);
+  }
+
+  private void loadExtraDim() {
+    extraDim = null;
+    final CSVData csv = new CSVData(config_dimensionPath.toString());
+    int cnt = 0;
+    if (csv.size() > 0) {
+      boolean ko = false;
+      final Map<String, Map<String, Map<String, String>>> dims = new HashMap<>();
+      for (int i = 0; i < csv.size(); i++) {
+        final String[] data = csv.getData(i);
+        if ((data == null) || (data.length != 4)) {
+          ko = true;
+          break;
+        }
+        final String dimNam = data[0];
+        final String dimSrc = data[1];
+        final String dimOld = data[2];
+        final String dimNew = data[3];
+        addMapping(dims, dimNam, dimSrc, dimOld, dimNew);
+        cnt++;
+      }
+      if (!ko && (dims.size() > 0)) {
+        extraDim = dims;
+      }
+    }
+    context.debug("Dimension Mapping Size: " + cnt);
+  }
+
+  private void addMapping(final Map<String, Map<String, Map<String, String>>> dims, final String dimName, final String dimSrc, final String dimOld, final String dimNew) {
+    Map<String, Map<String, String>> srcs;
+    Map<String, String> maps;
+    srcs = dims.get(dimName);
+    if (srcs == null) {
+      srcs = new HashMap<>();
+      dims.put(dimName, srcs);
+    }
+    maps = srcs.get(dimSrc);
+    if (maps == null) {
+      maps = new HashMap<>();
+      srcs.put(dimSrc, maps);
+    }
+    maps.put(dimOld, dimNew);
   }
 
   @Override
@@ -130,18 +191,38 @@ public class DynatraceMetricExporter extends GenericExporter {
     final String split = DynatraceMetricExporter.getIt(json, MeasureFields.FLD_SPLIT, "false");
     String metricFormat;
     if ((split != null) && "true".equals(split)) {
-      metricFormat = config_dynatraceMetricSplitted;
+      metricFormat = config_metricSplitted;
     }
     else {
-      metricFormat = config_dynatraceMetric;
+      metricFormat = config_metric;
     }
     final StringBuffer row = new StringBuffer(256);
     row.append(MessageFormat.format(metricFormat, metrics[0], metrics[1], metrics[2], metrics[3], metrics[4], metrics[5], dimensions[0], dimensions[1], dimensions[2], dimensions[3], dimensions[4], dimensions[5], value[0], value[1], value[2], value[3], value[4], value[5]));
+    boolean done;
+    if (extraDim != null) {
+      for (final Entry<String, Map<String, Map<String, String>>> d : extraDim.entrySet()) {
+        done = false;
+        final String dimName = d.getKey();
+        for (final Entry<String, Map<String, String>> s : d.getValue().entrySet()) {
+          final String val = MessageFormat.format(s.getKey(), metrics[0], metrics[1], metrics[2], metrics[3], metrics[4], metrics[5], dimensions[0], dimensions[1], dimensions[2], dimensions[3], dimensions[4], dimensions[5], value[0], value[1], value[2], value[3], value[4], value[5]);
+          final String newVal = s.getValue().get(val);
+          if (newVal != null) {
+            row.append(',').append(dimName).append('=').append('"').append(newVal).append('"');
+            done = true;
+            break;
+          }
+        }
+        if (done) {
+          break;
+        }
+      }
+    }
     row.append(' ');
     row.append("gauge,");
     DynatraceMetricExporter.appendDouble(row, json, MeasureFields.FLD_VALUE);
     row.append(' ');
     return row.toString();
+
   }
 
   private void convertIt(final String[] value, final String[] metrics, final String[] dimensions) {

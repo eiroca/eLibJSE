@@ -25,6 +25,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 final public class LibStr {
 
@@ -166,6 +167,24 @@ final public class LibStr {
       data = "?";
     }
     return data;
+  }
+
+  final public static String merge(final Map<?, ?> map, final String sep, final String nullVal) {
+    final StringBuilder sb = new StringBuilder();
+    boolean first = true;
+    for (Map.Entry<?, ?> o : map.entrySet()) {
+      if (!first) {
+        sb.append(sep);
+      }
+      Object k = o.getKey();
+      Object v = o.getValue();
+      if (k != null) {
+        sb.append('"').append(k).append('"');
+        sb.append(':').append('"').append(v != null ? v : nullVal).append('"');
+      }
+      first = false;
+    }
+    return sb.toString();
   }
 
   final public static String merge(final List<? extends Object> list, final String sep, final String nullVal) {

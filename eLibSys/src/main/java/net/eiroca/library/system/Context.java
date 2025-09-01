@@ -261,4 +261,9 @@ public class Context implements IContext {
     return attributes.get(name);
   }
 
+  @Override
+  public String toString() {
+    return "Context [name=" + name + ", config=" + LibStr.merge(config, ",", "") + ", attributes=" + attributes + "]";
+  }
+
 }

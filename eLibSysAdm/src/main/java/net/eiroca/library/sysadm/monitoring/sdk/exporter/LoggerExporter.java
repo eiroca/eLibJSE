@@ -27,10 +27,11 @@ import net.eiroca.library.system.Logs;
 public class LoggerExporter extends GenericExporter {
 
   public static final String ID = "logger".toLowerCase();
+  protected static String CONFIG_PREFIX = LoggerExporter.ID + ".";
   //
-  public static StringParameter _logger = new StringParameter(LoggerExporter.config, "logger", "Metrics");
+  public static StringParameter _logger = new StringParameter(LoggerExporter.config, "name", "Metrics");
   // Dynamic mapped to parameters
-  protected String config_logger;
+  protected String config_name;
   //
   protected Logger metricLog = null;
 
@@ -41,8 +42,8 @@ public class LoggerExporter extends GenericExporter {
   @Override
   public void setup(final IContext context) throws Exception {
     super.setup(context);
-    GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
-    metricLog = LibStr.isNotEmptyOrNull(config_logger) ? Logs.getLogger(config_logger) : null;
+    GenericExporter.config.convert(context, LoggerExporter.CONFIG_PREFIX, this, "config_");
+    metricLog = LibStr.isNotEmptyOrNull(config_name) ? Logs.getLogger(config_name) : null;
   }
 
   @Override

@@ -35,26 +35,28 @@ public class ElasticExporter extends GenericExporter {
   private static final Encoder BASE64ENCODER = Base64.getEncoder();
 
   public static final String ID = "elastic".toLowerCase();
+  protected static String CONFIG_PREFIX = ElasticExporter.ID + ".";
+
   //
-  public static StringParameter _elasticURL = new StringParameter(ElasticExporter.config, "elasticURL", null);
-  public static StringParameter _elasticUsername = new StringParameter(ElasticExporter.config, "elasticUsername", null);
-  public static StringParameter _elasticPassword = new StringParameter(ElasticExporter.config, "elasticPassword", null);
-  public static StringParameter _elasticIndex = new StringParameter(ElasticExporter.config, "elasticIndex", "metrics-");
-  public static IntegerParameter _elasticIndexMode = new IntegerParameter(ElasticExporter.config, "elasticIndexMode", 1, 0, 2);
+  public static StringParameter _elasticURL = new StringParameter(ElasticExporter.config, "URL", null);
+  public static StringParameter _elasticUsername = new StringParameter(ElasticExporter.config, "username", null);
+  public static StringParameter _elasticPassword = new StringParameter(ElasticExporter.config, "password", null);
+  public static StringParameter _elasticIndex = new StringParameter(ElasticExporter.config, "index", "metrics-");
+  public static IntegerParameter _elasticIndexMode = new IntegerParameter(ElasticExporter.config, "indexMode", 1, 0, 2);
   public static StringParameter _indexDateFormat = new StringParameter(ElasticExporter.config, "indexDateFormat", "yyyy.MM.dd");
-  public static StringParameter _elasticType = new StringParameter(ElasticExporter.config, "elasticType", "metric");
-  public static IntegerParameter _elasticVersion = new IntegerParameter(ElasticExporter.config, "elasticVersion", 7);
-  public static StringParameter _elasticPipeline = new StringParameter(ElasticExporter.config, "elasticPipeline", null);
+  public static StringParameter _elasticType = new StringParameter(ElasticExporter.config, "type", null);
+  public static IntegerParameter _elasticVersion = new IntegerParameter(ElasticExporter.config, "version", 7);
+  public static StringParameter _elasticPipeline = new StringParameter(ElasticExporter.config, "pipeline", null);
   // Dynamic mapped to parameters
-  protected String config_elasticURL;
-  protected String config_elasticUsername;
-  protected String config_elasticPassword;
-  protected String config_elasticIndex;
-  protected int config_elasticIndexMode;// 0 fixed, 1 fixed+now 2 fixed+event.date
+  protected String config_URL;
+  protected String config_username;
+  protected String config_password;
+  protected String config_index;
+  protected int config_indexMode;// 0 fixed, 1 fixed+now 2 fixed+event.date
   protected String config_indexDateFormat;
-  protected String config_elasticType;
-  protected int config_elasticVersion;
-  protected String config_elasticPipeline;
+  protected String config_type;
+  protected int config_version;
+  protected String config_pipeline;
   //
   protected ElasticBulk elasticServer = null;
   protected SimpleDateFormat indexDateFormat;
@@ -66,20 +68,20 @@ public class ElasticExporter extends GenericExporter {
   @Override
   public void setup(final IContext context) throws Exception {
     super.setup(context);
-    GenericExporter.config.convert(context, GenericExporter.CONFIG_PREFIX, this, "config_");
+    GenericExporter.config.convert(context, ElasticExporter.CONFIG_PREFIX, this, "config_");
     indexDateFormat = new SimpleDateFormat(config_indexDateFormat);
-    elasticServer = LibStr.isNotEmptyOrNull(config_elasticURL) ? new ElasticBulk(config_elasticURL, config_elasticVersion) : null;
+    elasticServer = LibStr.isNotEmptyOrNull(config_URL) ? new ElasticBulk(config_URL, config_version) : null;
     String token = null;
     if (elasticServer != null) {
-      if (config_elasticUsername != null) {
-        final String credential = config_elasticUsername + ":" + config_elasticPassword;
+      if (config_username != null) {
+        final String credential = config_username + ":" + config_password;
         final String auth = ElasticExporter.BASE64ENCODER.encodeToString(credential.getBytes());
         token = auth.substring(0, 8);
         elasticServer.setAuthorization("Basic " + auth);
       }
       elasticServer.open();
     }
-    context.info(this.getClass().getName(), " setup done, url=", config_elasticURL, " token=", token);
+    context.info(this.getClass().getName(), " setup done, url=", config_URL, " token=", token);
   }
 
   @Override
@@ -113,7 +115,7 @@ public class ElasticExporter extends GenericExporter {
     try {
       final String _id = getEventID(event);
       final String _indexName = getEventIndex(event);
-      elasticServer.add(_indexName, config_elasticType, _id, config_elasticPipeline, _doc);
+      elasticServer.add(_indexName, config_type, _id, config_pipeline, _doc);
     }
     catch (final Exception e) {
       context.error("Error exporting ", _doc, "->", e.getMessage(), " ", Helper.getStackTraceAsString(e));
@@ -122,16 +124,16 @@ public class ElasticExporter extends GenericExporter {
 
   private String getEventIndex(final Event event) {
     String index;
-    switch (config_elasticIndexMode) {
+    switch (config_indexMode) {
       case 1:
-        index = config_elasticIndex + indexDateFormat.format(new Date());
+        index = config_index + indexDateFormat.format(new Date());
         break;
       case 2:
         final long timestamp = event.getTimestamp();
-        index = config_elasticIndex + indexDateFormat.format(new Date(timestamp));
+        index = config_index + indexDateFormat.format(new Date(timestamp));
         break;
       default:
-        index = config_elasticIndex;
+        index = config_index;
         break;
     }
     return index;
