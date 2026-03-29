@@ -98,22 +98,6 @@ final public class LibFile {
     return LibFile.readString(path, LibFile.ENCODING_UTF8);
   }
 
-  public static String readString(final Reader reader) throws IOException {
-    final StringBuffer data = new StringBuffer();
-    BufferedReader br = null;
-    try {
-      br = new BufferedReader(reader);
-      int ch;
-      while ((ch = br.read()) != -1) {
-        data.append((char)ch);
-      }
-    }
-    finally {
-      Helper.close(br, reader);
-    }
-    return data.toString();
-  }
-
   public static String readString(final InputStream inputStream, final String encoding) {
     try {
       return LibFile.readString(new InputStreamReader(inputStream, encoding));
@@ -148,6 +132,22 @@ final public class LibFile {
       Helper.close(reader, is);
     }
     return null;
+  }
+
+  public static String readString(final Reader reader) throws IOException {
+    final StringBuffer data = new StringBuffer();
+    BufferedReader br = null;
+    try {
+      br = new BufferedReader(reader);
+      int ch;
+      while ((ch = br.read()) != -1) {
+        data.append((char)ch);
+      }
+    }
+    finally {
+      Helper.close(br, reader);
+    }
+    return data.toString();
   }
 
   public static boolean appendString(final String path, final String data) {
@@ -378,4 +378,10 @@ final public class LibFile {
     return properties;
   }
 
+  public static boolean isValidFilename(String filename) {
+    if (filename == null || filename.isEmpty() || filename.length() > 255) { return false; }
+    // Regex matches strings that DO NOT contain: < > : " / \ | ? * or control characters (0-31)
+    return !filename.matches(".*[<>:\"/\\\\|?*\\x00-\\x1F].*");
+  }
+  
 }

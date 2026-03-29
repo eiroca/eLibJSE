@@ -208,7 +208,7 @@ final public class Helper {
         result = dateFormat.parse(val);
       }
     }
-    catch (final ParseException e) {
+    catch (final ParseException|NumberFormatException e) {
     }
     return result;
   }

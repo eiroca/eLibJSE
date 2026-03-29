@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -31,7 +32,8 @@ import net.eiroca.library.core.LibStr;
 public class GsonUtil {
 
   final public static String toJSON(final Object obj) {
-    return new Gson().toJson(obj);
+    final Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").create();
+    return g.toJson(obj);
   }
 
   final public static void compatta(final JsonObject o, final String key) {
