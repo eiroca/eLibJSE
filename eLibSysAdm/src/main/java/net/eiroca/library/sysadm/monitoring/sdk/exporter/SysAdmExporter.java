@@ -26,6 +26,7 @@ import org.apache.http.message.BasicHeader;
 import net.eiroca.ext.library.gson.SimpleGson;
 import net.eiroca.ext.library.http.HttpClientHelper;
 import net.eiroca.library.config.parameter.StringParameter;
+import net.eiroca.library.core.Helper;
 import net.eiroca.library.sysadm.monitoring.api.Event;
 import net.eiroca.library.system.IContext;
 
@@ -84,6 +85,7 @@ public class SysAdmExporter extends GenericExporter {
 
   @Override
   public void endBulk() {
+    Helper.close(client);
     client = null;
   }
 

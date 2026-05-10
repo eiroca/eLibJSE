@@ -19,6 +19,7 @@ package net.eiroca.ext.library.words;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class Sentence {
   private static CSVMap validWords = new CSVMap();
   private static CSVMap replaces = new CSVMap();
   private static CSVMap alias = new CSVMap();
-  private static List<String[]> preferred;
+  private static List<String[]> preferred = new ArrayList<String[]>();
 
   private static final Map<String, WordInfo> words = new HashMap<>();
 
@@ -136,14 +137,24 @@ public class Sentence {
     return (Character.isAlphabetic(ch) || Character.isDigit(ch) || (ch == '\''));
   }
 
+  private enum WordState {
+    START_WORD, IN_WORD, END_WORD, NOTIN_WORD, INVALID
+  }
+
   public void addNormalizeChar(char ch) {
-    if (((ch >= (char)0) && (ch <= (char)31)) || (ch == (char)160)) {
+    if (((ch >= (char)0) && (ch <= (char)31))) {
       ch = ' ';
     }
-    else if ((ch == '`') || (ch == '�')) {
+    else if ((ch == (char)160)) {
       ch = ' ';
     }
-    else if (ch == (char)96) {
+    else if ((ch == '“') || (ch == '”')) {
+      ch = '"';
+    }
+    else if ((ch == '‘') || (ch == '’')) {
+      ch = '\'';
+    }
+    else if ((ch == '`') || (ch == '´')) {
       ch = '\'';
     }
     else {
@@ -153,36 +164,32 @@ public class Sentence {
     final boolean isWordable = Sentence.isWordable(ch);
     final boolean isDigit = Character.isDigit(ch);
     hasDigit = hasDigit || isDigit;
-    isNumber = isNumber && (Character.isDigit(ch) || (ch == '.'));
-    int state;
+    isNumber = isNumber && (isDigit || (ch == '.'));
+    WordState state;
     if (isWordable && lastCharIsWordable) {
-      state = 0;
+      state = WordState.IN_WORD;
     }
     else if (isWordable && !lastCharIsWordable) {
-      state = 1;
+      state = WordState.START_WORD;
     }
     else if (!isWordable && lastCharIsWordable) {
-      state = 2;
+      state = WordState.END_WORD;
       final String wordStr = word.toString();
       if ((ch != ' ') && (wordStr.startsWith("http") || wordStr.startsWith("https"))) {
-        state = 0;
+        state = WordState.IN_WORD;
       }
       else if (isNumber) {
-        state = 0;
+        state = WordState.IN_WORD;
       }
     }
     else if (!isWordable && !lastCharIsWordable) {
-      state = 3;
+      state = WordState.NOTIN_WORD;
     }
     else {
-      state = -1;
+      state = WordState.INVALID;
     }
     switch (state) {
-      case 0: // in word
-        word.append(ch);
-        lastChar = ch;
-        break;
-      case 1: // word start
+      case START_WORD: // word start
         word.append(ch);
         if (lastChar != ' ') {
           sb.append(' ');
@@ -192,7 +199,11 @@ public class Sentence {
         hasDigit = isDigit;
         isNumber = isDigit;
         break;
-      case 2:// word end
+      case IN_WORD: // in word
+        word.append(ch);
+        lastChar = ch;
+        break;
+      case END_WORD:// word end
         String theWord = word.toString();
         boolean addDot = false;
         if (theWord.endsWith(".")) {
@@ -212,11 +223,12 @@ public class Sentence {
         lastCharIsWordable = false;
         hasDigit = false;
         break;
-      case 3:// not in word
+      case NOTIN_WORD:// not in word
+        if (ch != ' ') sb.append(' ');
         sb.append(ch);
         lastChar = ch;
         break;
-      default:
+      case INVALID:// not in word
         System.err.println("Sentence invalid state");
         break;
     }
