@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>net.eiroca</groupId>
 		<artifactId>eLibJSE</artifactId>
-    <version>1.8.1</version>
+		<version>1.8.1</version>
 	</parent>
 	<name>eLibServer</name>
 	<artifactId>eLibServer</artifactId>
@@ -16,14 +16,16 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.sparkjava</groupId>
-			<artifactId>spark-core</artifactId>
-			<version>${spark.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>${gson.version}</version>
+		</dependency>
+		<!-- Source: https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>
