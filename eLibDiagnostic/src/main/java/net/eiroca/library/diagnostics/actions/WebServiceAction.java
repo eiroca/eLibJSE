@@ -62,6 +62,7 @@ import com.predic8.wsdl.PortType;
 import com.predic8.wsdl.Service;
 import com.predic8.wsdl.WSDLParser;
 import com.predic8.xml.util.ExternalResolver;
+import groovy.namespace.QName;
 import net.eiroca.library.config.parameter.BooleanParameter;
 import net.eiroca.library.config.parameter.StringParameter;
 import net.eiroca.library.core.Helper;
@@ -71,8 +72,6 @@ import net.eiroca.library.diagnostics.IConverter;
 import net.eiroca.library.diagnostics.actiondata.ActionData;
 import net.eiroca.library.diagnostics.util.ReturnObject;
 import net.eiroca.library.system.IContext;
-import sun.net.www.protocol.http.AuthCacheImpl;
-import sun.net.www.protocol.http.AuthCacheValue;
 
 public class WebServiceAction extends HTTPAction {
 
@@ -193,7 +192,6 @@ public class WebServiceAction extends HTTPAction {
         ProxySelector.setDefault(new WsProxySelector()); // added proxy selector
         // setup default authenticator if proxy authentication is used
         if ((pProxyUser.get() != null) && !pProxyUser.get().isEmpty()) {
-          AuthCacheValue.setAuthCache(new AuthCacheImpl());
           Authenticator.setDefault(new WsAuthenticator());
         }
       }
@@ -209,7 +207,7 @@ public class WebServiceAction extends HTTPAction {
       // The soapActionUri is set here. otherwise we get an error on .net based services.
       if (pIsDotNet.get()) {
         final String soapActionUri = new StringBuilder(wsTargetNamespace).append("/").append(wsOperationName).toString();
-        dispatch.getRequestContext().put(BindingProvider.SOAPACTION_USE_PROPERTY, new Boolean(true));
+        dispatch.getRequestContext().put(BindingProvider.SOAPACTION_USE_PROPERTY, Boolean.TRUE);
         dispatch.getRequestContext().put(BindingProvider.SOAPACTION_URI_PROPERTY, soapActionUri);
       }
       // add SOAP message
@@ -392,7 +390,7 @@ public class WebServiceAction extends HTTPAction {
           if ((in != null) && (message != null) && (parts != null) && !parts.isEmpty()) {
             for (final Part part : parts) {
               final Element e1 = part.getElement();
-              final groovy.xml.QName qName = (e1 != null) ? e1.getQname() : null;
+              final QName qName = (e1 != null) ? e1.getQname() : null;
               if ((e1 != null) && (qName != null)) {
                 e = defs.getElement(qName);
                 if (e != null) {
@@ -406,7 +404,7 @@ public class WebServiceAction extends HTTPAction {
                 if ((part.getType() != null) && (part.getType().getQname() != null) && (part.getType().getQname().getLocalPart() != null) && !part.getType().getQname().getLocalPart().equals("complexType")) {
                   final String name = (part != null) ? part.getName() : null;
                   final TypeDefinition type = (part != null) ? part.getType() : null;
-                  final groovy.xml.QName qn = (type != null) ? type.getQname() : null;
+                  final QName qn = (type != null) ? type.getQname() : null;
                   final String s = (qn != null) ? qn.getLocalPart() : null;
                   if ((name != null) && !part.getName().isEmpty() && (type != null) && (qn != null) && (s != null) && !s.isEmpty()) {
                     final WSElement wsElement = new WSElement(name, qn);

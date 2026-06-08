@@ -1,6 +1,6 @@
 /**
  *
- * Copyright (C) 1999-2021 Enrico Croce - AGPL >= 3.0
+ * Copyright (C) 1999-2026 Enrico Croce - AGPL >= 3.0
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the
  * GNU Affero General Public License as published by the Free Software Foundation, either version 3
@@ -14,29 +14,13 @@
  * If not, see <http://www.gnu.org/licenses/>.
  *
  **/
-package net.eiroca.library.diagnostics.actions;
+package net.eiroca.library.config.parameter;
 
-import com.predic8.schema.Element;
-import groovy.namespace.QName;
+import java.nio.file.Path;
 
-public class WSElement extends Element {
+@FunctionalInterface
+public interface LocalPathGetter {
 
-  String name;
-  QName qName;
-
-  public WSElement(final String name, final QName qName) {
-    this.name = name;
-    this.qName = qName;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public QName getType() {
-    return qName;
-  }
+  Path getPath();
 
 }

@@ -19,7 +19,6 @@ package net.eiroca.library.server;
 public class ServerResponse {
 
   public int status;
-
   public String message;
 
   public ServerResponse(final int status) {
@@ -45,10 +44,6 @@ public class ServerResponse {
 
   public void setMessage(String message) {
     this.message = message;
-  }
-
-  public Object getPayload() {
-    return null;
   }
 
 }

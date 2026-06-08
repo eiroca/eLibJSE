@@ -41,8 +41,4 @@ public class ResultResponse<T> extends ServerResponse {
     this.result = result;
   }
 
-  public Object getPayload() {
-    return result;
-  }
-
 }
