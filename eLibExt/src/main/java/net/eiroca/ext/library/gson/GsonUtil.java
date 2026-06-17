@@ -16,6 +16,7 @@
  **/
 package net.eiroca.ext.library.gson;
 
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,9 +32,16 @@ import net.eiroca.library.core.LibStr;
 
 public class GsonUtil {
 
+  private static final Gson gson;
+  static {
+    gson = new GsonBuilder()
+        .registerTypeHierarchyAdapter(Path.class, new GsonPathTypeAdapter())
+        .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX")
+        .create();
+  }
+
   final public static String toJSON(final Object obj) {
-    final Gson g = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX").create();
-    return g.toJson(obj);
+    return gson.toJson(obj);
   }
 
   final public static void compatta(final JsonObject o, final String key) {

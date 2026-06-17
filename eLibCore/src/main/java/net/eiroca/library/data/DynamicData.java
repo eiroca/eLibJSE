@@ -101,6 +101,10 @@ public class DynamicData {
     }
   }
 
+  public <T> T get(final String key) {
+    return get(key, null);
+  }
+
   @SuppressWarnings("unchecked")
   public <T> T get(final String key, final T def) {
     boolean isExt = true;

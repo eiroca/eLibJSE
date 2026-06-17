@@ -22,7 +22,7 @@ import net.eiroca.library.system.Context;
 
 public class ServerContext extends Context {
 
-  private ICredentialProvider provider = null;
+  private transient ICredentialProvider provider = null;
 
   public ServerContext(final String name, final Properties properties) {
     super(name, properties);

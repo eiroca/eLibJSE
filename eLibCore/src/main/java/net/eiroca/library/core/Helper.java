@@ -70,6 +70,8 @@ final public class Helper {
 
   private static final double MILLIS = 0.000001;
 
+  private static long count_id = -1;
+
   final public static void close(final AutoCloseable... resources) {
     for (final AutoCloseable res : resources) {
       if (res != null) {
@@ -110,7 +112,7 @@ final public class Helper {
 
   final public static String writeList(final List<? extends Object> objects, final String prefix, final String suffix) {
     final StringBuilder buf = new StringBuilder();
-    writeList(buf, objects, prefix, suffix);
+    Helper.writeList(buf, objects, prefix, suffix);
     return buf.toString();
   }
 
@@ -208,7 +210,7 @@ final public class Helper {
         result = dateFormat.parse(val);
       }
     }
-    catch (final ParseException|NumberFormatException e) {
+    catch (final ParseException | NumberFormatException e) {
     }
     return result;
   }
@@ -267,46 +269,46 @@ final public class Helper {
     return path;
   }
 
-  public static Properties mergeProperties(Properties main, Properties[] defs, String[] paths) {
-    Properties merged = new Properties();
+  public static Properties mergeProperties(final Properties main, final Properties[] defs, final String[] paths) {
+    final Properties merged = new Properties();
     if (defs != null) {
-      for (Properties p : defs) {
-        copyProperties(p, merged);
+      for (final Properties p : defs) {
+        Helper.copyProperties(p, merged);
       }
     }
     if (paths != null) {
-      for (String s : paths) {
+      for (final String s : paths) {
         try {
-          Properties p = loadProperties(s, false);
-          copyProperties(p, merged);
+          final Properties p = Helper.loadProperties(s, false);
+          Helper.copyProperties(p, merged);
         }
-        catch (IOException e) {
+        catch (final IOException e) {
         }
       }
     }
-    copyProperties(main, merged);
+    Helper.copyProperties(main, merged);
     return merged;
   }
 
-  private static void copyProperties(Properties source, Properties dest) {
-    for (Entry<Object, Object> e : source.entrySet()) {
+  private static void copyProperties(final Properties source, final Properties dest) {
+    for (final Entry<Object, Object> e : source.entrySet()) {
       dest.put(e.getKey(), e.getValue());
     }
   }
 
   public static Properties buildProperties(final String propertiesStr) {
-    InputStream is = new ByteArrayInputStream(propertiesStr.getBytes(StandardCharsets.UTF_8));
+    final InputStream is = new ByteArrayInputStream(propertiesStr.getBytes(StandardCharsets.UTF_8));
     Properties p = null;
     try {
-      p = loadProperties(is, false);
+      p = Helper.loadProperties(is, false);
     }
-    catch (IOException e) {
+    catch (final IOException e) {
     }
     return p;
   }
 
   public static Properties loadProperties(final String propertiesFile, final boolean sorted) throws IOException {
-    InputStream inputStream = new FileInputStream(propertiesFile);
+    final InputStream inputStream = new FileInputStream(propertiesFile);
     return Helper.loadProperties(inputStream, sorted);
   }
 
@@ -456,10 +458,27 @@ final public class Helper {
       try {
         host = InetAddress.getLocalHost().getHostName();
       }
-      catch (UnknownHostException e) {
+      catch (final UnknownHostException e) {
       }
     }
     return host;
+  }
+
+  public synchronized static long getNextCountID() {
+    Helper.count_id = (Helper.count_id + 1) & 0x7FFF_FFFF_FFFF_FFFFL;
+    return Helper.count_id;
+  }
+
+  public static Properties getSubConfig(final Properties config, final String prefix) {
+    final Properties exporterConfig = new Properties();
+    final int len = prefix.length();
+    for (final String propName : config.stringPropertyNames()) {
+      if (propName.startsWith(prefix)) {
+        final String val = config.getProperty(propName);
+        exporterConfig.setProperty(propName.substring(len), val);
+      }
+    }
+    return exporterConfig;
   }
 
 }

@@ -42,11 +42,11 @@ public class Context implements IContext {
   };
 
   protected String name;
-  protected Logger logger;
-  protected int bonusLevel = 0;
+  protected transient Logger logger;
+  protected transient int bonusLevel = 0;
 
-  protected Map<String, String> config = new HashMap<>();
-  protected Map<String, Object> attributes = new HashMap<>();
+  protected transient Map<String, String> config = new HashMap<>();
+  protected transient Map<String, Object> attributes = new HashMap<>();
 
   public static Context current() {
     return Context.currentContext.get();

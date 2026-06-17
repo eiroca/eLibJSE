@@ -18,9 +18,9 @@ package net.eiroca.library.sysadm.monitoring.api;
 
 import net.eiroca.library.system.IContext;
 
-public interface IContextEnabled {
+public interface IContextEnabled<C extends IContext> {
 
-  public void setup(final IContext context) throws Exception;
+  public void setup(final C context) throws Exception;
 
   public void teardown() throws Exception;
 
